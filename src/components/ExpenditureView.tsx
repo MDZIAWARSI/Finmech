@@ -35,7 +35,8 @@ export function ExpenditureView({
 }: ExpenditureViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [viewMode, setViewMode] = useState<'chart' | 'trend'>('chart');
+  // Default to Weekly Curve as requested
+  const [viewMode, setViewMode] = useState<'chart' | 'trend'>('trend');
 
   // Filter only expense transactions
   const expenseTransactions = useMemo(() => {
@@ -246,21 +247,11 @@ export function ExpenditureView({
         </div>
       </section>
 
-      {/* Interactive Pie Chart & Trend Graph for Selected Month */}
+      {/* Interactive Trend Graph (Default) & Pie Chart for Selected Month */}
       {monthCategoryBreakdown.length > 0 && (
         <section aria-label="Visual month charts" className="pt-2">
           <div className="flex items-center justify-between pb-3">
             <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#141417] p-1 rounded-full text-xs font-medium">
-              <button
-                onClick={() => setViewMode('chart')}
-                className={`px-3 py-1 rounded-full transition-all ${
-                  viewMode === 'chart'
-                    ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white font-semibold shadow-xs'
-                    : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
-                }`}
-              >
-                Category Pie
-              </button>
               <button
                 onClick={() => setViewMode('trend')}
                 className={`px-3 py-1 rounded-full transition-all ${
@@ -271,25 +262,37 @@ export function ExpenditureView({
               >
                 Weekly Curve
               </button>
+              <button
+                onClick={() => setViewMode('chart')}
+                className={`px-3 py-1 rounded-full transition-all ${
+                  viewMode === 'chart'
+                    ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white font-semibold shadow-xs'
+                    : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
+                }`}
+              >
+                Category Pie
+              </button>
             </div>
 
             <span className="text-xs text-neutral-400 font-medium">
-              {monthCategoryBreakdown.length} Categories in {activeMonthLabel}
+              {viewMode === 'trend'
+                ? `${activeMonthLabel} Velocity`
+                : `${monthCategoryBreakdown.length} Categories in ${activeMonthLabel}`}
             </span>
           </div>
 
-          {viewMode === 'chart' ? (
+          {viewMode === 'trend' ? (
+            <SpendingTrendGraph
+              data={trendData}
+              currency={currency}
+              title={`${activeMonthLabel} Outflow Trajectory`}
+            />
+          ) : (
             <SpendingPieChart
               slices={monthCategoryBreakdown}
               totalAmount={activeMonthTotal}
               currency={currency}
               onSelectCategory={(cat) => setSelectedCategory(cat)}
-            />
-          ) : (
-            <SpendingTrendGraph
-              data={trendData}
-              currency={currency}
-              title={`${activeMonthLabel} Outflow Trajectory`}
             />
           )}
         </section>

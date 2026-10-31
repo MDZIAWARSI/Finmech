@@ -91,17 +91,17 @@ export function Navbar({
   // Dynamic wing widths: locks center + at 50vw and keeps left/right wings harmoniously balanced
   const leftWingWidth =
     currentTab === 'dashboard'
-      ? 160
+      ? 140
       : currentTab === 'spends'
-      ? 146
-      : 88;
+      ? 130
+      : 84;
 
   const rightWingWidth =
     currentTab === 'business'
-      ? 158
+      ? 140
       : currentTab === 'cash'
-      ? 134
-      : 88;
+      ? 120
+      : 84;
 
   return (
     <>
@@ -160,7 +160,7 @@ export function Navbar({
           <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
-              className="w-9 h-9 rounded-full bg-white dark:bg-[#141417] border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-center text-neutral-700 dark:text-neutral-200 hover:border-neutral-400 dark:hover:border-neutral-600 transition-all shadow-xs"
+              className="w-10 h-10 rounded-full bg-white dark:bg-[#141417] border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-center text-neutral-700 dark:text-neutral-200 hover:border-neutral-400 dark:hover:border-neutral-600 active:scale-95 transition-all shadow-xs touch-manipulation cursor-pointer"
               aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {theme === 'dark' ? (
@@ -236,14 +236,14 @@ export function Navbar({
       */}
       <nav
         aria-label="Bottom navigation dock"
-        className="fixed bottom-6 left-1/2 z-40 pointer-events-none"
+        className="fixed bottom-8 sm:bottom-10 left-1/2 z-40 pointer-events-none pb-[env(safe-area-inset-bottom)]"
       >
         <div className="relative pointer-events-none">
           {/* Background Pill: Expands left and right with balanced spring physics while keeping center + strictly anchored */}
           <motion.div
             animate={{
-              left: -(leftWingWidth + 48),
-              right: -(rightWingWidth + 48),
+              left: -(leftWingWidth + 44),
+              right: -(rightWingWidth + 44),
             }}
             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
             className="absolute top-0 -translate-y-1/2 h-14 bg-white/95 dark:bg-[#121215]/95 backdrop-blur-2xl border border-neutral-200/80 dark:border-neutral-800 shadow-[0_16px_40px_rgba(0,0,0,0.14)] dark:shadow-[0_20px_48px_rgba(0,0,0,0.7)] rounded-full pointer-events-none z-0"
@@ -253,7 +253,7 @@ export function Navbar({
           <motion.div
             animate={{ width: leftWingWidth }}
             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-            className="absolute right-[32px] top-0 -translate-y-1/2 flex items-center justify-end gap-2 pointer-events-auto z-10"
+            className="absolute right-[30px] top-0 -translate-y-1/2 flex items-center justify-end gap-1.5 pointer-events-auto z-10"
           >
             {leftTabs.map((item) => {
               const Icon = item.icon;
@@ -262,7 +262,7 @@ export function Navbar({
                 <button
                   key={item.id}
                   onClick={() => onTabChange(item.id)}
-                  className={`relative h-10 rounded-full flex items-center justify-center gap-2 text-xs transition-colors group focus:outline-none shrink-0 ${
+                  className={`relative h-10 rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
                     isActive ? 'px-3.5' : 'w-10'
                   }`}
                   aria-label={item.label}
@@ -314,7 +314,7 @@ export function Navbar({
           <motion.div
             animate={{ width: rightWingWidth }}
             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-            className="absolute left-[32px] top-0 -translate-y-1/2 flex items-center justify-start gap-2 pointer-events-auto z-10"
+            className="absolute left-[30px] top-0 -translate-y-1/2 flex items-center justify-start gap-1.5 pointer-events-auto z-10"
           >
             {rightTabs.map((item) => {
               const Icon = item.icon;
@@ -323,7 +323,7 @@ export function Navbar({
                 <button
                   key={item.id}
                   onClick={() => onTabChange(item.id)}
-                  className={`relative h-10 rounded-full flex items-center justify-center gap-2 text-xs transition-colors group focus:outline-none shrink-0 ${
+                  className={`relative h-10 rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
                     isActive ? 'px-3.5' : 'w-10'
                   }`}
                   aria-label={item.label}

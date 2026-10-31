@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
 
 @layer base {
   :root {
@@ -10,7 +10,7 @@
     --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
-  .dark {
+  .dark, [data-theme="dark"] {
     --background: #09090b;
     --foreground: #fcfcfc;
   }

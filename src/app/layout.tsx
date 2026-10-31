@@ -47,10 +47,16 @@ export default function RootLayout({
             __html: `
               try {
                 var stored = localStorage.getItem('finmech_theme');
-                if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                  document.documentElement.classList.add('dark');
+                var isDark = stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                var root = document.documentElement;
+                if (isDark) {
+                  root.classList.add('dark');
+                  root.setAttribute('data-theme', 'dark');
+                  root.style.colorScheme = 'dark';
                 } else {
-                  document.documentElement.classList.remove('dark');
+                  root.classList.remove('dark');
+                  root.setAttribute('data-theme', 'light');
+                  root.style.colorScheme = 'light';
                 }
               } catch (e) {}
             `,

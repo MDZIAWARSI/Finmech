@@ -81,7 +81,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         uid: 'local_user_zia',
         displayName: 'Zia',
         email: 'mdziawarsi14@gmail.com',
-        photoURL: '/avatar.jpg',
       };
       setUser(localUser);
       localStorage.setItem('finmech_local_user', JSON.stringify(localUser));
@@ -96,7 +95,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         uid: 'local_user_' + Date.now(),
         displayName: email.split('@')[0],
         email: email,
-        photoURL: '/avatar.jpg',
       };
       setUser(localUser);
       localStorage.setItem('finmech_local_user', JSON.stringify(localUser));
@@ -118,7 +116,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         uid: 'local_user_' + Date.now(),
         displayName: name || email.split('@')[0],
         email: email,
-        photoURL: '/avatar.jpg',
       };
       setUser(localUser);
       localStorage.setItem('finmech_local_user', JSON.stringify(localUser));

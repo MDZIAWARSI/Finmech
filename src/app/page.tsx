@@ -263,7 +263,7 @@ export default function Home() {
         onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         userName={user ? (user.displayName || user.email?.split('@')[0]) : undefined}
-        userPhoto={user ? (user.photoURL || '/avatar.jpg') : null}
+        userPhoto={user?.photoURL && !user.photoURL.includes('Icon.png') && user.photoURL !== '/avatar.jpg' ? user.photoURL : (profile.photoURL && !profile.photoURL.includes('Icon.png') && profile.photoURL !== '/avatar.jpg' ? profile.photoURL : null)}
         userEmail={user ? user.email : null}
       />
 

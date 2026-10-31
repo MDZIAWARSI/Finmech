@@ -13,7 +13,6 @@ export const DEFAULT_PROFILE: UserProfile = {
   currency: '₹',
   monthlySavingsTarget: 15000,
   monthlyBudget: 35000,
-  photoURL: '/avatar.jpg',
 };
 
 export const DEFAULT_DENOMINATIONS: CashDenominationCount = {

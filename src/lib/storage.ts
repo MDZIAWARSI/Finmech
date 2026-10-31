@@ -190,3 +190,4 @@ export function exportFinancialDataJson(transactions: Transaction[], profile: Us
   };
   return JSON.stringify(payload, null, 2);
 }
+

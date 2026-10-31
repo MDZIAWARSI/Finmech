@@ -211,6 +211,7 @@ export default function Home() {
         onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
         onOpenTargetModal={() => setIsTargetModalOpen(true)}
         userName={profile.name}
+        savingsPercentage={summary.savingsGoal.percentage}
       />
 
       {/* Main Container - Mobile First with Desktop Max Width */}

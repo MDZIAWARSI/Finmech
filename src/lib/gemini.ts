@@ -206,3 +206,4 @@ Answer concisely (max 3-4 sentences), with extreme tactical precision, numerical
 
   return `Currently, your total net worth is ${currency}${summary.totalNetWorth.toLocaleString()} with ${currency}${summary.cashInHand.toLocaleString()} in cash, ${currency}${summary.bankBalance.toLocaleString()} in bank, and ${currency}${summary.businessBalance.toLocaleString()} in live business funds. You are ${summary.savingsGoal.percentage}% toward your savings goal. Ask me how to cut specific categories or hit your savings target faster!`;
 }
+

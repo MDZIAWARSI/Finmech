@@ -31,7 +31,7 @@ export function AiCopilotView({
     {
       id: 'msg_init',
       role: 'assistant',
-      content: `Hello Zia! I am your Finmech AI copilot. Your net worth is ${currency}${summary.totalNetWorth.toLocaleString('en-IN')}, and you are ${summary.savingsGoal.percentage}% toward your ${currency}${summary.savingsGoal.targetAmount.toLocaleString()} savings target. Ask me how to hit your goal or optimize spending.`,
+      content: `Hello! I am your Finmech AI copilot. Your net worth is ${currency}${summary.totalNetWorth.toLocaleString('en-IN')}, and you are ${summary.savingsGoal.percentage}% toward your ${currency}${summary.savingsGoal.targetAmount.toLocaleString()} savings target. Ask me how to hit your goal or optimize spending.`,
       timestamp: 'Just now',
     },
   ]);

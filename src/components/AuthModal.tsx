@@ -192,7 +192,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    placeholder="Zia"
+                    placeholder="Your Name"
                     className="w-full px-3 py-2 bg-neutral-50 dark:bg-[#1a1a1f] border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
                   />
                 </div>
@@ -207,7 +207,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="zia@example.com"
+                  placeholder="you@example.com"
                   className="w-full px-3 py-2 bg-neutral-50 dark:bg-[#1a1a1f] border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
                 />
               </div>

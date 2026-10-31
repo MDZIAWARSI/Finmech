@@ -78,9 +78,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       // Offline/Local user fallback
       const localUser: any = {
-        uid: 'local_user_zia',
-        displayName: 'Zia',
-        email: 'mdziawarsi14@gmail.com',
+        uid: 'local_user_' + Date.now(),
+        displayName: 'User',
+        email: 'user@example.com',
       };
       setUser(localUser);
       localStorage.setItem('finmech_local_user', JSON.stringify(localUser));

@@ -1,0 +1,22 @@
+{
+  "name": "Finmech — Minimal Wealth, Spends & Business Tracker",
+  "short_name": "Finmech",
+  "description": "Ultra-minimal expenditure tracker, cash in hand count, live business funds, and AI savings target advisor.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/Icon.png",
+      "sizes": "400x400",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

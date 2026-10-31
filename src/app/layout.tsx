@@ -21,6 +21,23 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: 'finmech — Minimal Wealth, Spends & Business Tracker',
   description: 'Ultra-minimal expenditure tracker, cash in hand count, live business funds, and AI savings target advisor.',
+  icons: {
+    icon: [
+      { url: '/Icon.png', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/Icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: ['/Icon.png'],
+  },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Finmech',
+  },
 };
 
 export const viewport: Viewport = {

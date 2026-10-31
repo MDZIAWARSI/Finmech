@@ -177,7 +177,7 @@ export function EditTransactionModal({
               </button>
             </div>
             {pocket !== transaction.pocket && (
-              <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium mt-1.5 flex items-center gap-1">
+              <p className="text-[11px] text-neutral-700 dark:text-neutral-300 font-medium mt-1.5 flex items-center gap-1">
                 <ArrowRightLeft className="w-3 h-3" />
                 Will move {currency}{amount || transaction.amount} from {transaction.pocket} to {pocket}
               </p>

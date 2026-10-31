@@ -258,3 +258,4 @@ export function SignInGate({ onContinueAsGuest }: SignInGateProps) {
     </div>
   );
 }
+

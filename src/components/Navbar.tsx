@@ -9,7 +9,7 @@ import {
   Plus, 
   Banknote, 
   Briefcase, 
-  Bot, 
+  Sparkles, 
   Sun, 
   Moon,
   PieChart as PieIcon,
@@ -189,8 +189,8 @@ export function Navbar({
             onClick={handleAiClick}
             className={`relative flex items-center justify-center transition-all border focus:outline-none ${
               isAiExpanded
-                ? 'h-11 px-4 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-indigo-400/50 shadow-[0_10px_28px_rgba(99,102,241,0.35)] gap-2'
-                : 'w-11 h-11 rounded-full bg-white dark:bg-[#121215] text-neutral-900 dark:text-white border-neutral-200/90 dark:border-neutral-800 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-[0_8px_24px_rgba(99,102,241,0.18)] dark:shadow-[0_8px_24px_rgba(99,102,241,0.22)]'
+                ? 'h-11 px-4 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 border-neutral-800 dark:border-neutral-200 shadow-lg shadow-black/15 dark:shadow-white/10 gap-2'
+                : 'w-11 h-11 rounded-full bg-white dark:bg-[#121215] text-neutral-800 dark:text-neutral-200 border-neutral-200/90 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-600 shadow-[0_4px_16px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
             }`}
             aria-label={
               isAiExpanded
@@ -203,7 +203,7 @@ export function Navbar({
                 : 'Finmech AI'
             }
           >
-            <Bot className={`w-4 h-4 shrink-0 ${isAiExpanded ? 'text-white' : 'text-indigo-500 dark:text-indigo-400'}`} />
+            <Sparkles className={`w-4 h-4 shrink-0 ${isAiExpanded ? 'text-white dark:text-neutral-950' : 'text-neutral-700 dark:text-neutral-300'}`} />
             <AnimatePresence>
               {isAiExpanded && (
                 <motion.div
@@ -214,7 +214,7 @@ export function Navbar({
                   className="flex items-center gap-1 overflow-hidden whitespace-nowrap select-none"
                 >
                   <span className="text-xs font-bold tracking-tight">Finmech AI</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-indigo-200 ml-0.5" />
+                  <ArrowRight className="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 ml-0.5" />
                 </motion.div>
               )}
             </AnimatePresence>

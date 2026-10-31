@@ -1,22 +1,22 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  User, 
-  onAuthStateChanged, 
-  signInWithPopup, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
+import {
+  User,
+  onAuthStateChanged,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   updateProfile,
-  signOut 
+  signOut
 } from 'firebase/auth';
-import { 
-  doc, 
-  setDoc, 
-  getDoc, 
-  collection, 
-  onSnapshot, 
-  writeBatch 
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  onSnapshot,
+  writeBatch
 } from 'firebase/firestore';
 import { auth, db, googleProvider, isFirebaseConfigured } from '@/lib/firebase';
 import { Transaction, UserProfile, CashDenominationCount } from '@/types/finance';
@@ -41,11 +41,11 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   isConfigured: false,
-  signInWithGoogle: async () => {},
-  signInWithEmail: async () => {},
-  signUpWithEmail: async () => {},
-  signOutUser: async () => {},
-  syncWithCloud: async () => {},
+  signInWithGoogle: async () => { },
+  signInWithEmail: async () => { },
+  signUpWithEmail: async () => { },
+  signOutUser: async () => { },
+  syncWithCloud: async () => { },
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (saved) {
         setUser(JSON.parse(saved));
       }
-    } catch {}
+    } catch { }
 
     if (!isFirebaseConfigured || !auth) {
       setLoading(false);
@@ -174,7 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (name) {
           try {
             await updateProfile(cred.user, { displayName: name });
-          } catch {}
+          } catch { }
         }
         if (db) {
           await setDoc(doc(db, 'users', cred.user.uid), {
@@ -202,7 +202,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (auth) {
       try {
         await signOut(auth);
-      } catch {}
+      } catch { }
     }
     setUser(null);
     localStorage.removeItem('finmech_local_user');

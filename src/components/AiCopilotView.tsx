@@ -7,7 +7,7 @@ import {
   Send, 
   RefreshCw, 
   Key, 
-  Bot,
+  Sparkles,
   X
 } from 'lucide-react';
 import { FinancialSummary, AiReport, ChatMessage } from '@/types/finance';
@@ -130,8 +130,8 @@ export function AiCopilotView({
       <section aria-label="AI Copilot overview" className="pt-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-indigo-500/10 dark:bg-indigo-400/10 border border-indigo-500/20 flex items-center justify-center shrink-0">
-              <Bot className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
+            <div className="w-6 h-6 rounded-lg bg-neutral-200/80 dark:bg-neutral-800 border border-neutral-300/80 dark:border-neutral-700/80 flex items-center justify-center shrink-0">
+              <Sparkles className="w-3.5 h-3.5 text-neutral-800 dark:text-neutral-200" />
             </div>
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
               Finmech Intelligence
@@ -275,7 +275,7 @@ export function AiCopilotView({
       <section aria-label="AI financial chat" className="space-y-4 pt-2">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
-            <Bot className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
+            <Sparkles className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
             Financial Copilot Chat
           </h2>
           <span className="text-[11px] text-neutral-400">Live intelligence</span>
@@ -287,7 +287,7 @@ export function AiCopilotView({
             <button
               key={prompt}
               onClick={() => handleSendMessage(prompt)}
-              className="px-3 py-1.5 rounded-full text-xs font-medium bg-neutral-100 dark:bg-[#141417] hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 text-neutral-700 dark:text-neutral-300 whitespace-nowrap transition-colors border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800/50"
+              className="px-3 py-1.5 rounded-full text-xs font-medium bg-neutral-100 dark:bg-[#141417] hover:bg-neutral-200/80 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 whitespace-nowrap transition-colors border border-neutral-200/60 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 shadow-xs"
             >
               {prompt}
             </button>
@@ -321,7 +321,7 @@ export function AiCopilotView({
 
           {sendingChat && (
             <div className="flex items-center gap-1.5 text-xs text-neutral-400 px-2">
-              <Bot className="w-3.5 h-3.5 animate-pulse text-indigo-500 dark:text-indigo-400" />
+              <Sparkles className="w-3.5 h-3.5 animate-pulse text-neutral-500 dark:text-neutral-400" />
               <span>Finmech Copilot is computing recommendations...</span>
             </div>
           )}
@@ -341,12 +341,12 @@ export function AiCopilotView({
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             disabled={sendingChat}
-            className="w-full pl-4 pr-12 py-3 bg-neutral-100/70 dark:bg-[#141417] rounded-2xl text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
+            className="w-full pl-4 pr-12 py-3 bg-neutral-100/70 dark:bg-[#141417] rounded-2xl text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-900 dark:focus:ring-white transition-all border border-neutral-200/60 dark:border-neutral-800"
           />
           <button
             type="submit"
             disabled={!chatInput.trim() || sendingChat}
-            className="absolute right-2 top-1/2 -translate-y-1/2 mt-1 w-8 h-8 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-800 disabled:opacity-40 flex items-center justify-center shadow-xs transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 mt-1 w-8 h-8 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:opacity-90 disabled:bg-neutral-200 dark:disabled:bg-neutral-800 disabled:text-neutral-400 disabled:opacity-40 flex items-center justify-center shadow-xs transition-colors"
             aria-label="Send query"
           >
             <Send className="w-3.5 h-3.5" />

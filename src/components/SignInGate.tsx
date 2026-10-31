@@ -34,7 +34,9 @@ export function SignInGate({ onContinueAsGuest }: SignInGateProps) {
     try {
       await signInWithGoogle();
     } catch (err: any) {
-      if (err.code === 'auth/unauthorized-domain') {
+      if (err.code === 'auth/operation-not-allowed') {
+        setErrorMsg('Google Sign-In is not enabled yet in Firebase. In Firebase Console -> Authentication -> Sign-in method, toggle Google to Enable, select your support email, and click Save.');
+      } else if (err.code === 'auth/unauthorized-domain') {
         setErrorMsg('Domain not authorized in Firebase Console. Add your Vercel URL in Firebase Console -> Authentication -> Settings -> Authorized Domains.');
       } else if (err.code === 'auth/popup-blocked') {
         setErrorMsg('Sign-in popup was blocked by your browser. Please allow popups for this site and retry.');

@@ -88,16 +88,44 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         {/* Logged in state */}
         {user ? (
-          <div className="py-6 space-y-4">
-            <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-[#18181b] border border-neutral-200/80 dark:border-neutral-800 space-y-2">
+          <div className="py-4 space-y-4">
+            {/* User Profile Card */}
+            <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-neutral-50 dark:bg-[#18181b] border border-neutral-200/80 dark:border-neutral-800">
+              {user.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName || 'Google Account'}
+                  referrerPolicy="no-referrer"
+                  className="w-12 h-12 rounded-full object-cover border border-neutral-200 dark:border-neutral-700 shadow-xs shrink-0"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center text-base font-extrabold shadow-xs shrink-0">
+                  {(user.displayName || user.email || 'U').charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-bold text-neutral-900 dark:text-white truncate">
+                  {user.displayName || user.email?.split('@')[0]}
+                </div>
+                <div className="text-xs text-neutral-400 truncate mt-0.5">
+                  {user.email}
+                </div>
+                <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Google Cloud Connected
+                </div>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-[#18181b] border border-neutral-200/80 dark:border-neutral-800 space-y-1">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
                 <span className="text-xs font-bold text-neutral-900 dark:text-white">
-                  Cloud Firestore Real-Time Sync Active
+                  Multi-Device Cloud Sync Active
                 </span>
               </div>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                Your expenditures, physical cash audits, and live business balances are encrypted and synced to your cloud account.
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                Your expenditures, physical wallet counts, and live business balances are continuously encrypted and synchronized.
               </p>
             </div>
 
@@ -106,7 +134,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 await signOutUser();
                 onClose();
               }}
-              className="w-full py-3 px-4 rounded-xl font-semibold text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
+              className="w-full py-3 px-4 rounded-xl font-bold text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors shadow-xs"
             >
               Sign Out
             </button>

@@ -7,6 +7,7 @@ import {
   signInWithPopup, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
+  updateProfile,
   signOut 
 } from 'firebase/auth';
 import { 
@@ -52,20 +53,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    // Check initial local cached user session
+    try {
+      const saved = localStorage.getItem('finmech_local_user');
+      if (saved) {
+        setUser(JSON.parse(saved));
+      }
+    } catch {}
+
     if (!isFirebaseConfigured || !auth) {
-      // Check if user had signed in via local session
-      try {
-        const saved = localStorage.getItem('finmech_local_user');
-        if (saved) {
-          setUser(JSON.parse(saved));
-        }
-      } catch {}
       setLoading(false);
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        try {
+          const storedUser = {
+            uid: currentUser.uid,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
+            email: currentUser.email,
+          };
+          localStorage.setItem('finmech_local_user', JSON.stringify(storedUser));
+          if (db) {
+            await setDoc(doc(db, 'users', currentUser.uid), {
+              name: currentUser.displayName,
+              email: currentUser.email,
+              photoURL: currentUser.photoURL,
+              profile: {
+                name: currentUser.displayName,
+                photoURL: currentUser.photoURL,
+              },
+              updatedAt: Date.now(),
+            }, { merge: true });
+          }
+        } catch (e) {
+          console.warn('Could not sync auth profile to firestore:', e);
+        }
+      } else {
+        try {
+          const saved = localStorage.getItem('finmech_local_user');
+          if (saved) {
+            setUser(JSON.parse(saved));
+          } else {
+            setUser(null);
+          }
+        } catch {
+          setUser(null);
+        }
+      }
       setLoading(false);
     });
 
@@ -74,7 +112,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     if (auth && googleProvider) {
-      await signInWithPopup(auth, googleProvider);
+      const res = await signInWithPopup(auth, googleProvider);
+      if (res.user) {
+        setUser(res.user);
+        try {
+          const storedUser = {
+            uid: res.user.uid,
+            displayName: res.user.displayName,
+            photoURL: res.user.photoURL,
+            email: res.user.email,
+          };
+          localStorage.setItem('finmech_local_user', JSON.stringify(storedUser));
+          if (db) {
+            await setDoc(doc(db, 'users', res.user.uid), {
+              name: res.user.displayName,
+              email: res.user.email,
+              photoURL: res.user.photoURL,
+              profile: {
+                name: res.user.displayName,
+                photoURL: res.user.photoURL,
+              },
+              updatedAt: Date.now(),
+            }, { merge: true });
+          }
+        } catch (e) {
+          console.warn('Could not save google profile:', e);
+        }
+      }
     } else {
       // Offline/Local user fallback
       const localUser: any = {
@@ -104,12 +168,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUpWithEmail = async (email: string, pass: string, name: string) => {
     if (auth) {
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
-      if (db && cred.user) {
-        await setDoc(doc(db, 'users', cred.user.uid), {
-          name,
-          email,
-          createdAt: Date.now(),
-        }, { merge: true });
+      if (cred.user) {
+        if (name) {
+          try {
+            await updateProfile(cred.user, { displayName: name });
+          } catch {}
+        }
+        if (db) {
+          await setDoc(doc(db, 'users', cred.user.uid), {
+            name: name || cred.user.displayName,
+            email,
+            profile: {
+              name: name || cred.user.displayName,
+            },
+            createdAt: Date.now(),
+          }, { merge: true });
+        }
       }
     } else {
       const localUser: any = {

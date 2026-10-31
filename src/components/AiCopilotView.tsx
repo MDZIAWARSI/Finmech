@@ -16,6 +16,7 @@ import { generateFinancialDiagnosis, askAiCopilot } from '@/lib/gemini';
 interface AiCopilotViewProps {
   summary: FinancialSummary;
   currency?: string;
+  userName?: string;
   onOpenTargetModal: () => void;
   onClose?: () => void;
 }
@@ -23,23 +24,47 @@ interface AiCopilotViewProps {
 export function AiCopilotView({
   summary,
   currency = '₹',
+  userName,
   onOpenTargetModal,
   onClose,
 }: AiCopilotViewProps) {
   const [report, setReport] = useState<AiReport | null>(null);
   const [loadingReport, setLoadingReport] = useState(false);
   const [chatInput, setChatInput] = useState('');
+  
+  const firstName = userName ? userName.split(' ')[0] : '';
+  const initialGreeting = firstName ? `Hello ${firstName}!` : 'Hello!';
+
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
       id: 'msg_init',
       role: 'assistant',
-      content: `Hello! I am your Finmech AI copilot. Your net worth is ${currency}${summary.totalNetWorth.toLocaleString('en-IN')}, and you are ${summary.savingsGoal.percentage}% toward your ${currency}${summary.savingsGoal.targetAmount.toLocaleString()} savings target. Ask me how to hit your goal or optimize spending.`,
+      content: `${initialGreeting} I am your Finmech AI copilot. Your net worth is ${currency}${summary.totalNetWorth.toLocaleString('en-IN')}, and you are ${summary.savingsGoal.percentage}% toward your ${currency}${summary.savingsGoal.targetAmount.toLocaleString()} savings target. Ask me how to hit your goal or optimize spending.`,
       timestamp: 'Just now',
     },
   ]);
   const [sendingChat, setSendingChat] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [showKeyInput, setShowKeyInput] = useState(false);
+
+  // Dynamically update greeting when user signs in
+  useEffect(() => {
+    if (userName) {
+      const first = userName.split(' ')[0];
+      setChatMessages((prev) => {
+        if (prev.length > 0 && prev[0].id === 'msg_init') {
+          return [
+            {
+              ...prev[0],
+              content: `Hello ${first}! I am your Finmech AI copilot. Your net worth is ${currency}${summary.totalNetWorth.toLocaleString('en-IN')}, and you are ${summary.savingsGoal.percentage}% toward your ${currency}${summary.savingsGoal.targetAmount.toLocaleString()} savings target. Ask me how to hit your goal or optimize spending.`,
+            },
+            ...prev.slice(1),
+          ];
+        }
+        return prev;
+      });
+    }
+  }, [userName, currency, summary.totalNetWorth, summary.savingsGoal.percentage, summary.savingsGoal.targetAmount]);
 
   useEffect(() => {
     const storedKey = localStorage.getItem('finmech_gemini_key') || '';
@@ -79,7 +104,7 @@ export function AiCopilotView({
     setSendingChat(true);
 
     try {
-      const response = await askAiCopilot(text, summary, currency, chatMessages, apiKey);
+      const response = await askAiCopilot(text, summary, currency, chatMessages, apiKey, userName);
       const aiMsg: ChatMessage = {
         id: `ai_${Date.now()}`,
         role: 'assistant',

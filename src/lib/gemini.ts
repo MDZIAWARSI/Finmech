@@ -129,13 +129,14 @@ export async function askAiCopilot(
   summary: FinancialSummary,
   currency: string = '₹',
   history: ChatMessage[] = [],
-  userKey?: string
+  userKey?: string,
+  userName?: string
 ): Promise<string> {
   const apiKey = userKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
 
   if (apiKey) {
     try {
-      const systemContext = `You are Finmech's AI financial partner.
+      const systemContext = `You are Finmech's personalized AI financial partner.${userName ? ` The user's name is ${userName}. Greet or address them naturally.` : ''}
 User Financial State:
 - Net Worth: ${currency}${summary.totalNetWorth.toLocaleString()}
 - Cash in Hand: ${currency}${summary.cashInHand.toLocaleString()}

@@ -73,12 +73,38 @@ export default function Home() {
     if (!user?.uid) return;
     const unsubscribe = subscribeToUserData(user.uid, {
       onTransactionsChange: (txs) => setTransactions(txs),
-      onProfileChange: (p) => setProfile(p),
+      onProfileChange: (p) => {
+        setProfile((prev) => {
+          const merged = {
+            ...p,
+            name: p.name || user.displayName || prev.name,
+            photoURL: p.photoURL || user.photoURL || prev.photoURL,
+          };
+          saveProfile(merged);
+          return merged;
+        });
+      },
       onDenominationsChange: (d) => setDenominations(d),
       onBusinessBalanceChange: (b) => setManualBusinessBalance(b),
     });
     return () => unsubscribe();
-  }, [user?.uid]);
+  }, [user?.uid, user?.displayName, user?.photoURL]);
+
+  // Keep profile in sync with Google account display name & photo
+  useEffect(() => {
+    if (!user) return;
+    if (user.displayName || user.photoURL) {
+      setProfile((prev) => {
+        const updated = {
+          ...prev,
+          name: user.displayName || prev.name,
+          photoURL: user.photoURL || prev.photoURL,
+        };
+        saveProfile(updated);
+        return updated;
+      });
+    }
+  }, [user?.displayName, user?.photoURL]);
 
   // Compute live financial summary
   const summary = computeFinancialSummary(
@@ -266,8 +292,8 @@ export default function Home() {
         onTabChange={setCurrentTab}
         onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        userName={user ? (user.displayName || user.email?.split('@')[0]) : undefined}
-        userPhoto={user?.photoURL && !user.photoURL.includes('Icon.png') && user.photoURL !== '/avatar.jpg' ? user.photoURL : (profile.photoURL && !profile.photoURL.includes('Icon.png') && profile.photoURL !== '/avatar.jpg' ? profile.photoURL : null)}
+        userName={user?.displayName || profile.name || (user?.email ? user.email.split('@')[0] : undefined)}
+        userPhoto={user?.photoURL || profile.photoURL || null}
         userEmail={user ? user.email : null}
       />
 
@@ -321,6 +347,7 @@ export default function Home() {
           <AiCopilotView
             summary={summary}
             currency={profile.currency}
+            userName={user?.displayName || profile.name || (user?.email ? user.email.split('@')[0] : undefined)}
             onOpenTargetModal={() => setIsTargetModalOpen(true)}
             onClose={() => setCurrentTab('dashboard')}
           />

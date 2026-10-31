@@ -107,6 +107,7 @@ export function Navbar({
                 <img
                   src={userPhoto}
                   alt={userName || 'User'}
+                  referrerPolicy="no-referrer"
                   className="w-10 h-10 rounded-full object-cover border border-neutral-200/80 dark:border-neutral-800 shadow-xs group-hover:scale-105 transition-transform"
                 />
               ) : userName ? (
@@ -135,7 +136,7 @@ export function Navbar({
                 onClick={onOpenAuthModal}
                 className="text-left text-sm font-bold text-neutral-900 dark:text-white leading-tight hover:opacity-80 transition-opacity"
               >
-                {userName ? `Hi, ${userName}` : (
+                {userName ? `Hi, ${userName.split(' ')[0]}` : (
                   <span className="text-neutral-500 dark:text-neutral-400 font-semibold hover:text-neutral-900 dark:hover:text-white flex items-center gap-1">
                     Sign in <span className="text-xs">→</span>
                   </span>

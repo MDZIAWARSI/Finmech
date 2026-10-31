@@ -88,20 +88,17 @@ export function Navbar({
     { id: 'business' as NavTab, label: 'Business', icon: Briefcase },
   ];
 
-  // Dynamic wing widths: locks center + at 50vw and keeps left/right wings harmoniously balanced
-  const leftWingWidth =
-    currentTab === 'dashboard'
-      ? 140
-      : currentTab === 'spends'
-      ? 130
-      : 84;
+  // Dynamic wing widths: wide, spacious, tactile floating dock
+  const isLeftActive = currentTab === 'dashboard' || currentTab === 'spends';
+  const isRightActive = currentTab === 'cash' || currentTab === 'business';
 
-  const rightWingWidth =
-    currentTab === 'business'
-      ? 140
-      : currentTab === 'cash'
-      ? 120
-      : 84;
+  const leftWingWidth = isLeftActive
+    ? (currentTab === 'dashboard' ? 156 : 148)
+    : 104;
+
+  const rightWingWidth = isRightActive
+    ? (currentTab === 'business' ? 156 : 142)
+    : 104;
 
   return (
     <>
@@ -242,18 +239,18 @@ export function Navbar({
           {/* Background Pill: Expands left and right with balanced spring physics while keeping center + strictly anchored */}
           <motion.div
             animate={{
-              left: -(leftWingWidth + 44),
-              right: -(rightWingWidth + 44),
+              left: -(leftWingWidth + 46),
+              right: -(rightWingWidth + 46),
             }}
             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-            className="absolute top-0 -translate-y-1/2 h-14 bg-white/95 dark:bg-[#121215]/95 backdrop-blur-2xl border border-neutral-200/80 dark:border-neutral-800 shadow-[0_16px_40px_rgba(0,0,0,0.14)] dark:shadow-[0_20px_48px_rgba(0,0,0,0.7)] rounded-full pointer-events-none z-0"
+            className="absolute top-0 -translate-y-1/2 h-[60px] bg-white/95 dark:bg-[#121215]/95 backdrop-blur-2xl border border-neutral-200/90 dark:border-neutral-800 shadow-[0_20px_50px_rgba(0,0,0,0.16)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.8)] rounded-full pointer-events-none z-0"
           />
 
           {/* Left Wing Tabs: Sits strictly to the left of the center + button */}
           <motion.div
             animate={{ width: leftWingWidth }}
             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-            className="absolute right-[30px] top-0 -translate-y-1/2 flex items-center justify-end gap-1.5 pointer-events-auto z-10"
+            className="absolute right-[30px] top-0 -translate-y-1/2 flex items-center justify-end gap-2 pointer-events-auto z-10"
           >
             {leftTabs.map((item) => {
               const Icon = item.icon;
@@ -262,20 +259,20 @@ export function Navbar({
                 <button
                   key={item.id}
                   onClick={() => onTabChange(item.id)}
-                  className={`relative h-10 rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
-                    isActive ? 'px-3.5' : 'w-10'
+                  className={`relative h-11 rounded-full flex items-center justify-center gap-2 text-xs transition-colors group focus:outline-none shrink-0 ${
+                    isActive ? 'px-4' : 'w-11'
                   }`}
                   aria-label={item.label}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="activeTabIndicator"
-                      className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
+                      className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-md"
                       transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                     />
                   )}
                   <Icon
-                    className={`w-[18px] h-[18px] relative z-10 transition-colors shrink-0 ${
+                    className={`w-5 h-5 relative z-10 transition-colors shrink-0 ${
                       isActive
                         ? 'text-white dark:text-neutral-900'
                         : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
@@ -303,7 +300,7 @@ export function Navbar({
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
               onClick={onOpenQuickEntry}
-              className="w-12 h-12 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.22)] dark:shadow-[0_4px_16px_rgba(255,255,255,0.18)] active:scale-90 transition-transform shrink-0 focus:outline-none"
+              className="w-[52px] h-[52px] rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-[0_6px_20px_rgba(0,0,0,0.25)] dark:shadow-[0_6px_20px_rgba(255,255,255,0.22)] active:scale-90 transition-transform shrink-0 focus:outline-none"
               aria-label="Add transaction"
             >
               <Plus className="w-6 h-6 stroke-[2.8]" />
@@ -314,7 +311,7 @@ export function Navbar({
           <motion.div
             animate={{ width: rightWingWidth }}
             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-            className="absolute left-[30px] top-0 -translate-y-1/2 flex items-center justify-start gap-1.5 pointer-events-auto z-10"
+            className="absolute left-[30px] top-0 -translate-y-1/2 flex items-center justify-start gap-2 pointer-events-auto z-10"
           >
             {rightTabs.map((item) => {
               const Icon = item.icon;
@@ -323,20 +320,20 @@ export function Navbar({
                 <button
                   key={item.id}
                   onClick={() => onTabChange(item.id)}
-                  className={`relative h-10 rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
-                    isActive ? 'px-3.5' : 'w-10'
+                  className={`relative h-11 rounded-full flex items-center justify-center gap-2 text-xs transition-colors group focus:outline-none shrink-0 ${
+                    isActive ? 'px-4' : 'w-11'
                   }`}
                   aria-label={item.label}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="activeTabIndicator"
-                      className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
+                      className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-md"
                       transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                     />
                   )}
                   <Icon
-                    className={`w-[18px] h-[18px] relative z-10 transition-colors shrink-0 ${
+                    className={`w-5 h-5 relative z-10 transition-colors shrink-0 ${
                       isActive
                         ? 'text-white dark:text-neutral-900'
                         : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'

@@ -152,3 +152,4 @@ export async function updateBusinessBalanceInCloud(userId: string, businessBalan
     console.warn('Failed to update business balance in Cloud Firestore:', err);
   }
 }
+

@@ -22,6 +22,14 @@ export function SavingsTargetModal({
   onSaveTarget,
 }: SavingsTargetModalProps) {
   const [targetInput, setTargetInput] = useState<string>(currentTarget.toString());
+  const [daysLeft, setDaysLeft] = useState(15);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTargetInput(currentTarget.toString());
+      setDaysLeft(Math.max(1, 30 - new Date().getDate()));
+    }
+  }, [isOpen, currentTarget]);
 
   if (!isOpen) return null;
 
@@ -29,11 +37,6 @@ export function SavingsTargetModal({
   const parsedTarget = Math.max(0, parseInt(targetInput || '0', 10));
   const remaining = Math.max(0, parsedTarget - currentSaved);
   const percentage = parsedTarget > 0 ? Math.min(100, Math.round((currentSaved / parsedTarget) * 100)) : 0;
-  const [daysLeft, setDaysLeft] = useState(15);
-
-  useEffect(() => {
-    setDaysLeft(Math.max(1, 30 - new Date().getDate()));
-  }, []);
   const dailyNeeded = Math.round(remaining / daysLeft);
 
   const handleSave = () => {

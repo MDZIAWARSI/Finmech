@@ -11,8 +11,7 @@ import {
   Briefcase, 
   Sparkles, 
   Sun, 
-  Moon, 
-  Target,
+  Moon,
   PieChart as PieIcon
 } from 'lucide-react';
 
@@ -22,48 +21,47 @@ interface NavbarProps {
   currentTab: NavTab;
   onTabChange: (tab: NavTab) => void;
   onOpenQuickEntry: () => void;
-  onOpenTargetModal: () => void;
   userName?: string;
-  savingsPercentage?: number;
 }
 
 export function Navbar({
   currentTab,
   onTabChange,
   onOpenQuickEntry,
-  onOpenTargetModal,
   userName = 'Zia',
-  savingsPercentage = 0,
 }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
 
-  const navItems = [
+  // 4 balanced navigation tabs: 2 on left, 2 on right
+  const leftTabs = [
     { id: 'dashboard' as NavTab, label: 'Overview', icon: LayoutDashboard },
     { id: 'spends' as NavTab, label: 'Spends', icon: PieIcon },
+  ];
+
+  const rightTabs = [
     { id: 'cash' as NavTab, label: 'Cash', icon: Banknote },
     { id: 'business' as NavTab, label: 'Business', icon: Briefcase },
-    { id: 'copilot' as NavTab, label: 'AI Copilot', icon: Sparkles },
   ];
 
   return (
     <>
-      {/* Top Header Bar */}
+      {/* Top Header Bar (Ultra Clean, No Cryptic Pills) */}
       <header className="sticky top-0 z-30 w-full bg-[#fafafa]/80 dark:bg-[#09090b]/80 backdrop-blur-md transition-colors">
-        <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
           {/* User profile & App branding */}
           <div className="flex items-center gap-3">
             <div className="relative">
               <div className="w-10 h-10 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center font-bold text-sm tracking-tight shadow-sm select-none">
                 {userName.charAt(0).toUpperCase()}
               </div>
-              <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-[#09090b]" />
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#09090b]" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
                   FINMECH
                 </span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-mono font-medium">
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-neutral-200/80 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-mono font-medium">
                   v2.0
                 </span>
               </div>
@@ -73,19 +71,8 @@ export function Navbar({
             </div>
           </div>
 
-          {/* Right Action Capsule */}
+          {/* Right Action: Clean Theme Toggle */}
           <div className="flex items-center gap-2">
-            {/* Quick Savings Target Pill */}
-            <button
-              onClick={onOpenTargetModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-[#141417] border border-neutral-200/80 dark:border-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:border-neutral-400 dark:hover:border-neutral-600 transition-all shadow-xs"
-              title="Adjust Savings Goal"
-            >
-              <Target className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="tabular-nums">{savingsPercentage}%</span>
-            </button>
-
-            {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
               className="w-9 h-9 rounded-full bg-white dark:bg-[#141417] border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-center text-neutral-700 dark:text-neutral-200 hover:border-neutral-400 dark:hover:border-neutral-600 transition-all shadow-xs"
@@ -101,13 +88,34 @@ export function Navbar({
         </div>
       </header>
 
-      {/* Floating Bottom Navigation Dock with Sliding Animated Active Pill */}
+      {/* Floating AI Button ("ai wala floating button") */}
+      <div className="fixed bottom-24 right-5 sm:right-8 z-40 pointer-events-auto">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => onTabChange(currentTab === 'copilot' ? 'dashboard' : 'copilot')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-full shadow-[0_12px_30px_rgba(0,0,0,0.22)] dark:shadow-[0_12px_30px_rgba(255,255,255,0.18)] border transition-all ${
+            currentTab === 'copilot'
+              ? 'bg-emerald-500 text-white border-emerald-400'
+              : 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-700/60 dark:border-neutral-300/60'
+          }`}
+          aria-label="Open AI Copilot"
+        >
+          <Sparkles className={`w-4 h-4 ${currentTab === 'copilot' ? 'text-white' : 'text-emerald-400 dark:text-emerald-500'}`} />
+          <span className="text-xs font-bold tracking-tight">
+            {currentTab === 'copilot' ? 'Close AI' : 'Finmech AI'}
+          </span>
+        </motion.button>
+      </div>
+
+      {/* Perfectly Symmetrical Bottom Navigation Dock: 2 on Left, Center +, 2 on Right */}
       <nav
         aria-label="Bottom navigation dock"
         className="fixed bottom-5 left-0 right-0 z-40 px-4 pointer-events-none flex justify-center"
       >
         <div className="bg-white/80 dark:bg-[#121215]/85 backdrop-blur-2xl border border-neutral-200/60 dark:border-neutral-800/70 shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] rounded-full p-1.5 flex items-center gap-1 pointer-events-auto">
-          {navItems.slice(0, 2).map((item) => {
+          {/* Left 2 Tabs (Home, Spends) */}
+          {leftTabs.map((item) => {
             const Icon = item.icon;
             const isActive = currentTab === item.id;
             return (
@@ -135,16 +143,17 @@ export function Navbar({
             );
           })}
 
-          {/* Center Elevated Quick Add Button with pop interaction */}
+          {/* Center Elevated Quick Add Button with spring pop interaction */}
           <button
             onClick={onOpenQuickEntry}
-            className="w-11 h-11 mx-1 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-transform"
+            className="w-11 h-11 mx-1.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-transform"
             aria-label="Add transaction"
           >
             <Plus className="w-5 h-5 stroke-[2.8]" />
           </button>
 
-          {navItems.slice(2).map((item) => {
+          {/* Right 2 Tabs (Cash, Business) */}
+          {rightTabs.map((item) => {
             const Icon = item.icon;
             const isActive = currentTab === item.id;
             return (
@@ -165,8 +174,6 @@ export function Navbar({
                   className={`w-5 h-5 relative z-10 transition-colors ${
                     isActive
                       ? 'text-white dark:text-neutral-900'
-                      : item.id === 'copilot'
-                      ? 'text-emerald-500'
                       : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
                   }`}
                 />

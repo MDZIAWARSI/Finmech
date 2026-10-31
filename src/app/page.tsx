@@ -204,14 +204,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fafafa] dark:bg-[#09090b] text-neutral-900 dark:text-neutral-100 transition-colors">
-      {/* Top Navbar Header */}
+      {/* Top Navbar Header & Floating Nav */}
       <Navbar
         currentTab={currentTab}
         onTabChange={setCurrentTab}
         onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
-        onOpenTargetModal={() => setIsTargetModalOpen(true)}
         userName={profile.name}
-        savingsPercentage={summary.savingsGoal.percentage}
       />
 
       {/* Main Container - Mobile First with Desktop Max Width */}

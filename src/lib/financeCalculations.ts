@@ -34,10 +34,9 @@ export function computeFinancialSummary(
   let bankBalance = 0;
   let businessBalance = 0;
 
-  // Monthly sums (current month)
-  const now = referenceDate || new Date('2025-01-01T00:00:00Z');
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
+  // Determine reference time (uses passed date or latest transaction date to remain deterministic)
+  const now = referenceDate || (transactions.length > 0 ? new Date(transactions[0].date) : new Date('2026-10-31T00:00:00Z'));
+  const nowTime = now.getTime();
 
   let monthlyExpenditure = 0;
   let monthlyIncome = 0;
@@ -51,7 +50,9 @@ export function computeFinancialSummary(
 
   transactions.forEach((tx) => {
     const txDate = new Date(tx.date);
-    const isCurrentMonth = txDate.getFullYear() === currentYear && txDate.getMonth() === currentMonth;
+    const txTime = txDate.getTime();
+    // Rolling 31-day activity window or calendar month
+    const isCurrentMonth = Math.abs(nowTime - txTime) <= 31 * 86400000;
 
     if (tx.type === 'expense') {
       if (tx.pocket === 'cash') cashBalance -= tx.amount;

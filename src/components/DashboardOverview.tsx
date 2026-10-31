@@ -4,29 +4,22 @@ import React, { useState } from 'react';
 import { 
   Eye, 
   EyeOff, 
-  Plus, 
-  ArrowDownLeft, 
-  ArrowLeftRight, 
-  Target, 
-  Wallet, 
-  Briefcase, 
-  Landmark, 
   ChevronRight, 
   TrendingUp, 
-  TrendingDown,
-  Sparkles,
-  ShoppingBag,
+  Wallet, 
+  Briefcase, 
+  Target, 
+  Flame,
   Utensils,
   Laptop,
   Home as HomeIcon,
+  ShoppingBag,
   ArrowUpRight,
-  ShieldCheck,
-  Flame,
-  Activity
+  ReceiptText
 } from 'lucide-react';
 import { FinancialSummary, Transaction } from '@/types/finance';
 import { NavTab } from './Navbar';
-import { SpendingTrendGraph, SpendingPieChart } from './Charts';
+import { SpendingPieChart, SpendingTrendGraph } from './Charts';
 
 interface DashboardOverviewProps {
   summary: FinancialSummary;
@@ -42,11 +35,10 @@ export function DashboardOverview({
   recentTransactions,
   currency = '₹',
   onNavigateTab,
-  onOpenQuickEntry,
   onOpenTargetModal,
 }: DashboardOverviewProps) {
   const [hideBalances, setHideBalances] = useState(false);
-  const [activeChartTab, setActiveChartTab] = useState<'trend' | 'distribution'>('trend');
+  const [activeChartTab, setActiveChartTab] = useState<'distribution' | 'trend'>('distribution');
 
   const formatAmount = (val: number) => {
     if (hideBalances) return '••••••';
@@ -70,7 +62,7 @@ export function DashboardOverview({
     return <ArrowUpRight className="w-4 h-4 text-neutral-800 dark:text-neutral-200" />;
   };
 
-  // 7-day trend points for the graph
+  // 7-day trend points
   const trendData = [
     { day: 'Mon', amount: Math.round(summary.dailyAverageSpend * 0.7) },
     { day: 'Tue', amount: Math.round(summary.dailyAverageSpend * 1.2) },
@@ -88,21 +80,27 @@ export function DashboardOverview({
     percentage: c.percentage,
   }));
 
-  const healthScore = Math.min(100, Math.max(40, 100 - Math.round((summary.monthlyExpenditure / Math.max(1, summary.monthlyIncome)) * 50)));
+  // Sparkline data points for the mini-chart inside Spent tile (Reference Image 7)
+  const miniSparklinePoints = [30, 45, 25, 60, 40, 75, 55];
+  const sparkWidth = 100;
+  const sparkHeight = 28;
+  const maxSpark = Math.max(...miniSparklinePoints);
+  const sparkPath = miniSparklinePoints.reduce((acc, val, i) => {
+    const x = (i / (miniSparklinePoints.length - 1)) * sparkWidth;
+    const y = sparkHeight - (val / maxSpark) * (sparkHeight - 4);
+    return i === 0 ? `M ${x} ${y}` : `${acc} L ${x} ${y}`;
+  }, '');
 
   return (
     <div className="space-y-4 pb-32 pt-2">
       {/* =========================================================================
-          BENTO TILE 1: Dominant Hero Net Worth (Full-width Bento Tile)
+          HERO BALANCE: Open, High-Whitespace & Elegant (No awkward button rows)
           ========================================================================= */}
-      <section 
-        aria-label="Total Net Worth Bento"
-        className="rounded-3xl p-6 sm:p-7 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs relative overflow-hidden transition-all"
-      >
-        <div className="flex items-center justify-between">
+      <section aria-label="Total Net Worth" className="pt-2 px-1">
+        <div className="flex items-center justify-between mb-1.5">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
-              Total Net Worth
+              Total Net Balance
             </span>
             <button
               onClick={() => setHideBalances(!hideBalances)}
@@ -120,125 +118,157 @@ export function DashboardOverview({
         </div>
 
         {/* Large Stark Typographic Display */}
-        <div className="mt-2 mb-1 text-5xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white tabular-nums display-amount">
+        <div className="text-5xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white tabular-nums display-amount">
           {formatAmount(summary.totalNetWorth)}
         </div>
 
-        <div className="text-xs text-neutral-400 dark:text-neutral-500 flex items-center gap-2 mb-6">
-          <span>Verified across Cash, Bank & Business</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Live Real-Time</span>
-        </div>
-
-        {/* Quick Action Pills Row inside Hero Bento */}
-        <div className="grid grid-cols-4 gap-2 pt-4 border-t border-neutral-100 dark:border-neutral-800/60">
-          <button
-            onClick={onOpenQuickEntry}
-            className="flex flex-col items-center justify-center group"
-          >
-            <div className="w-11 h-11 rounded-2xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center shadow-xs group-hover:scale-105 active:scale-95 transition-transform">
-              <Plus className="w-4 h-4 stroke-[2.5]" />
-            </div>
-            <span className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 mt-1.5">
-              Spend
-            </span>
-          </button>
-
-          <button
-            onClick={onOpenQuickEntry}
-            className="flex flex-col items-center justify-center group"
-          >
-            <div className="w-11 h-11 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center shadow-xs group-hover:scale-105 active:scale-95 transition-transform">
-              <ArrowDownLeft className="w-4 h-4 text-emerald-500" />
-            </div>
-            <span className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 mt-1.5">
-              Inflow
-            </span>
-          </button>
-
-          <button
-            onClick={onOpenQuickEntry}
-            className="flex flex-col items-center justify-center group"
-          >
-            <div className="w-11 h-11 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center shadow-xs group-hover:scale-105 active:scale-95 transition-transform">
-              <ArrowLeftRight className="w-4 h-4" />
-            </div>
-            <span className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 mt-1.5">
-              Transfer
-            </span>
-          </button>
-
-          <button
-            onClick={onOpenTargetModal}
-            className="flex flex-col items-center justify-center group"
-          >
-            <div className="w-11 h-11 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center shadow-xs group-hover:scale-105 active:scale-95 transition-transform">
-              <Target className="w-4 h-4 text-neutral-700 dark:text-neutral-300" />
-            </div>
-            <span className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 mt-1.5">
-              Target
-            </span>
-          </button>
+        <div className="text-xs text-neutral-400 dark:text-neutral-500 flex items-center gap-2 mt-2">
+          <span>Live capital across Cash, Bank & Business</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Active Sync</span>
         </div>
       </section>
 
       {/* =========================================================================
-          BENTO ROW 2: Cash in Hand Bento & Live Business Money Bento
+          2x2 BENTO GRID: Inspired directly by Reference Image 7 & Image 2
+          Clean equal-column tiles with rich metrics & micro-sparklines
           ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        {/* Cash in Hand Bento Tile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+        {/* Bento Tile 1: Spent This Month + Mini Sparkline Chart */}
         <div
-          onClick={() => onNavigateTab('cash')}
-          className="rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between"
+          onClick={() => onNavigateTab('spends')}
+          className="rounded-3xl p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-9 h-9 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-800 dark:text-neutral-200">
-                <Wallet className="w-4 h-4" />
-              </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
+                <ReceiptText className="w-3.5 h-3.5" />
+                Spent This Month
+              </span>
               <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
             </div>
 
-            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
-              Cash in Hand
+            <div className="flex items-baseline justify-between">
+              <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight">
+                {formatAmount(summary.monthlyExpenditure)}
+              </div>
+
+              {/* Mini Sparkline Graph inside the tile (Reference Image 7) */}
+              <div className="w-[100px] h-[28px] shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                <svg viewBox={`0 0 ${sparkWidth} ${sparkHeight}`} className="w-full h-full overflow-visible">
+                  <path
+                    d={sparkPath}
+                    fill="none"
+                    className="stroke-neutral-900 dark:stroke-white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle
+                    cx={sparkWidth}
+                    cy={sparkHeight - (miniSparklinePoints[miniSparklinePoints.length - 1] / maxSpark) * (sparkHeight - 4)}
+                    r="3"
+                    className="fill-emerald-500"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-xs text-neutral-400">
+            <span>Burn: <strong>{formatAmount(Math.round(summary.dailyAverageSpend))}/day</strong></span>
+            <span className="font-semibold text-neutral-700 dark:text-neutral-300 group-hover:underline">
+              View Spends →
             </span>
-            <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight mt-0.5">
+          </div>
+        </div>
+
+        {/* Bento Tile 2: Savings Goal Target + Progress Bar */}
+        <div
+          onClick={onOpenTargetModal}
+          className="rounded-3xl p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
+                <Target className="w-3.5 h-3.5 text-emerald-500" />
+                Savings Goal
+              </span>
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                {summary.savingsGoal.percentage}% locked
+              </span>
+            </div>
+
+            <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight">
+              {formatAmount(summary.savingsGoal.currentSaved)}
+            </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/60 space-y-1.5">
+            <div className="w-full h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, summary.savingsGoal.percentage)}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between text-xs text-neutral-400">
+              <span>Goal: {formatAmount(summary.savingsGoal.targetAmount)}</span>
+              <span className="font-semibold text-neutral-700 dark:text-neutral-300 group-hover:underline">
+                Adjust Goal →
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bento Tile 3: Cash in Hand + Notes Audit */}
+        <div
+          onClick={() => onNavigateTab('cash')}
+          className="rounded-3xl p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
+                <Wallet className="w-3.5 h-3.5" />
+                Cash in Hand
+              </span>
+              <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
+            </div>
+
+            <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight">
               {formatAmount(summary.cashInHand)}
             </div>
           </div>
 
           <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-xs text-neutral-400">
-            <span>Physical notes & coins</span>
-            <span className="font-semibold text-neutral-800 dark:text-neutral-200 group-hover:underline">
-              Audit Denominations →
+            <span>Physical pocket cash</span>
+            <span className="font-semibold text-neutral-700 dark:text-neutral-300 group-hover:underline">
+              Audit Notes →
             </span>
           </div>
         </div>
 
-        {/* Live Business Money Bento Tile */}
+        {/* Bento Tile 4: Live Business Capital + Revenue Inflow */}
         <div
           onClick={() => onNavigateTab('business')}
-          className="rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between"
+          className="rounded-3xl p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-9 h-9 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-800 dark:text-neutral-200">
-                <Briefcase className="w-4 h-4" />
-              </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
+                <Briefcase className="w-3.5 h-3.5" />
+                Live Business Money
+              </span>
               <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
             </div>
 
-            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
-              Live Business Capital
-            </span>
-            <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight mt-0.5">
+            <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight">
               {formatAmount(summary.businessBalance)}
             </div>
           </div>
 
           <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-xs text-neutral-400">
             <span>Manual live count</span>
-            <span className="font-semibold text-neutral-800 dark:text-neutral-200 group-hover:underline">
+            <span className="font-semibold text-neutral-700 dark:text-neutral-300 group-hover:underline">
               Manage Funds →
             </span>
           </div>
@@ -246,82 +276,7 @@ export function DashboardOverview({
       </div>
 
       {/* =========================================================================
-          BENTO ROW 3: Monthly Savings Target & Fiscal Health Burn Bento
-          ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        {/* Savings Goal Bento Tile */}
-        <div 
-          onClick={onOpenTargetModal}
-          className="rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between space-y-3"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
-              <Target className="w-3.5 h-3.5 text-emerald-500" />
-              Savings Goal Target
-            </span>
-            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
-              {summary.savingsGoal.percentage}% locked
-            </span>
-          </div>
-
-          <div>
-            <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight">
-              {formatAmount(summary.savingsGoal.currentSaved)}
-            </div>
-            <div className="text-xs text-neutral-400 mt-0.5">
-              Target: {formatAmount(summary.savingsGoal.targetAmount)} ({formatAmount(summary.savingsGoal.remaining)} left)
-            </div>
-          </div>
-
-          <div className="space-y-1.5 pt-1">
-            <div className="w-full h-2 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, summary.savingsGoal.percentage)}%` }}
-              />
-            </div>
-            <div className="text-[11px] text-neutral-400 flex items-center justify-between">
-              <span>Status: <strong className="text-neutral-800 dark:text-neutral-200">{summary.savingsGoal.status === 'achieved' ? 'Goal Met' : 'On Track'}</strong></span>
-              <span className="group-hover:underline font-medium">Adjust Target →</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Fiscal Health & Burn Rate Bento Tile */}
-        <div 
-          onClick={() => onNavigateTab('spends')}
-          className="rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between space-y-3"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
-              <Flame className="w-3.5 h-3.5 text-amber-500" />
-              Daily Burn Pace
-            </span>
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 tabular-nums">
-              {healthScore}/100 Health
-            </span>
-          </div>
-
-          <div>
-            <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight">
-              {formatAmount(Math.round(summary.dailyAverageSpend))}/day
-            </div>
-            <div className="text-xs text-neutral-400 mt-0.5">
-              Total Month Outflow: {formatAmount(summary.monthlyExpenditure)}
-            </div>
-          </div>
-
-          <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-xs text-neutral-400">
-            <span>Projected: {formatAmount(Math.round(summary.dailyAverageSpend * 30))}</span>
-            <span className="font-semibold text-neutral-800 dark:text-neutral-200 group-hover:underline">
-              Analyze Spends →
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* =========================================================================
-          BENTO ROW 4: Interactive Visual Analytics (Full-width Bento Tile)
+          BENTO TILE 5: Visual Expenditure Analytics (Full-Width Bento Tile)
           ========================================================================= */}
       <section 
         aria-label="Visual Analytics Bento"
@@ -329,16 +284,6 @@ export function DashboardOverview({
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#1c1c21] p-1 rounded-full text-xs font-semibold">
-            <button
-              onClick={() => setActiveChartTab('trend')}
-              className={`px-3 py-1 rounded-full transition-all ${
-                activeChartTab === 'trend'
-                  ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'
-                  : 'text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
-              }`}
-            >
-              Spend Curve
-            </button>
             <button
               onClick={() => setActiveChartTab('distribution')}
               className={`px-3 py-1 rounded-full transition-all ${
@@ -349,37 +294,47 @@ export function DashboardOverview({
             >
               Category Pie
             </button>
+            <button
+              onClick={() => setActiveChartTab('trend')}
+              className={`px-3 py-1 rounded-full transition-all ${
+                activeChartTab === 'trend'
+                  ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'
+                  : 'text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
+              }`}
+            >
+              Weekly Curve
+            </button>
           </div>
 
           <span className="text-xs font-semibold text-neutral-400">
-            {activeChartTab === 'trend' ? 'Weekly Outflow Velocity' : 'Capital Allocation'}
+            {activeChartTab === 'distribution' ? 'Capital Breakdown' : 'Daily Outflow Dynamics'}
           </span>
         </div>
 
-        {/* Dynamic Graph or Donut Chart */}
+        {/* Dynamic Chart */}
         <div className="py-2">
-          {activeChartTab === 'trend' ? (
-            <SpendingTrendGraph
-              data={trendData}
-              currency={currency}
-              title="Daily Spend Velocity"
-            />
-          ) : (
+          {activeChartTab === 'distribution' ? (
             <SpendingPieChart
               slices={pieSlices}
               totalAmount={summary.monthlyExpenditure}
               currency={currency}
               onSelectCategory={() => onNavigateTab('spends')}
             />
+          ) : (
+            <SpendingTrendGraph
+              data={trendData}
+              currency={currency}
+              title="Daily Spend Velocity"
+            />
           )}
         </div>
       </section>
 
       {/* =========================================================================
-          BENTO ROW 5: Recent Transactions Activity (Bento Tile)
+          BENTO TILE 6: Recent Movements Activity Stream
           ========================================================================= */}
       <section 
-        aria-label="Recent Transactions Bento"
+        aria-label="Recent Movements Bento"
         className="rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-3"
       >
         <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-neutral-800/60">

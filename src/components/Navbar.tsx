@@ -110,7 +110,7 @@ export function Navbar({
       </header>
 
       {/* Floating AI Button ("ai wala floating button") */}
-      <div className="fixed bottom-24 right-5 sm:right-8 z-40 pointer-events-auto">
+      <div className="fixed bottom-24 right-4 sm:right-8 z-40 pointer-events-auto">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -129,104 +129,119 @@ export function Navbar({
         </motion.button>
       </div>
 
-      {/* Perfectly Symmetrical Bottom Navigation Dock: 2 on Left, Center +, 2 on Right */}
+      {/* Perfectly Symmetrical Bottom Navigation Dock:
+          - Center + button is locked to exact dead-center (50% midpoint)
+          - Left wing aligns to the right (justify-end): tabs expand outwards to the left (icons move left)
+          - Right wing aligns to the left (justify-start): tabs expand outwards to the right (icons move right)
+          - + button is noticeably larger, prominent, and elevated with tactile click interaction
+      */}
       <nav
         aria-label="Bottom navigation dock"
-        className="fixed bottom-5 left-0 right-0 z-40 px-4 pointer-events-none flex justify-center"
+        className="fixed bottom-5 left-0 right-0 z-40 px-2 sm:px-4 pointer-events-none flex justify-center"
       >
-        <div className="bg-white/80 dark:bg-[#121215]/85 backdrop-blur-2xl border border-neutral-200/60 dark:border-neutral-800/70 shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] rounded-full p-1.5 flex items-center gap-1 pointer-events-auto">
-          {/* Left 2 Tabs (Home, Spends) */}
-          {leftTabs.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onTabChange(item.id)}
-                className={`relative py-2.5 rounded-full flex items-center justify-center gap-1.5 text-xs transition-all group focus:outline-none ${
-                  isActive ? 'px-4' : 'px-3'
-                }`}
-                aria-label={item.label}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-                <Icon
-                  className={`w-4 h-4 relative z-10 transition-colors shrink-0 ${
-                    isActive
-                      ? 'text-white dark:text-neutral-900'
-                      : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
+        <div className="bg-white/85 dark:bg-[#121215]/90 backdrop-blur-2xl border border-neutral-200/70 dark:border-neutral-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.75)] rounded-full p-1.5 flex items-center justify-between pointer-events-auto w-full max-w-[364px] sm:max-w-[396px]">
+          
+          {/* Left Wing: 2 Tabs (Overview, Spends) - Expands outwards to the left */}
+          <div className="flex-1 flex items-center justify-end gap-1 sm:gap-1.5 min-w-0">
+            {leftTabs.map((item) => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onTabChange(item.id)}
+                  className={`relative h-11 rounded-full flex items-center justify-center gap-1.5 text-xs transition-all group focus:outline-none shrink-0 ${
+                    isActive ? 'px-3 sm:px-3.5' : 'w-9 sm:w-10'
                   }`}
-                />
-                {isActive && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.18 }}
-                    className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
-              </button>
-            );
-          })}
-
-          {/* Center Elevated Quick Add Button with spring pop interaction */}
-          <button
-            onClick={onOpenQuickEntry}
-            className="w-11 h-11 mx-1 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-transform shrink-0"
-            aria-label="Add transaction"
-          >
-            <Plus className="w-5 h-5 stroke-[2.8]" />
-          </button>
-
-          {/* Right 2 Tabs (Cash, Business) */}
-          {rightTabs.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onTabChange(item.id)}
-                className={`relative py-2.5 rounded-full flex items-center justify-center gap-1.5 text-xs transition-all group focus:outline-none ${
-                  isActive ? 'px-4' : 'px-3'
-                }`}
-                aria-label={item.label}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                  aria-label={item.label}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabIndicator"
+                      className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+                  <Icon
+                    className={`w-4 h-4 relative z-10 transition-colors shrink-0 ${
+                      isActive
+                        ? 'text-white dark:text-neutral-900'
+                        : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
+                    }`}
                   />
-                )}
-                <Icon
-                  className={`w-4 h-4 relative z-10 transition-colors shrink-0 ${
-                    isActive
-                      ? 'text-white dark:text-neutral-900'
-                      : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
+                  {isActive && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: 'auto' }}
+                      exit={{ opacity: 0, width: 0 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Center Elevated Quick Add Button (Prominent, Larger, Locked at 50% midpoint) */}
+          <div className="shrink-0 flex items-center justify-center px-1 sm:px-1.5">
+            <motion.button
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={onOpenQuickEntry}
+              className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-[0_8px_25px_rgba(0,0,0,0.28)] dark:shadow-[0_8px_25px_rgba(255,255,255,0.22)] transition-transform shrink-0 focus:outline-none"
+              aria-label="Add transaction"
+            >
+              <Plus className="w-6 h-6 stroke-[3]" />
+            </motion.button>
+          </div>
+
+          {/* Right Wing: 2 Tabs (Cash, Business) - Expands outwards to the right */}
+          <div className="flex-1 flex items-center justify-start gap-1 sm:gap-1.5 min-w-0">
+            {rightTabs.map((item) => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onTabChange(item.id)}
+                  className={`relative h-11 rounded-full flex items-center justify-center gap-1.5 text-xs transition-all group focus:outline-none shrink-0 ${
+                    isActive ? 'px-3 sm:px-3.5' : 'w-9 sm:w-10'
                   }`}
-                />
-                {isActive && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.18 }}
-                    className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
-              </button>
-            );
-          })}
+                  aria-label={item.label}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabIndicator"
+                      className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+                  <Icon
+                    className={`w-4 h-4 relative z-10 transition-colors shrink-0 ${
+                      isActive
+                        ? 'text-white dark:text-neutral-900'
+                        : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
+                    }`}
+                  />
+                  {isActive && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: 'auto' }}
+                      exit={{ opacity: 0, width: 0 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
         </div>
       </nav>
     </>

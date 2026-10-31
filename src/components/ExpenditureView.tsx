@@ -38,20 +38,25 @@ export function ExpenditureView({
 }: ExpenditureViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'expense' | 'income' | 'transfer'>('all');
+  const [typeFilter, setTypeFilter] = useState<'expense' | 'income' | 'transfer' | 'all'>('expense');
   // Default to Weekly Curve as requested
   const [viewMode, setViewMode] = useState<'chart' | 'trend'>('trend');
 
+  // Strictly personal transactions (business is quarantined to the Business tab)
+  const personalTransactions = useMemo(() => {
+    return transactions.filter((t) => t.pocket !== 'business' && t.toPocket !== 'business');
+  }, [transactions]);
+
   // Filter transactions by selected type
   const typeFilteredTransactions = useMemo(() => {
-    if (typeFilter === 'all') return transactions;
-    return transactions.filter((t) => t.type === typeFilter);
-  }, [transactions, typeFilter]);
+    if (typeFilter === 'all') return personalTransactions;
+    return personalTransactions.filter((t) => t.type === typeFilter);
+  }, [personalTransactions, typeFilter]);
 
-  // Backward compatibility for analytics
+  // Pure personal expense transactions
   const expenseTransactions = useMemo(() => {
-    return transactions.filter((t) => t.type === 'expense');
-  }, [transactions]);
+    return personalTransactions.filter((t) => t.type === 'expense');
+  }, [personalTransactions]);
 
   // Extract unique Year-Months from transactions
   const availableMonths = useMemo(() => {
@@ -95,13 +100,20 @@ export function ExpenditureView({
 
   // Compute stats for the selected month
   const activeMonthTotal = useMemo(() => {
+    if (typeFilter === 'all') {
+      // In all personal view, show pure personal expenditure so income isn't summed into spends
+      return monthFilteredExpenses.filter((tx) => tx.type === 'expense').reduce((acc, tx) => acc + tx.amount, 0);
+    }
     return monthFilteredExpenses.reduce((acc, tx) => acc + tx.amount, 0);
-  }, [monthFilteredExpenses]);
+  }, [monthFilteredExpenses, typeFilter]);
 
-  // Dynamic Category breakdown for the selected month
+  // Dynamic Category breakdown for Pie Chart: strictly personal expenses (never income or business)
   const monthCategoryBreakdown = useMemo(() => {
     const totals: Record<string, number> = {};
-    monthFilteredExpenses.forEach((tx) => {
+    const relevantExpenses = monthFilteredExpenses.filter((tx) => tx.type === 'expense');
+    const totalExp = relevantExpenses.reduce((acc, tx) => acc + tx.amount, 0);
+
+    relevantExpenses.forEach((tx) => {
       totals[tx.category] = (totals[tx.category] || 0) + tx.amount;
     });
 
@@ -109,10 +121,10 @@ export function ExpenditureView({
       .map(([category, amount]) => ({
         label: category,
         amount,
-        percentage: activeMonthTotal > 0 ? (amount / activeMonthTotal) * 100 : 0,
+        percentage: totalExp > 0 ? (amount / totalExp) * 100 : 0,
       }))
       .sort((a, b) => b.amount - a.amount);
-  }, [monthFilteredExpenses, activeMonthTotal]);
+  }, [monthFilteredExpenses]);
 
   // Categories list for category filter pills
   const categories = useMemo(() => {
@@ -242,16 +254,16 @@ export function ExpenditureView({
       {/* Dynamic Month Header Total */}
       <section aria-label="Month spend overview">
         <div className="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-          {activeMonthLabel}
+          {activeMonthLabel} • {typeFilter === 'income' ? 'Personal Income' : typeFilter === 'transfer' ? 'Transfers' : 'Personal Spends'}
         </div>
 
         {/* Big Typography Display */}
         <div className="text-5xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white tabular-nums display-amount mt-1">
-          {currency}{activeMonthTotal.toLocaleString('en-IN')}
+          {typeFilter === 'income' ? '+' : ''}{currency}{activeMonthTotal.toLocaleString('en-IN')}
         </div>
 
         <div className="text-xs text-neutral-400 dark:text-neutral-500 mt-2 flex items-center gap-2">
-          <span>{monthFilteredExpenses.length} logged expense items</span>
+          <span>{monthFilteredExpenses.length} {typeFilter === 'income' ? 'income records' : typeFilter === 'transfer' ? 'transfers' : 'personal expenses'}</span>
           <span>•</span>
           <span>Average per item: <strong>{currency}{Math.round(activeMonthTotal / Math.max(1, monthFilteredExpenses.length)).toLocaleString()}</strong></span>
         </div>
@@ -310,17 +322,20 @@ export function ExpenditureView({
 
       {/* Search & Category Filter Pills */}
       <section aria-label="Spends breakdown list" className="space-y-4 pt-2">
-        {/* Type Filter Tabs: All Activity, Expenses, Income, Transfers */}
+        {/* Type Filter Tabs: Expenses (Default), Income, Transfers, All Personal */}
         <div className="flex items-center bg-neutral-100 dark:bg-[#141417] p-1 rounded-2xl text-xs font-semibold">
           {[
-            { id: 'all', label: 'All Activity' },
             { id: 'expense', label: 'Expenses' },
             { id: 'income', label: 'Income' },
             { id: 'transfer', label: 'Transfers' },
+            { id: 'all', label: 'All Personal' },
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setTypeFilter(tab.id as any)}
+              onClick={() => {
+                setTypeFilter(tab.id as any);
+                setSelectedCategory('All');
+              }}
               className={`flex-1 py-1.5 rounded-xl transition-all ${
                 typeFilter === tab.id
                   ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'

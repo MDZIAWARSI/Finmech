@@ -416,9 +416,9 @@ export default function Home() {
         {currentTab === 'spends' && (
           <ExpenditureView
             summary={summary}
-            transactions={transactions}
+            transactions={transactions.filter((t) => t.pocket !== 'business' && t.toPocket !== 'business')}
             currency={profile.currency}
-            onOpenQuickEntry={() => handleOpenQuickEntry()}
+            onOpenQuickEntry={() => handleOpenQuickEntry({ type: 'expense', pocket: 'bank' })}
             onDeleteTransaction={handleDeleteTransaction}
             onEditTransaction={setEditingTransaction}
             onExportData={handleExportData}

@@ -2,106 +2,96 @@
 
 @layer base {
   :root {
-    --bg-page: #f6f7fa;
+    --bg-page: #fafafa;
     --bg-surface: #ffffff;
-    --bg-surface-elevated: #f0f2f5;
-    --bg-surface-subtle: #f8f9fb;
-    --border-color: rgba(15, 23, 42, 0.06);
-    --border-color-hover: rgba(15, 23, 42, 0.12);
-    --text-primary: #0f141c;
-    --text-secondary: #526071;
-    --text-muted: #8c9ba9;
-    --accent-glow: rgba(16, 185, 129, 0.1);
-    --dock-bg: rgba(255, 255, 255, 0.85);
-    --dock-border: rgba(15, 23, 42, 0.08);
+    --bg-surface-elevated: #f4f4f5;
+    --bg-surface-subtle: #f9f9fb;
+    --border-color: rgba(0, 0, 0, 0.07);
+    --border-color-hover: rgba(0, 0, 0, 0.15);
+    --text-primary: #09090b;
+    --text-secondary: #52525b;
+    --text-muted: #71717a;
+    --dock-bg: rgba(255, 255, 255, 0.9);
+    --dock-border: rgba(0, 0, 0, 0.08);
 
-    /* Layered subtle shadows for clean iOS / Revolut elevation */
-    --shadow-card: 0px 1px 3px rgba(0, 0, 0, 0.04), 0px 6px 16px rgba(0, 0, 0, 0.03);
-    --shadow-card-hover: 0px 4px 12px rgba(0, 0, 0, 0.06), 0px 12px 24px rgba(0, 0, 0, 0.04);
-    --shadow-dock: 0px 10px 30px -5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.15);
+    /* Clean monochrome card elevation */
+    --shadow-card: 0px 1px 2px rgba(0, 0, 0, 0.04), 0px 4px 12px rgba(0, 0, 0, 0.02);
+    --shadow-card-hover: 0px 2px 6px rgba(0, 0, 0, 0.06), 0px 8px 20px rgba(0, 0, 0, 0.04);
+    --shadow-dock: 0px 12px 32px -4px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
   }
 
   html.dark {
-    --bg-page: #0c0d12;
-    --bg-surface: #14161f;
-    --bg-surface-elevated: #1a1d28;
-    --bg-surface-subtle: #101219;
-    --border-color: rgba(255, 255, 255, 0.07);
-    --border-color-hover: rgba(255, 255, 255, 0.14);
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --accent-glow: rgba(16, 185, 129, 0.15);
-    --dock-bg: rgba(20, 22, 31, 0.85);
+    --bg-page: #09090b;
+    --bg-surface: #121215;
+    --bg-surface-elevated: #18181b;
+    --bg-surface-subtle: #141418;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-color-hover: rgba(255, 255, 255, 0.16);
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+    --dock-bg: rgba(18, 18, 21, 0.88);
     --dock-border: rgba(255, 255, 255, 0.1);
 
-    --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.06),
-                   0 4px 14px rgba(0, 0, 0, 0.4);
-    --shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.12),
-                         0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-dock: 0px 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 2px 8px rgba(0, 0, 0, 0.5);
+    --shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 6px 18px rgba(0, 0, 0, 0.6);
+    --shadow-dock: 0px 14px 36px -4px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
   }
 
   html.midnight {
     --bg-page: #000000;
-    --bg-surface: #0a0a0c;
-    --bg-surface-elevated: #111215;
-    --bg-surface-subtle: #060608;
-    --border-color: rgba(255, 255, 255, 0.09);
-    --border-color-hover: rgba(255, 255, 255, 0.2);
+    --bg-surface: #09090b;
+    --bg-surface-elevated: #121215;
+    --bg-surface-subtle: #050506;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-color-hover: rgba(255, 255, 255, 0.22);
     --text-primary: #ffffff;
     --text-secondary: #a1a1aa;
-    --text-muted: #71717a;
-    --accent-glow: rgba(16, 185, 129, 0.2);
-    --dock-bg: rgba(10, 10, 12, 0.9);
+    --text-muted: #52525b;
+    --dock-bg: rgba(9, 9, 11, 0.94);
     --dock-border: rgba(255, 255, 255, 0.12);
 
-    --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.09),
-                   0 4px 16px rgba(0, 0, 0, 0.8);
-    --shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.18),
-                         0 8px 28px rgba(0, 0, 0, 0.9);
-    --shadow-dock: 0px 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.15);
+    --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 10px rgba(0, 0, 0, 0.8);
+    --shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 6px 20px rgba(0, 0, 0, 0.9);
+    --shadow-dock: 0px 16px 40px -4px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.15);
   }
 
   body {
     background-color: var(--bg-page);
     color: var(--text-primary);
-    transition: background-color 200ms ease-out, color 200ms ease-out;
+    transition: background-color 150ms ease-out, color 150ms ease-out;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   /* Accessible focus indicators */
   :focus-visible {
-    outline: 2px solid #10b981 !important;
+    outline: 2px solid var(--text-primary) !important;
     outline-offset: 2px !important;
   }
 
-  /* Tabular numbers for financial stability */
+  /* Tabular numbers for clean financial alignment */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Mobile input zoom prevention: must be >= 16px on mobile viewports */
+  /* Mobile input zoom prevention */
   @media (max-width: 640px) {
     input, select, textarea {
       font-size: 16px !important;
     }
   }
 
-  /* Tactile press feedback from better-interface */
+  /* Tactile press feedback */
   .btn-tactile {
-    transition-property: transform, opacity, background-color;
-    transition-duration: 150ms;
-    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 120ms ease-out, opacity 120ms ease-out;
   }
   .btn-tactile:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
 
-  /* Hide scrollbars gracefully */
+  /* Hide scrollbars */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }

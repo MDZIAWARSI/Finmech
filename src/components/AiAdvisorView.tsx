@@ -3,13 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Sparkles,
-  ShieldCheck,
   Key,
-  AlertTriangle,
+  AlertCircle,
   Lightbulb,
   Send,
-  Bot,
-  User,
   Copy,
   Check,
   RotateCw,
@@ -35,12 +32,11 @@ export default function AiAdvisorView({
   const [executiveReport, setExecutiveReport] = useState<string>('');
   const [isLoadingAudit, setIsLoadingAudit] = useState(false);
 
-  // Chat State
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
       id: 'msg_welcome',
       role: 'assistant',
-      content: `👋 Hey! I'm your FINMECH AI Copilot. I analyze your live expenditures, cash in hand (₹${summary.cashInHand}), and business money (₹${summary.businessBalance}) to find where cash is leaking and how to fix it. Ask me anything!`,
+      content: `👋 Hey Alex, I'm your FINMECH Financial Copilot. I analyze your live expenditures, cash in hand (₹${summary.cashInHand}), and business division (₹${summary.businessBalance}) to find where cash is leaking and how to save. What would you like to review?`,
       timestamp: 'Just now',
     },
   ]);
@@ -104,9 +100,7 @@ export default function AiAdvisorView({
         role: 'assistant',
         content: reply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isAiGenerated: true,
       };
-
       setChatMessages((prev) => [...prev, aiMsg]);
     } catch {
       setChatMessages((prev) => [
@@ -114,8 +108,8 @@ export default function AiAdvisorView({
         {
           id: `msg_err_${Date.now()}`,
           role: 'assistant',
-          content: 'Sorry, I hit a momentary network hiccup. Please try again.',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          content: 'Unable to reach Gemini right now. Heuristic analysis remains active on your dashboard.',
+          timestamp: 'Just now',
         },
       ]);
     } finally {
@@ -124,7 +118,7 @@ export default function AiAdvisorView({
   };
 
   const handleCopyReport = () => {
-    const textToCopy = `=== FINMECH AI Financial Health Report ===\nTotal Net Worth: ₹${summary.totalNetWorth.toLocaleString('en-IN')}\nCash in Hand: ₹${summary.cashInHand.toLocaleString('en-IN')}\nLive Business Money: ₹${summary.businessBalance.toLocaleString('en-IN')} (Margin: ${summary.businessMetrics.profitMargin}%)\nMonthly Expenditure: ₹${summary.monthlyExpenditure.toLocaleString('en-IN')}\nDaily Burn Rate: ₹${summary.dailyAverageSpend}/day\n\nExecutive Diagnosis:\n${executiveReport}\n\nTop Savings Opportunities:\n${suggestions.map((s, i) => `${i + 1}. ${s.title} (Save ₹${s.potentialMonthlySavings}/mo): ${s.actionableStep}`).join('\n')}`;
+    const textToCopy = `=== FINMECH AI Financial Health Report ===\nTotal Net Worth: ₹${summary.totalNetWorth.toLocaleString('en-IN')}\nCash in Hand: ₹${summary.cashInHand.toLocaleString('en-IN')}\nBusiness Division: ₹${summary.businessBalance.toLocaleString('en-IN')}\nMonthly Expenditure: ₹${summary.monthlyExpenditure.toLocaleString('en-IN')}\nDaily Burn: ₹${summary.dailyAverageSpend}/day\n\nDiagnostic Summary:\n${executiveReport}\n\nTop Savings:\n${suggestions.map((s, i) => `${i + 1}. ${s.title} (Save ₹${s.potentialMonthlySavings}/mo): ${s.actionableStep}`).join('\n')}`;
     navigator.clipboard.writeText(textToCopy);
     setCopiedReport(true);
     setTimeout(() => setCopiedReport(false), 2000);
@@ -136,157 +130,116 @@ export default function AiAdvisorView({
   );
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-24">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--bg-surface)] p-6 sm:p-8 border border-[var(--border-color)] shadow-[var(--shadow-card)]">
+    <div className="space-y-4 sm:space-y-6 pb-28">
+      {/* Hero Diagnostic Card (Minimal Monochrome) */}
+      <div className="rounded-[28px] bg-[var(--bg-surface)] p-6 sm:p-8 border border-[var(--border-color)] shadow-[var(--shadow-card)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-500">
-                <Sparkles className="h-4 w-4" aria-hidden="true" />
-              </span>
-              <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">
-                FINMECH AI Financial Copilot
-              </span>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)]">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>AI Spending Diagnostics</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mt-2 tracking-tight">
-              Where You Spend More & How to Fix It
+            <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mt-1 tracking-tight">
+              Where Money Leaks & How to Save
             </h1>
-            <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-xl">
-              Continuous analysis of your expenditure, physical pocket cash, and live business cashflow with tailored fixes.
+            <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-lg leading-relaxed">
+              Audits physical cash notes, digital bank UPI, and business division to flag leakage.
             </p>
           </div>
 
-          <div className="flex flex-col sm:items-end gap-2 shrink-0">
+          <div className="flex items-center gap-2">
             <button
               onClick={onOpenApiKeyModal}
-              className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-bold border transition-transform duration-150 active:scale-[0.96] min-h-[44px] ${
+              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-all ${
                 apiKeyConfig.isValidated
-                  ? 'bg-emerald-500/15 text-emerald-500 border-emerald-500/40'
-                  : 'bg-amber-500/15 text-amber-500 border-amber-500/40'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                  : 'bg-[var(--bg-surface-elevated)] border-[var(--border-color)] text-[var(--text-muted)]'
               }`}
-              aria-label="Manage Protected API Key"
             >
-              {apiKeyConfig.isValidated ? (
-                <>
-                  <ShieldCheck className="h-4 w-4 text-emerald-500" aria-hidden="true" />
-                  <span>Gemini 2.5 Flash Connected</span>
-                </>
-              ) : (
-                <>
-                  <Key className="h-4 w-4 text-amber-500" aria-hidden="true" />
-                  <span>Free AI Mode (Add Your Key)</span>
-                </>
-              )}
+              <Key className="h-3.5 w-3.5" />
+              <span>{apiKeyConfig.isValidated ? 'Gemini 2.5 Active' : 'Free Heuristic Mode'}</span>
             </button>
-            <span className="text-[10px] text-[var(--text-muted)]">
-              Keys are encrypted in browser sandbox and never leaked.
-            </span>
-          </div>
-        </div>
-
-        {/* Executive Summary Snippet */}
-        <div className="mt-6 pt-5 border-t border-[var(--border-color)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex-1">
-            <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">
-              AI Diagnostic Verdict:
-            </p>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-              {isLoadingAudit ? 'Analyzing spending patterns...' : executiveReport}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto justify-between sm:justify-start">
-            <div className="rounded-2xl bg-emerald-500/15 px-4 py-2 border border-emerald-500/30 text-center">
-              <span className="text-[10px] text-[var(--text-muted)] block font-medium">Monthly Savings</span>
-              <span className="text-lg font-black text-emerald-500 tabular-nums">
-                +₹{totalPotentialSavings.toLocaleString('en-IN')}/mo
-              </span>
-            </div>
 
             <button
               onClick={runAudit}
               disabled={isLoadingAudit}
-              className="p-3 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] hover:border-emerald-500/40 disabled:opacity-50 transition-transform duration-150 active:scale-[0.94] min-h-[44px] min-w-[44px] flex items-center justify-center"
-              title="Re-run AI Analysis"
-              aria-label="Re-run AI Spending Analysis"
+              className="p-2 rounded-full bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] hover:border-[var(--border-color-hover)] transition-all"
+              title="Rerun Analysis"
             >
-              <RotateCw className={`h-4 w-4 ${isLoadingAudit ? 'animate-spin' : ''}`} aria-hidden="true" />
+              <RotateCw className={`h-3.5 w-3.5 ${isLoadingAudit ? 'animate-spin' : ''}`} />
             </button>
+          </div>
+        </div>
+
+        {/* Diagnostic Text & Savings */}
+        <div className="mt-5 pt-4 border-t border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex-1">
+            <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-0.5">
+              Diagnostic Summary
+            </span>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+              {isLoadingAudit ? 'Auditing transaction streams...' : executiveReport}
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-[var(--bg-surface-elevated)] px-4 py-2 border border-[var(--border-color)] text-right sm:text-left shrink-0">
+            <span className="text-[10px] text-[var(--text-muted)] block font-medium">Estimated Monthly Retain</span>
+            {/* Subtle green tint for positive savings */}
+            <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
+              +₹{totalPotentialSavings.toLocaleString('en-IN')}/mo
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Suggested Fixes Grid */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-500" aria-hidden="true" />
-            <h2 className="text-sm font-bold text-[var(--text-primary)]">
-              Targeted Spending Leaks & Actionable Fixes
-            </h2>
-          </div>
+      {/* Suggested Fixes Grid (Minimal Monochrome) */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <h2 className="text-sm font-bold text-[var(--text-primary)]">Targeted Opportunities</h2>
           <button
             onClick={handleCopyReport}
-            className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] min-h-[36px]"
-            aria-label="Copy AI Financial Report"
+            className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)]"
           >
-            {copiedReport ? (
-              <>
-                <Check className="h-3.5 w-3.5 text-emerald-500" aria-hidden="true" />
-                <span className="text-emerald-500">Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Copy Report</span>
-              </>
-            )}
+            {copiedReport ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+            <span>{copiedReport ? 'Copied' : 'Copy Report'}</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {suggestions.map((sug) => {
             const isHigh = sug.severity === 'high';
             return (
               <div
                 key={sug.id}
-                className="rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] flex flex-col justify-between"
+                className="rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-color)] p-4 sm:p-5 shadow-[var(--shadow-card)] flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
                     <span
-                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                         isHigh
-                          ? 'bg-rose-500/15 text-rose-500 border border-rose-500/30'
-                          : 'bg-amber-500/15 text-amber-500 border border-amber-500/30'
+                          ? 'bg-red-500/10 text-red-600 dark:text-red-400'
+                          : 'bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)]'
                       }`}
                     >
                       {sug.category}
                     </span>
-                    <span className="text-xs font-black text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 tabular-nums">
-                      Save ₹{sug.potentialMonthlySavings.toLocaleString('en-IN')}/mo
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                      +₹{sug.potentialMonthlySavings.toLocaleString('en-IN')}/mo
                     </span>
                   </div>
 
-                  <h3 className="text-sm font-bold text-[var(--text-primary)] mt-2.5">{sug.title}</h3>
+                  <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] mt-2">{sug.title}</h3>
                   <p className="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
                     {sug.description}
                   </p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-[var(--border-color)] bg-[var(--bg-surface-elevated)] -mx-5 -mb-5 p-4 rounded-b-3xl">
-                  <div className="flex items-start gap-2">
-                    <Lightbulb className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" aria-hidden="true" />
-                    <div>
-                      <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
-                        How to fix this:
-                      </p>
-                      <p className="text-xs text-[var(--text-primary)] mt-0.5 leading-snug">
-                        {sug.actionableStep}
-                      </p>
-                    </div>
-                  </div>
+                <div className="mt-3 pt-3 border-t border-[var(--border-color)] flex items-start gap-2">
+                  <Lightbulb className="h-3.5 w-3.5 text-[var(--text-muted)] shrink-0 mt-0.5" />
+                  <p className="text-xs text-[var(--text-primary)] leading-snug">
+                    {sug.actionableStep}
+                  </p>
                 </div>
               </div>
             );
@@ -294,107 +247,64 @@ export default function AiAdvisorView({
         </div>
       </div>
 
-      {/* Interactive AI Chat Section (Mobile Optimized) */}
-      <div className="rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] p-4 sm:p-6 shadow-[var(--shadow-card)] flex flex-col h-[520px]">
-        <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)] shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-indigo-600 text-slate-950 font-bold">
-              <Bot className="h-4 w-4 text-slate-950" aria-hidden="true" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-[var(--text-primary)]">FinMech AI Copilot Chat</h3>
-              <p className="text-[11px] text-[var(--text-muted)]">Ask about your budget, purchases, or business</p>
-            </div>
-          </div>
-          <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-bold">
-            Live Synced
-          </span>
+      {/* Minimal Interactive Copilot Chat */}
+      <div className="rounded-[28px] bg-[var(--bg-surface)] border border-[var(--border-color)] p-4 sm:p-5 shadow-[var(--shadow-card)] flex flex-col h-[460px]">
+        <div className="pb-3 border-b border-[var(--border-color)] shrink-0">
+          <h3 className="text-sm font-bold text-[var(--text-primary)]">Copilot Chat</h3>
+          <p className="text-xs text-[var(--text-muted)]">Ask questions regarding your burn rate and division</p>
         </div>
 
-        {/* Quick Question Pills */}
-        <div className="py-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0 border-b border-[var(--border-color)]">
-          {[
-            'Where am I spending more this month?',
-            'Can I afford a ₹3,000 purchase today?',
-            'How can I boost my business margin?',
-            'Give me a 30-day student savings plan',
-          ].map((prompt, i) => (
-            <button
-              key={i}
-              onClick={() => handleSendMessage(prompt)}
-              className="rounded-full bg-[var(--bg-surface-elevated)] px-3.5 py-1.5 text-[11px] font-medium text-[var(--text-secondary)] border border-[var(--border-color)] hover:border-emerald-500 hover:text-emerald-500 whitespace-nowrap transition-transform duration-150 active:scale-[0.96] shrink-0 min-h-[36px]"
-            >
-              {prompt}
-            </button>
-          ))}
-        </div>
-
-        {/* Chat Stream */}
-        <div className="flex-1 overflow-y-auto space-y-3.5 py-4 pr-1 no-scrollbar">
+        {/* Chat Feed */}
+        <div className="flex-1 overflow-y-auto py-3 space-y-3 no-scrollbar">
           {chatMessages.map((msg) => {
             const isUser = msg.role === 'user';
             return (
-              <div
-                key={msg.id}
-                className={`flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : ''}`}
-              >
+              <div key={msg.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed ${
                     isUser
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30'
-                  }`}
-                >
-                  {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
-                </div>
-                <div
-                  className={`max-w-[85%] sm:max-w-[80%] rounded-3xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${
-                    isUser
-                      ? 'bg-indigo-600 text-white rounded-tr-none'
-                      : 'bg-[var(--bg-surface-elevated)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-tl-none shadow-sm'
+                      ? 'bg-[var(--text-primary)] text-[var(--bg-page)]'
+                      : 'bg-[var(--bg-surface-elevated)] text-[var(--text-primary)] border border-[var(--border-color)]'
                   }`}
                 >
                   <p className="whitespace-pre-line">{msg.content}</p>
-                  <span className="block text-[9px] opacity-60 mt-1 text-right">
-                    {msg.timestamp}
-                  </span>
                 </div>
               </div>
             );
           })}
-
           {isAiReplying && (
-            <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] pl-10">
-              <Sparkles className="h-4 w-4 text-emerald-500 animate-spin" aria-hidden="true" />
-              <span>FinMech AI is analyzing your cashflow...</span>
+            <div className="flex justify-start">
+              <div className="rounded-2xl bg-[var(--bg-surface-elevated)] px-4 py-2.5 text-xs text-[var(--text-muted)] animate-pulse border border-[var(--border-color)]">
+                Thinking...
+              </div>
             </div>
           )}
           <div ref={chatBottomRef} />
         </div>
 
-        {/* Chat Input */}
+        {/* Input Form */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
             handleSendMessage();
           }}
-          className="pt-3 border-t border-[var(--border-color)] shrink-0 flex gap-2"
+          className="pt-2 border-t border-[var(--border-color)] flex items-center gap-2 shrink-0"
         >
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Ask FinMech: 'How do I cut down on dining out?'..."
-            className="flex-1 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-2.5 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-emerald-500 min-h-[44px]"
-            aria-label="Message to FinMech Copilot"
+            placeholder="Ask AI Copilot..."
+            style={{ fontSize: '16px' }}
+            className="flex-1 rounded-full bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-2 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none min-h-[42px]"
           />
           <button
             type="submit"
             disabled={!inputText.trim() || isAiReplying}
-            className="flex items-center justify-center rounded-2xl bg-emerald-600 px-4 py-2.5 text-white hover:bg-emerald-500 disabled:opacity-50 transition-transform duration-150 active:scale-[0.94] min-h-[44px] min-w-[44px]"
-            aria-label="Send message"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--text-primary)] text-[var(--bg-page)] disabled:opacity-30 transition-transform active:scale-95 shrink-0"
+            aria-label="Send Message"
           >
-            <Send className="h-4 w-4" aria-hidden="true" />
+            <Send className="h-4 w-4" />
           </button>
         </form>
       </div>

@@ -210,13 +210,13 @@ export default function AuthModal({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="student@college.edu or founder@startup.io"
-                    className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-3 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-indigo-500 min-h-[44px]"
+                    className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-3 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none min-h-[44px]"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 py-3.5 text-xs font-bold text-white hover:bg-indigo-500 transition-transform duration-150 active:scale-[0.96] shadow-md shadow-indigo-600/25 min-h-[48px]"
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[var(--text-primary)] text-[var(--bg-page)] py-3 text-xs font-bold hover:opacity-90 transition-all active:scale-[0.98] min-h-[46px]"
                 >
                   <Send className="h-4 w-4" aria-hidden="true" />
                   <span>Send Free Login Code (OTP)</span>
@@ -232,7 +232,7 @@ export default function AuthModal({
                     <button
                       type="button"
                       onClick={() => setStep('email')}
-                      className="text-[11px] font-bold text-indigo-500 hover:text-indigo-600 min-h-[36px]"
+                      className="text-[11px] font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] min-h-[36px]"
                     >
                       Change Email
                     </button>
@@ -244,13 +244,13 @@ export default function AuthModal({
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     placeholder="••••••"
-                    className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-3 text-center text-xl font-mono font-black tracking-widest text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 min-h-[48px]"
+                    className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-3 text-center text-xl font-mono font-black tracking-widest text-[var(--text-primary)] focus:outline-none min-h-[48px]"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3.5 text-xs font-bold text-white hover:bg-emerald-500 transition-transform duration-150 active:scale-[0.96] shadow-md shadow-emerald-600/25 min-h-[48px]"
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[var(--text-primary)] text-[var(--bg-page)] py-3 text-xs font-bold hover:opacity-90 transition-all active:scale-[0.98] min-h-[46px]"
                 >
                   <KeyRound className="h-4 w-4" aria-hidden="true" />
                   <span>Verify Code & Sign In</span>

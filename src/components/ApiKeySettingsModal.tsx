@@ -93,11 +93,11 @@ export default function ApiKeySettingsModal({
         {/* Header */}
         <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-500">
-              <Key className="h-5 w-5" aria-hidden="true" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] text-[var(--text-primary)]">
+              <Key className="h-4 w-4" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-[var(--text-primary)]">Protected API Key</h2>
+              <h2 className="text-sm font-bold text-[var(--text-primary)]">Protected API Key</h2>
               <p className="text-xs text-[var(--text-muted)]">Private AI intelligence engine</p>
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function ApiKeySettingsModal({
             <button
               type="submit"
               disabled={isVerifying || !keyInput.trim()}
-              className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3 text-xs font-bold text-slate-950 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 transition-transform duration-150 active:scale-[0.96] shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 min-h-[44px]"
+              className="flex-1 rounded-2xl bg-[var(--text-primary)] text-[var(--bg-page)] py-3 text-xs font-bold hover:opacity-90 disabled:opacity-50 transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-1.5 min-h-[44px]"
             >
               {isVerifying ? (
                 <span>Verifying...</span>

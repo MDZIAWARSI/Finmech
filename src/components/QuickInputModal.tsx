@@ -8,7 +8,6 @@ import {
   Building2,
   Briefcase,
   ArrowRightLeft,
-  Calendar,
   Utensils,
   Car,
   BookOpen,
@@ -16,10 +15,7 @@ import {
   ShoppingBag,
   Laptop,
   Film,
-  Plus,
-  Minus,
   Check,
-  Delete,
   ChevronDown,
   Layers,
   ArrowUpRight,
@@ -82,7 +78,7 @@ const QUICK_PRESETS = [
   { label: 'Canteen', amount: 80, cat: 'Food & Dining', pocket: 'cash' as PocketType },
   { label: 'Auto', amount: 50, cat: 'Commute & Travel', pocket: 'cash' as PocketType },
   { label: 'Xerox', amount: 40, cat: 'Education & Xerox', pocket: 'cash' as PocketType },
-  { label: 'Meal (UPI)', amount: 180, cat: 'Food & Dining', pocket: 'bank' as PocketType },
+  { label: 'Meal', amount: 180, cat: 'Food & Dining', pocket: 'bank' as PocketType },
 ];
 
 export default function QuickInputModal({
@@ -91,7 +87,6 @@ export default function QuickInputModal({
   onAddTransaction,
   apiKey,
 }: QuickInputModalProps) {
-  // Keypad & display state
   const [displayValue, setDisplayValue] = useState('0');
   const [expressionHint, setExpressionHint] = useState('');
   const [type, setType] = useState<TransactionType>('expense');
@@ -100,18 +95,15 @@ export default function QuickInputModal({
   const [category, setCategory] = useState('Food & Dining');
   const [note, setNote] = useState('');
 
-  // Mode: Keypad vs AI Text Parser
   const [entryMode, setEntryMode] = useState<'keypad' | 'ai'>('keypad');
   const [naturalText, setNaturalText] = useState('');
   const [isParsing, setIsParsing] = useState(false);
 
-  // Category Drawer Open
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
   const [isPocketDrawerOpen, setIsPocketDrawerOpen] = useState(false);
 
   if (!isOpen) return null;
 
-  // Keypad Handlers
   const handleKeypadPress = (val: string) => {
     if (val === 'CLEAR') {
       setDisplayValue('0');
@@ -128,7 +120,6 @@ export default function QuickInputModal({
       return;
     }
 
-    // Calculation operators (+, -)
     if (val === '+' || val === '-' || val === '×' || val === '÷') {
       const currentNum = parseFloat(displayValue) || 0;
       setExpressionHint(`${currentNum} ${val}`);
@@ -143,10 +134,9 @@ export default function QuickInputModal({
       return;
     }
 
-    // Digit press
     setDisplayValue((prev) => {
       if (prev === '0') return val;
-      if (prev.length >= 8) return prev; // max 8 digits
+      if (prev.length >= 8) return prev;
       return prev + val;
     });
   };
@@ -178,7 +168,6 @@ export default function QuickInputModal({
   };
 
   const handleFinalSubmit = () => {
-    // Resolve expression if pending
     let finalAmount = parseFloat(displayValue);
     if (expressionHint) {
       const parts = expressionHint.split(' ');
@@ -207,14 +196,13 @@ export default function QuickInputModal({
     if (type === 'income') {
       try {
         confetti({
-          particleCount: 45,
-          spread: 60,
+          particleCount: 35,
+          spread: 50,
           origin: { y: 0.6 },
         });
       } catch {}
     }
 
-    // Reset and close
     setDisplayValue('0');
     setExpressionHint('');
     setNote('');
@@ -224,34 +212,34 @@ export default function QuickInputModal({
   const CurrentIcon = CATEGORY_ICONS[category] || Layers;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
       <div
-        className="w-full sm:max-w-md rounded-t-[32px] sm:rounded-[32px] bg-[var(--bg-surface)] border border-[var(--border-color)] p-5 sm:p-6 shadow-2xl flex flex-col justify-between max-h-[95vh] overflow-y-auto no-scrollbar animate-in slide-in-from-bottom duration-200"
+        className="w-full sm:max-w-md rounded-t-[28px] sm:rounded-[28px] bg-[var(--bg-surface)] border border-[var(--border-color)] p-5 sm:p-6 shadow-2xl flex flex-col justify-between max-h-[92vh] overflow-y-auto no-scrollbar animate-in slide-in-from-bottom duration-150"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Grab bar on mobile */}
-        <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-[var(--border-color)] sm:hidden" />
+        {/* Mobile grab bar */}
+        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[var(--border-color)] sm:hidden" />
 
-        {/* Top Header: Close + Segmented Pill Toggle + AI Switch */}
-        <div className="flex items-center justify-between pb-3">
+        {/* Top Control Bar (Minimal Monochrome) */}
+        <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]">
           <button
             onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-transform duration-150 active:scale-95"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-transform duration-120 active:scale-95"
             aria-label="Close"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
 
-          {/* Segmented Control (Expense / Income / Transfer) */}
-          <div className="flex items-center rounded-full bg-[var(--bg-surface-elevated)] p-1 border border-[var(--border-color)]">
+          {/* Segmented Pill Toggle: Expense / Income / Transfer */}
+          <div className="flex items-center rounded-full bg-[var(--bg-surface-elevated)] p-0.5 border border-[var(--border-color)]">
             <button
               onClick={() => {
                 setType('expense');
                 setCategory(CATEGORIES.expense[0]);
               }}
-              className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition-all duration-150 ${
+              className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
                 type === 'expense'
-                  ? 'bg-rose-500 text-white shadow-sm'
+                  ? 'bg-[var(--text-primary)] text-[var(--bg-page)] shadow-sm'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -264,9 +252,9 @@ export default function QuickInputModal({
                 setType('income');
                 setCategory(CATEGORIES.income[0]);
               }}
-              className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition-all duration-150 ${
+              className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
                 type === 'income'
-                  ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                  ? 'bg-emerald-600 text-white dark:bg-emerald-500 dark:text-slate-950 shadow-sm'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -281,9 +269,9 @@ export default function QuickInputModal({
                 setPocket('bank');
                 setToPocket('cash');
               }}
-              className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition-all duration-150 ${
+              className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
                 type === 'transfer'
-                  ? 'bg-indigo-600 text-white shadow-sm'
+                  ? 'bg-[var(--text-primary)] text-[var(--bg-page)] shadow-sm'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -292,33 +280,31 @@ export default function QuickInputModal({
             </button>
           </div>
 
-          {/* AI Entry Switch */}
+          {/* AI Switch */}
           <button
             onClick={() => setEntryMode(entryMode === 'keypad' ? 'ai' : 'keypad')}
-            className={`flex h-10 w-10 items-center justify-center rounded-full border transition-transform duration-150 active:scale-95 ${
+            className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all ${
               entryMode === 'ai'
-                ? 'bg-emerald-500/20 border-emerald-500 text-emerald-500'
-                : 'bg-[var(--bg-surface-elevated)] border-[var(--border-color)] text-[var(--text-secondary)]'
+                ? 'bg-[var(--text-primary)] text-[var(--bg-page)] border-[var(--text-primary)]'
+                : 'bg-[var(--bg-surface-elevated)] border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
             }`}
             aria-label="Toggle AI natural language mode"
-            title="Toggle AI natural language entry"
           >
             <Sparkles className="h-4 w-4" />
           </button>
         </div>
 
-        {/* AI Natural Language Mode */}
+        {/* AI Entry Form */}
         {entryMode === 'ai' ? (
           <div className="py-4 space-y-3">
             <div className="rounded-2xl bg-[var(--bg-surface-elevated)] p-4 border border-[var(--border-color)]">
-              <label className="block text-xs font-bold text-emerald-500 mb-1 flex items-center gap-1.5">
-                <Sparkles className="h-4 w-4" />
-                <span>AI Quick Speech / Text Entry</span>
+              <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
+                AI Speech / Natural Text
               </label>
               <textarea
                 value={naturalText}
                 onChange={(e) => setNaturalText(e.target.value)}
-                placeholder="e.g. Spent 120 on auto rickshaw via cash, or Got 4500 client payout into business"
+                placeholder="e.g. Spent 120 on auto via cash, or Received 4000 for web project into business"
                 rows={3}
                 style={{ fontSize: '16px' }}
                 className="w-full rounded-xl bg-transparent border-none text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none resize-none"
@@ -327,41 +313,38 @@ export default function QuickInputModal({
                 type="button"
                 onClick={handleNaturalParse}
                 disabled={isParsing || !naturalText.trim()}
-                className="mt-2 w-full rounded-xl bg-emerald-500 py-2.5 text-xs font-bold text-slate-950 hover:bg-emerald-400 disabled:opacity-50 transition-transform duration-150 active:scale-95"
+                className="mt-2 w-full rounded-xl bg-[var(--text-primary)] text-[var(--bg-page)] py-2.5 text-xs font-bold hover:opacity-90 disabled:opacity-50 transition-all active:scale-98"
               >
-                {isParsing ? 'Parsing with AI...' : 'Auto-Populate Keypad'}
+                {isParsing ? 'Processing...' : 'Fill Keypad'}
               </button>
             </div>
-            <p className="text-center text-[11px] text-[var(--text-muted)]">
-              FinMech AI will parse your pocket, category, and rupee amount automatically.
-            </p>
           </div>
         ) : (
-          /* Revolut-Style Display & Keypad */
-          <div className="flex flex-col justify-between space-y-3 pt-1">
-            {/* Account / Pocket Pill Selector */}
+          /* Revolut-Style Minimal Keypad Screen */
+          <div className="flex flex-col justify-between space-y-3 pt-2">
+            {/* Pocket Selector Pill */}
             <div className="flex items-center justify-center">
               <button
                 type="button"
                 onClick={() => setIsPocketDrawerOpen(!isPocketDrawerOpen)}
-                className="flex items-center gap-2 rounded-full bg-[var(--bg-surface-elevated)] px-4 py-2 border border-[var(--border-color)] text-xs font-bold text-[var(--text-primary)] hover:border-emerald-500/40 transition-all min-h-[40px]"
+                className="flex items-center gap-2 rounded-full bg-[var(--bg-surface-elevated)] px-4 py-1.5 border border-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] hover:border-[var(--border-color-hover)] transition-all min-h-[36px]"
               >
                 {pocket === 'cash' ? (
-                  <Banknote className="h-4 w-4 text-amber-500" />
+                  <Banknote className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                 ) : pocket === 'bank' ? (
-                  <Building2 className="h-4 w-4 text-indigo-500" />
+                  <Building2 className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                 ) : (
-                  <Briefcase className="h-4 w-4 text-cyan-500" />
+                  <Briefcase className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                 )}
                 <span>
-                  {pocket === 'cash' ? 'Cash in Hand' : pocket === 'bank' ? 'Personal Bank' : 'Biz Division'}
+                  {pocket === 'cash' ? 'Cash in Hand' : pocket === 'bank' ? 'Personal Bank' : 'Division'}
                 </span>
                 {type === 'transfer' && (
                   <span className="text-[var(--text-muted)]">
-                    → {toPocket === 'cash' ? 'Cash' : toPocket === 'bank' ? 'Bank' : 'Biz'}
+                    → {toPocket === 'cash' ? 'Cash' : toPocket === 'bank' ? 'Bank' : 'Division'}
                   </span>
                 )}
-                <ChevronDown className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                <ChevronDown className="h-3 w-3 text-[var(--text-muted)]" />
               </button>
             </div>
 
@@ -376,22 +359,22 @@ export default function QuickInputModal({
                       setPocket(p);
                       setIsPocketDrawerOpen(false);
                     }}
-                    className={`py-2 px-2 rounded-xl text-xs font-bold capitalize transition-all ${
+                    className={`py-2 px-1 rounded-xl text-xs font-semibold capitalize transition-all ${
                       pocket === p
-                        ? 'bg-emerald-500 text-slate-950'
+                        ? 'bg-[var(--text-primary)] text-[var(--bg-page)]'
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     }`}
                   >
-                    {p === 'business' ? 'Biz Division' : p}
+                    {p === 'business' ? 'Division' : p}
                   </button>
                 ))}
               </div>
             )}
 
-            {/* Central Calculation & Large Amount Display */}
+            {/* Central Large Amount Typography */}
             <div className="py-2 text-center">
               {expressionHint && (
-                <p className="text-xs font-mono font-semibold text-[var(--text-muted)] tracking-wider">
+                <p className="text-xs font-mono font-medium text-[var(--text-muted)]">
                   {expressionHint}
                 </p>
               )}
@@ -399,28 +382,36 @@ export default function QuickInputModal({
                 <span className="text-2xl sm:text-3xl font-extrabold text-[var(--text-muted)] select-none">
                   ₹
                 </span>
-                <span className="text-4xl sm:text-5xl font-black text-[var(--text-primary)] tracking-tight tabular-nums select-none">
+                <span
+                  className={`text-4xl sm:text-5xl font-black tracking-tight tabular-nums select-none ${
+                    type === 'income'
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : type === 'expense'
+                      ? 'text-[var(--text-primary)]'
+                      : 'text-[var(--text-primary)]'
+                  }`}
+                >
                   {displayValue}
                 </span>
               </div>
             </div>
 
-            {/* Quick Preset Chips Row */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            {/* Quick Presets */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
               {QUICK_PRESETS.map((p) => (
                 <button
                   key={p.label}
                   type="button"
                   onClick={() => handleApplyPreset(p)}
-                  className="rounded-full bg-[var(--bg-surface-elevated)] px-3 py-1 text-[11px] font-bold text-[var(--text-secondary)] hover:text-emerald-500 border border-[var(--border-color)] whitespace-nowrap min-h-[32px] transition-transform duration-150 active:scale-95"
+                  className="rounded-full bg-[var(--bg-surface-elevated)] px-3 py-1 text-[11px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-color)] whitespace-nowrap min-h-[30px] transition-transform duration-120 active:scale-95"
                 >
                   {p.label} ₹{p.amount}
                 </button>
               ))}
             </div>
 
-            {/* In-App 4x4 Revolut Numeric Keypad */}
-            <div className="grid grid-cols-4 gap-2 pt-1">
+            {/* Tactile Monochrome 4x4 Keypad (Image 4 Revolut style) */}
+            <div className="grid grid-cols-4 gap-1.5 pt-1">
               {[
                 { label: '7', val: '7' },
                 { label: '8', val: '8' },
@@ -443,11 +434,11 @@ export default function QuickInputModal({
                   key={key.label}
                   type="button"
                   onClick={() => handleKeypadPress(key.val)}
-                  className={`flex h-12 sm:h-13 items-center justify-center rounded-2xl text-base sm:text-lg font-bold transition-all duration-150 active:scale-90 ${
-                    key.isOp
-                      ? 'bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25 border border-emerald-500/30'
-                      : key.isBack
-                      ? 'bg-rose-500/15 text-rose-500 hover:bg-rose-500/25'
+                  className={`flex h-12 items-center justify-center rounded-2xl text-base font-bold transition-all duration-120 active:scale-95 ${
+                    key.isBack
+                      ? 'bg-[var(--bg-surface-elevated)] text-red-600 dark:text-red-400 hover:bg-red-500/10'
+                      : key.isOp
+                      ? 'bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-color)]'
                       : 'bg-[var(--bg-surface-elevated)] text-[var(--text-primary)] hover:bg-[var(--border-color-hover)] border border-[var(--border-color)]'
                   }`}
                 >
@@ -456,49 +447,45 @@ export default function QuickInputModal({
               ))}
             </div>
 
-            {/* Optional Memo / Note Input */}
+            {/* Note Input */}
             <div className="pt-1">
               <input
                 type="text"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Add note (e.g. Late night snack, Auto to station)..."
+                placeholder="Optional note (e.g. Chai, auto fare)..."
                 style={{ fontSize: '16px' }}
                 className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-3.5 py-2 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none min-h-[40px]"
               />
             </div>
 
-            {/* Bottom Bar: Category Pill on Left + Save Pill on Right */}
+            {/* Bottom Bar: Category Selector & Monochrome Save */}
             <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-color)]">
-              {/* Category Selector Pill */}
               <button
                 type="button"
                 onClick={() => setIsCategoryDrawerOpen(!isCategoryDrawerOpen)}
-                className="flex-1 flex items-center justify-between rounded-full bg-[var(--bg-surface-elevated)] px-4 py-3 border border-[var(--border-color)] hover:border-emerald-500/40 text-xs font-bold text-[var(--text-primary)] min-h-[48px] transition-transform duration-150 active:scale-95"
+                className="flex-1 flex items-center justify-between rounded-full bg-[var(--bg-surface-elevated)] px-4 py-3 border border-[var(--border-color)] hover:border-[var(--border-color-hover)] text-xs font-semibold text-[var(--text-primary)] min-h-[46px] transition-all active:scale-98"
               >
                 <div className="flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-500">
-                    <CurrentIcon className="h-3.5 w-3.5" />
-                  </div>
+                  <CurrentIcon className="h-4 w-4 text-[var(--text-muted)]" />
                   <span className="truncate max-w-[120px]">{category}</span>
                 </div>
-                <ChevronDown className="h-4 w-4 text-[var(--text-muted)] shrink-0" />
+                <ChevronDown className="h-3.5 w-3.5 text-[var(--text-muted)] shrink-0" />
               </button>
 
-              {/* Save Button */}
               <button
                 type="button"
                 onClick={handleFinalSubmit}
-                className="flex-1 rounded-full bg-emerald-500 py-3 text-sm font-black text-slate-950 hover:bg-emerald-400 shadow-lg shadow-emerald-500/25 transition-transform duration-150 active:scale-95 min-h-[48px] flex items-center justify-center gap-1.5"
+                className="flex-1 rounded-full bg-[var(--text-primary)] text-[var(--bg-page)] py-3 text-xs font-bold hover:opacity-90 shadow-md transition-all active:scale-98 min-h-[46px] flex items-center justify-center gap-1.5"
               >
                 <Check className="h-4 w-4" />
                 <span>Save</span>
               </button>
             </div>
 
-            {/* Category Drawer Accordion */}
+            {/* Category Accordion */}
             {isCategoryDrawerOpen && (
-              <div className="rounded-2xl bg-[var(--bg-surface-elevated)] p-3 border border-[var(--border-color)] max-h-48 overflow-y-auto no-scrollbar animate-in fade-in">
+              <div className="rounded-2xl bg-[var(--bg-surface-elevated)] p-3 border border-[var(--border-color)] max-h-44 overflow-y-auto no-scrollbar animate-in fade-in">
                 <div className="grid grid-cols-2 gap-1.5">
                   {(CATEGORIES[type] || CATEGORIES.expense).map((cat) => {
                     const Icon = CATEGORY_ICONS[cat] || Layers;
@@ -510,9 +497,9 @@ export default function QuickInputModal({
                           setCategory(cat);
                           setIsCategoryDrawerOpen(false);
                         }}
-                        className={`flex items-center gap-2 rounded-xl p-2 text-xs font-semibold text-left transition-all ${
+                        className={`flex items-center gap-2 rounded-xl p-2 text-xs font-medium text-left transition-all ${
                           category === cat
-                            ? 'bg-emerald-500 text-slate-950 font-bold'
+                            ? 'bg-[var(--text-primary)] text-[var(--bg-page)] font-bold'
                             : 'text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]'
                         }`}
                       >

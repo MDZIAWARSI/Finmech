@@ -77,7 +77,13 @@ export function AuthModal({
       await signInWithGoogle();
       onClose();
     } catch (err: any) {
-      setErrorMsg(err.message || 'Google sign in failed. Ensure popup is allowed and domain is authorized.');
+      if (err.code === 'auth/unauthorized-domain') {
+        setErrorMsg('Domain not authorized in Firebase Console. Add your Vercel URL in Firebase Console -> Authentication -> Settings -> Authorized Domains.');
+      } else if (err.code === 'auth/popup-blocked') {
+        setErrorMsg('Sign-in popup was blocked by your browser. Please allow popups for this site and retry.');
+      } else {
+        setErrorMsg(err.message || 'Google sign in failed. Ensure popup is allowed and domain is authorized.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -164,32 +170,40 @@ export function AuthModal({
           <div className="py-4 space-y-4">
             {/* User Profile Card */}
             <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-neutral-50 dark:bg-[#18181b] border border-neutral-200/80 dark:border-neutral-800">
-              {user.photoURL && !photoError ? (
-                <img
-                  src={user.photoURL}
-                  alt={user.displayName || 'Google Account'}
-                  referrerPolicy="no-referrer"
-                  crossOrigin="anonymous"
-                  onError={() => setPhotoError(true)}
-                  className="w-12 h-12 rounded-full object-cover border border-neutral-200 dark:border-neutral-700 shadow-xs shrink-0"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center text-base font-extrabold shadow-xs shrink-0">
-                  {(user.displayName || user.email || 'U').charAt(0).toUpperCase()}
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-bold text-neutral-900 dark:text-white truncate">
-                  {user.displayName || (user.email ? user.email.split('@')[0] : 'User')}
-                </div>
-                <div className="text-xs text-neutral-400 truncate mt-0.5">
-                  {user.email || 'Signed in via Account'}
-                </div>
-                <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Google Cloud Keyed • Active
-                </div>
-              </div>
+              {(() => {
+                const photo = user.photoURL || user.providerData?.find((p) => p.photoURL)?.photoURL;
+                const name = user.displayName || user.providerData?.find((p) => p.displayName)?.displayName || (user.email ? user.email.split('@')[0] : 'User');
+                const email = user.email || user.providerData?.find((p) => p.email)?.email;
+                return (
+                  <>
+                    {photo && !photoError ? (
+                      <img
+                        src={photo}
+                        alt={name}
+                        referrerPolicy="no-referrer"
+                        onError={() => setPhotoError(true)}
+                        className="w-12 h-12 rounded-full object-cover border border-neutral-200 dark:border-neutral-700 shadow-xs shrink-0"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center text-base font-extrabold shadow-xs shrink-0">
+                        {name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-bold text-neutral-900 dark:text-white truncate">
+                        {name}
+                      </div>
+                      <div className="text-xs text-neutral-400 truncate mt-0.5">
+                        {email || 'Signed in via Account'}
+                      </div>
+                      <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Google Cloud Keyed • Active
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             {/* Cloud Sync info */}
@@ -387,7 +401,7 @@ export function AuthModal({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="you@example.com"
+                  placeholder="Enter your email"
                   className="w-full px-3 py-2 bg-neutral-50 dark:bg-[#1a1a1f] border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
                 />
               </div>

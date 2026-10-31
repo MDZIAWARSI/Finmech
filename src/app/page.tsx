@@ -393,9 +393,9 @@ export default function Home() {
         onTabChange={setCurrentTab}
         onOpenQuickEntry={() => handleOpenQuickEntry()}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        userName={user?.displayName || profile.name || (user?.email ? user.email.split('@')[0] : undefined)}
-        userPhoto={user?.photoURL || profile.photoURL || null}
-        userEmail={user ? user.email : null}
+        userName={user?.displayName || user?.providerData?.find((p) => p.displayName)?.displayName || profile.name || (user?.email ? user.email.split('@')[0] : undefined)}
+        userPhoto={user?.photoURL || user?.providerData?.find((p) => p.photoURL)?.photoURL || profile.photoURL || null}
+        userEmail={user ? (user.email || user.providerData?.find((p) => p.email)?.email || null) : null}
       />
 
       {/* Main Container - Mobile First with Desktop Max Width */}
@@ -453,7 +453,7 @@ export default function Home() {
           <AiCopilotView
             summary={summary}
             currency={profile.currency}
-            userName={user?.displayName || profile.name || (user?.email ? user.email.split('@')[0] : undefined)}
+            userName={user?.displayName || user?.providerData?.find((p) => p.displayName)?.displayName || profile.name || (user?.email ? user.email.split('@')[0] : undefined)}
             onOpenTargetModal={() => setIsTargetModalOpen(true)}
             onClose={() => setCurrentTab('dashboard')}
           />

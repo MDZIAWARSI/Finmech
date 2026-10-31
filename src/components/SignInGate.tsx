@@ -34,7 +34,13 @@ export function SignInGate({ onContinueAsGuest }: SignInGateProps) {
     try {
       await signInWithGoogle();
     } catch (err: any) {
-      setErrorMsg(err.message || 'Google sign-in was interrupted. Please ensure popups are enabled and retry.');
+      if (err.code === 'auth/unauthorized-domain') {
+        setErrorMsg('Domain not authorized in Firebase Console. Add your Vercel URL in Firebase Console -> Authentication -> Settings -> Authorized Domains.');
+      } else if (err.code === 'auth/popup-blocked') {
+        setErrorMsg('Sign-in popup was blocked by your browser. Please allow popups for this site and retry.');
+      } else {
+        setErrorMsg(err.message || 'Google sign-in was interrupted. Please ensure popups are enabled and retry.');
+      }
     } finally {
       setIsSubmitting(false);
     }

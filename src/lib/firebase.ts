@@ -4,12 +4,12 @@ import { getFirestore } from 'firebase/firestore';
 
 export function getFirebaseConfig() {
   const envConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyCYMyZkFcjqHgNPyhwKwEJjOMwyRsZZJEo',
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'finmech-ab904.firebaseapp.com',
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'finmech-ab904',
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'finmech-ab904.firebasestorage.app',
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '891582111550',
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:891582111550:web:d4a2c53b6dfd3c63cbd66f',
   };
 
   if (envConfig.apiKey && envConfig.projectId && envConfig.apiKey !== 'dummy') {

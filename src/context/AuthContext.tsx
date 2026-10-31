@@ -53,11 +53,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Check initial local cached user session
+    // Check initial local cached user session (purge any legacy dummy "local_user_" or "user@example.com")
     try {
       const saved = localStorage.getItem('finmech_local_user');
       if (saved) {
-        setUser(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.uid && !parsed.uid.startsWith('local_user_') && parsed.email !== 'user@example.com') {
+          setUser(parsed);
+        } else {
+          localStorage.removeItem('finmech_local_user');
+        }
       }
     } catch { }
 
@@ -142,14 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } else {
-      // Offline/Local user fallback
-      const localUser: any = {
-        uid: 'local_user_' + Date.now(),
-        displayName: 'User',
-        email: 'user@example.com',
-      };
-      setUser(localUser);
-      localStorage.setItem('finmech_local_user', JSON.stringify(localUser));
+      throw new Error('Firebase Authentication is not initialized.');
     }
   };
 
@@ -157,13 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (auth) {
       await signInWithEmailAndPassword(auth, email, pass);
     } else {
-      const localUser: any = {
-        uid: 'local_user_' + Date.now(),
-        displayName: email.split('@')[0],
-        email: email,
-      };
-      setUser(localUser);
-      localStorage.setItem('finmech_local_user', JSON.stringify(localUser));
+      throw new Error('Firebase Authentication is not initialized.');
     }
   };
 
@@ -188,13 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } else {
-      const localUser: any = {
-        uid: 'local_user_' + Date.now(),
-        displayName: name || email.split('@')[0],
-        email: email,
-      };
-      setUser(localUser);
-      localStorage.setItem('finmech_local_user', JSON.stringify(localUser));
+      throw new Error('Firebase Authentication is not initialized.');
     }
   };
 

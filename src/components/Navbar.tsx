@@ -113,7 +113,6 @@ export function Navbar({
                   src={userPhoto}
                   alt={userName || 'User'}
                   referrerPolicy="no-referrer"
-                  crossOrigin="anonymous"
                   onError={() => setImageError(true)}
                   className="w-10 h-10 rounded-full object-cover border border-neutral-200/80 dark:border-neutral-800 shadow-xs group-hover:scale-105 transition-transform"
                 />

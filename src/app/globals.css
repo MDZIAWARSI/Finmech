@@ -24,6 +24,24 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   font-feature-settings: 'cv02' 1, 'cv03' 1, 'cv04' 1, 'cv11' 1, 'ss01' 1;
+  /* Disable accidental text selection, callout menus & tap highlights on long clicks */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keep inputs, textareas and editable fields selectable for typing and editing */
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Prevent image drag and long-press callout menus on iOS */
+img, svg {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Premium Typography Numerals (Monospace alignment + slashed zero option) */
@@ -50,6 +68,7 @@ body {
 /* Safe hit-target minimums & focus rings (WCAG AA compliant) */
 button, a, input, select {
   touch-action: manipulation;
+  -webkit-touch-callout: none;
 }
 
 :focus-visible {

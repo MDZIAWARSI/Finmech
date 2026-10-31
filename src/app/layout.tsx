@@ -58,6 +58,15 @@ export default function RootLayout({
                   root.setAttribute('data-theme', 'light');
                   root.style.colorScheme = 'light';
                 }
+
+                // Disable native callout menu on long clicks/taps across UI elements, preserving input editing
+                document.addEventListener('contextmenu', function(e) {
+                  var target = e.target;
+                  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+                    return;
+                  }
+                  e.preventDefault();
+                }, { passive: false });
               } catch (e) {}
             `,
           }}

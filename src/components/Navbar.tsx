@@ -41,7 +41,12 @@ export function Navbar({
 }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const [isAiExpanded, setIsAiExpanded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const aiButtonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [userPhoto]);
 
   // Auto-collapse if user doesn't click again within 4.5 seconds
   useEffect(() => {
@@ -103,11 +108,13 @@ export function Navbar({
               className="relative group focus:outline-none"
               title={userEmail ? `Signed in as ${userEmail}` : 'Sign in / Cloud Sync'}
             >
-              {userPhoto && !userPhoto.includes('Icon.png') && userPhoto !== '/avatar.jpg' ? (
+              {userPhoto && !imageError && !userPhoto.includes('Icon.png') && userPhoto !== '/avatar.jpg' ? (
                 <img
                   src={userPhoto}
                   alt={userName || 'User'}
                   referrerPolicy="no-referrer"
+                  crossOrigin="anonymous"
+                  onError={() => setImageError(true)}
                   className="w-10 h-10 rounded-full object-cover border border-neutral-200/80 dark:border-neutral-800 shadow-xs group-hover:scale-105 transition-transform"
                 />
               ) : userName ? (

@@ -52,6 +52,11 @@ if (typeof window !== 'undefined') {
       auth = getAuth(app);
       db = getFirestore(app);
       googleProvider = new GoogleAuthProvider();
+      googleProvider.addScope('profile');
+      googleProvider.addScope('email');
+      googleProvider.setCustomParameters({
+        prompt: 'select_account',
+      });
     } catch (err) {
       console.warn('Failed to initialize Firebase with provided config:', err);
     }

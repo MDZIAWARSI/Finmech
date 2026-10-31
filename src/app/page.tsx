@@ -17,6 +17,7 @@ import {
   saveDenominations, 
   getStoredLiveBusinessBalance,
   saveLiveBusinessBalance,
+  clearUserData,
   exportFinancialDataJson,
   DEFAULT_PROFILE,
   DEFAULT_DENOMINATIONS
@@ -35,6 +36,7 @@ import { QuickEntryModal } from '@/components/QuickEntryModal';
 import { EditTransactionModal } from '@/components/EditTransactionModal';
 import { SavingsTargetModal } from '@/components/SavingsTargetModal';
 import { AuthModal } from '@/components/AuthModal';
+import { SignInGate } from '@/components/SignInGate';
 import { useAuth } from '@/context/AuthContext';
 import { 
   subscribeToUserData, 
@@ -42,7 +44,8 @@ import {
   deleteTransactionFromCloud, 
   updateProfileInCloud, 
   updateDenominationsInCloud, 
-  updateBusinessBalanceInCloud 
+  updateBusinessBalanceInCloud,
+  clearUserCloudData
 } from '@/lib/firestoreSync';
 
 export default function Home() {
@@ -53,7 +56,8 @@ export default function Home() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [denominations, setDenominations] = useState<CashDenominationCount>(DEFAULT_DENOMINATIONS);
   const [manualBusinessBalance, setManualBusinessBalance] = useState<number | undefined>(undefined);
-  const { user, syncWithCloud } = useAuth();
+  const [isGuestMode, setIsGuestMode] = useState(false);
+  const { user, loading: authLoading, signOutUser } = useAuth();
 
   // Modals state
   const [isQuickEntryOpen, setIsQuickEntryOpen] = useState(false);
@@ -64,16 +68,36 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
     setCurrentDate(new Date());
-    setTransactions(getStoredTransactions());
-    setProfile(getStoredProfile());
-    setDenominations(getStoredDenominations());
-    setManualBusinessBalance(getStoredLiveBusinessBalance());
   }, []);
+
+  // Isolate and load data keyed to the authenticated user
+  useEffect(() => {
+    if (!mounted) return;
+    if (user?.uid) {
+      const uid = user.uid;
+      setTransactions(getStoredTransactions(uid));
+      setProfile(getStoredProfile(uid));
+      setDenominations(getStoredDenominations(uid));
+      setManualBusinessBalance(getStoredLiveBusinessBalance(uid));
+    } else if (isGuestMode) {
+      setTransactions(getStoredTransactions(null));
+      setProfile(getStoredProfile(null));
+      setDenominations(getStoredDenominations(null));
+      setManualBusinessBalance(getStoredLiveBusinessBalance(null));
+    } else {
+      // User signed out -> Wipe memory completely so no data is taken or exposed
+      setTransactions([]);
+      setProfile(DEFAULT_PROFILE);
+      setDenominations(DEFAULT_DENOMINATIONS);
+      setManualBusinessBalance(0);
+    }
+  }, [user?.uid, isGuestMode, mounted]);
 
   // Real-time Cloud Firestore synchronization when user is signed in
   useEffect(() => {
     if (!user?.uid) return;
-    const unsubscribe = subscribeToUserData(user.uid, {
+    const uid = user.uid;
+    const unsubscribe = subscribeToUserData(uid, {
       onTransactionsChange: (txs) => setTransactions(txs),
       onProfileChange: (p) => {
         setProfile((prev) => {
@@ -82,7 +106,7 @@ export default function Home() {
             name: p.name || user.displayName || prev.name,
             photoURL: p.photoURL || user.photoURL || prev.photoURL,
           };
-          saveProfile(merged);
+          saveProfile(merged, uid);
           return merged;
         });
       },
@@ -95,14 +119,16 @@ export default function Home() {
   // Keep profile in sync with Google account display name & photo
   useEffect(() => {
     if (!user) return;
-    if (user.displayName || user.photoURL) {
+    const photo = user.photoURL || user.providerData?.find((p) => p.photoURL)?.photoURL || null;
+    const name = user.displayName || user.providerData?.find((p) => p.displayName)?.displayName || null;
+    if (name || photo) {
       setProfile((prev) => {
         const updated = {
           ...prev,
-          name: user.displayName || prev.name,
-          photoURL: user.photoURL || prev.photoURL,
+          name: name || prev.name,
+          photoURL: photo || prev.photoURL,
         };
-        saveProfile(updated);
+        saveProfile(updated, user.uid);
         return updated;
       });
     }
@@ -140,7 +166,7 @@ export default function Home() {
 
     const updated = [newTx, ...transactions];
     setTransactions(updated);
-    saveTransactions(updated);
+    saveTransactions(updated, user?.uid);
     if (user?.uid) {
       addTransactionToCloud(user.uid, newTx);
     }
@@ -149,7 +175,7 @@ export default function Home() {
   const handleDeleteTransaction = (id: string) => {
     const updated = transactions.filter((t) => t.id !== id);
     setTransactions(updated);
-    saveTransactions(updated);
+    saveTransactions(updated, user?.uid);
     if (user?.uid) {
       deleteTransactionFromCloud(user.uid, id);
     }
@@ -158,7 +184,7 @@ export default function Home() {
   const handleUpdateTransaction = (updatedTx: Transaction) => {
     const updated = transactions.map((t) => (t.id === updatedTx.id ? updatedTx : t));
     setTransactions(updated);
-    saveTransactions(updated);
+    saveTransactions(updated, user?.uid);
     if (user?.uid) {
       addTransactionToCloud(user.uid, updatedTx);
     }
@@ -167,7 +193,7 @@ export default function Home() {
 
   const handleUpdateDenominations = (newCounts: CashDenominationCount) => {
     setDenominations(newCounts);
-    saveDenominations(newCounts);
+    saveDenominations(newCounts, user?.uid);
     if (user?.uid) {
       updateDenominationsInCloud(user.uid, newCounts);
     }
@@ -188,7 +214,7 @@ export default function Home() {
       };
       const updated = [adjustmentTx, ...transactions];
       setTransactions(updated);
-      saveTransactions(updated);
+      saveTransactions(updated, user?.uid);
       if (user?.uid) {
         addTransactionToCloud(user.uid, adjustmentTx);
       }
@@ -209,7 +235,7 @@ export default function Home() {
     };
     const updated = [atmTx, ...transactions];
     setTransactions(updated);
-    saveTransactions(updated);
+    saveTransactions(updated, user?.uid);
     if (user?.uid) {
       addTransactionToCloud(user.uid, atmTx);
     }
@@ -217,7 +243,7 @@ export default function Home() {
 
   const handleUpdateBusinessBalance = (newBalance: number) => {
     setManualBusinessBalance(newBalance);
-    saveLiveBusinessBalance(newBalance);
+    saveLiveBusinessBalance(newBalance, user?.uid);
     if (user?.uid) {
       updateBusinessBalanceInCloud(user.uid, newBalance);
     }
@@ -237,7 +263,7 @@ export default function Home() {
       };
       const updated = [adjTx, ...transactions];
       setTransactions(updated);
-      saveTransactions(updated);
+      saveTransactions(updated, user?.uid);
       if (user?.uid) {
         addTransactionToCloud(user.uid, adjTx);
       }
@@ -258,7 +284,7 @@ export default function Home() {
     };
     const updated = [transferTx, ...transactions];
     setTransactions(updated);
-    saveTransactions(updated);
+    saveTransactions(updated, user?.uid);
     if (user?.uid) {
       addTransactionToCloud(user.uid, transferTx);
     }
@@ -270,14 +296,48 @@ export default function Home() {
       monthlySavingsTarget: newTarget,
     };
     setProfile(updatedProfile);
-    saveProfile(updatedProfile);
+    saveProfile(updatedProfile, user?.uid);
     if (user?.uid) {
       updateProfileInCloud(user.uid, updatedProfile);
     }
   };
 
+  // Full clean reset of data (Local & Cloud)
+  const handleClearAllData = async () => {
+    if (user?.uid) {
+      await clearUserCloudData(user.uid);
+      clearUserData(user.uid);
+    } else {
+      clearUserData(null);
+    }
+    setTransactions([]);
+    setDenominations(DEFAULT_DENOMINATIONS);
+    setManualBusinessBalance(0);
+    const resetProfile: UserProfile = {
+      ...DEFAULT_PROFILE,
+      id: user?.uid || 'user_default',
+      name: user?.displayName || '',
+      photoURL: user?.photoURL || undefined,
+    };
+    setProfile(resetProfile);
+    saveProfile(resetProfile, user?.uid);
+  };
+
+  // Clear device cache and re-sync
+  const handleClearLocalCache = () => {
+    clearUserData(user?.uid);
+    setTransactions([]);
+    setDenominations(DEFAULT_DENOMINATIONS);
+    setManualBusinessBalance(0);
+  };
+
   const handleExportData = () => {
-    const jsonStr = exportFinancialDataJson(transactions, profile);
+    const jsonStr = exportFinancialDataJson(
+      transactions, 
+      profile, 
+      denominations, 
+      summary.businessBalance
+    );
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -288,12 +348,17 @@ export default function Home() {
   };
 
   // Only render on client to ensure hydrations match localStorage
-  if (!mounted) {
+  if (!mounted || authLoading) {
     return (
       <div className="min-h-screen bg-[#fafafa] dark:bg-[#09090b] flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-neutral-300 dark:border-neutral-700 border-t-neutral-900 dark:border-t-white animate-spin" />
       </div>
     );
+  }
+
+  // Mandatory Sign-In Screen when unauthenticated
+  if (!user && !isGuestMode) {
+    return <SignInGate onContinueAsGuest={() => setIsGuestMode(true)} />;
   }
 
   return (
@@ -403,6 +468,9 @@ export default function Home() {
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+        onClearAllData={handleClearAllData}
+        onClearLocalCache={handleClearLocalCache}
+        onExportData={handleExportData}
       />
     </div>
   );

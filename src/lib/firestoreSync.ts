@@ -6,7 +6,8 @@ import {
   deleteDoc, 
   writeBatch,
   query,
-  orderBy 
+  orderBy,
+  getDocs 
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Transaction, UserProfile, CashDenominationCount } from '@/types/finance';
@@ -39,21 +40,21 @@ export function subscribeToUserData(
       const data = snap.data();
       if (data.profile) {
         callbacks.onProfileChange(data.profile);
-        saveProfile(data.profile);
+        saveProfile(data.profile, userId);
       }
       if (data.denominations) {
         callbacks.onDenominationsChange(data.denominations);
-        saveDenominations(data.denominations);
+        saveDenominations(data.denominations, userId);
       }
       if (typeof data.businessBalance === 'number') {
         callbacks.onBusinessBalanceChange(data.businessBalance);
-        saveLiveBusinessBalance(data.businessBalance);
+        saveLiveBusinessBalance(data.businessBalance, userId);
       }
     } else {
       // First-time sync: Upload current local state to initialize cloud document
-      const currentProfile = getStoredProfile();
-      const currentDenoms = getStoredDenominations();
-      const currentBizBalance = getStoredLiveBusinessBalance();
+      const currentProfile = getStoredProfile(userId);
+      const currentDenoms = getStoredDenominations(userId);
+      const currentBizBalance = getStoredLiveBusinessBalance(userId);
       setDoc(userDocRef, {
         profile: currentProfile,
         denominations: currentDenoms,
@@ -74,10 +75,10 @@ export function subscribeToUserData(
         cloudTxs.push(d.data() as Transaction);
       });
       callbacks.onTransactionsChange(cloudTxs);
-      saveTransactions(cloudTxs);
+      saveTransactions(cloudTxs, userId);
     } else {
       // If cloud has 0 transactions, but user has existing local transactions, push them up
-      const localTxs = getStoredTransactions();
+      const localTxs = getStoredTransactions(userId);
       if (localTxs.length > 0) {
         const batch = writeBatch(db);
         localTxs.forEach((tx) => {
@@ -150,6 +151,42 @@ export async function updateBusinessBalanceInCloud(userId: string, businessBalan
     }, { merge: true });
   } catch (err) {
     console.warn('Failed to update business balance in Cloud Firestore:', err);
+  }
+}
+
+export async function clearUserCloudData(userId: string) {
+  if (!db || !userId) return;
+  try {
+    const txsColRef = collection(db, 'users', userId, 'transactions');
+    const snap = await getDocs(query(txsColRef));
+    if (!snap.empty) {
+      const batch = writeBatch(db);
+      snap.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    }
+    const userDocRef = doc(db, 'users', userId);
+    await setDoc(userDocRef, {
+      profile: {
+        id: userId,
+        name: '',
+        currency: '₹',
+        monthlySavingsTarget: 0,
+        monthlyBudget: 0,
+      },
+      denominations: {
+        500: 0,
+        200: 0,
+        100: 0,
+        50: 0,
+        20: 0,
+        10: 0,
+        coins: 0,
+      },
+      businessBalance: 0,
+      updatedAt: Date.now(),
+    }, { merge: true });
+  } catch (err) {
+    console.warn('Failed to clear user cloud data:', err);
   }
 }
 

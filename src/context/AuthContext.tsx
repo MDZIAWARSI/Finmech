@@ -70,21 +70,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (currentUser) {
         setUser(currentUser);
         try {
+          const photo = currentUser.photoURL || currentUser.providerData?.find((p) => p.photoURL)?.photoURL || null;
+          const name = currentUser.displayName || currentUser.providerData?.find((p) => p.displayName)?.displayName || null;
+          const email = currentUser.email || currentUser.providerData?.find((p) => p.email)?.email || null;
+
           const storedUser = {
             uid: currentUser.uid,
-            displayName: currentUser.displayName,
-            photoURL: currentUser.photoURL,
-            email: currentUser.email,
+            displayName: name,
+            photoURL: photo,
+            email: email,
           };
           localStorage.setItem('finmech_local_user', JSON.stringify(storedUser));
           if (db) {
             await setDoc(doc(db, 'users', currentUser.uid), {
-              name: currentUser.displayName,
-              email: currentUser.email,
-              photoURL: currentUser.photoURL,
+              name: name,
+              email: email,
+              photoURL: photo,
               profile: {
-                name: currentUser.displayName,
-                photoURL: currentUser.photoURL,
+                name: name,
+                photoURL: photo,
               },
               updatedAt: Date.now(),
             }, { merge: true });
@@ -93,16 +97,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.warn('Could not sync auth profile to firestore:', e);
         }
       } else {
+        setUser(null);
         try {
-          const saved = localStorage.getItem('finmech_local_user');
-          if (saved) {
-            setUser(JSON.parse(saved));
-          } else {
-            setUser(null);
-          }
-        } catch {
-          setUser(null);
-        }
+          localStorage.removeItem('finmech_local_user');
+        } catch {}
       }
       setLoading(false);
     });
@@ -116,21 +114,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (res.user) {
         setUser(res.user);
         try {
+          const photo = res.user.photoURL || res.user.providerData?.find((p) => p.photoURL)?.photoURL || null;
+          const name = res.user.displayName || res.user.providerData?.find((p) => p.displayName)?.displayName || null;
+          const email = res.user.email || res.user.providerData?.find((p) => p.email)?.email || null;
+
           const storedUser = {
             uid: res.user.uid,
-            displayName: res.user.displayName,
-            photoURL: res.user.photoURL,
-            email: res.user.email,
+            displayName: name,
+            photoURL: photo,
+            email: email,
           };
           localStorage.setItem('finmech_local_user', JSON.stringify(storedUser));
           if (db) {
             await setDoc(doc(db, 'users', res.user.uid), {
-              name: res.user.displayName,
-              email: res.user.email,
-              photoURL: res.user.photoURL,
+              name: name,
+              email: email,
+              photoURL: photo,
               profile: {
-                name: res.user.displayName,
-                photoURL: res.user.photoURL,
+                name: name,
+                photoURL: photo,
               },
               updatedAt: Date.now(),
             }, { merge: true });

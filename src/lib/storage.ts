@@ -1,31 +1,20 @@
 import { Transaction, UserProfile, CashDenominationCount } from '@/types/finance';
 
-const STORAGE_KEYS = {
+// Helper to generate isolated storage keys scoped to the signed-in user
+function getUserKey(type: 'txs' | 'profile' | 'denoms' | 'biz', userId?: string | null): string {
+  if (userId) {
+    return `finmech_u_${userId}_${type}_v4`;
+  }
+  return `finmech_guest_${type}_v4`;
+}
+
+// Fallback legacy keys for migration
+const LEGACY_STORAGE_KEYS = {
   TRANSACTIONS: 'finmech_transactions_v3',
   PROFILE: 'finmech_profile_v3',
   CASH_DENOMINATIONS: 'finmech_cash_denominations_v3',
   LIVE_BUSINESS_BALANCE: 'finmech_live_business_balance_v3',
 };
-
-// Clean one-time reset for freshly starting at 0
-function ensureFreshStart() {
-  if (typeof window === 'undefined') return;
-  try {
-    if (!localStorage.getItem('finmech_fresh_v3')) {
-      localStorage.removeItem('finmech_transactions_v2');
-      localStorage.removeItem('finmech_profile_v2');
-      localStorage.removeItem('finmech_cash_denominations_v2');
-      localStorage.removeItem('finmech_live_business_balance_v2');
-      localStorage.removeItem('finmech_local_user');
-      localStorage.removeItem('finmech_firebase_config');
-      localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS);
-      localStorage.removeItem(STORAGE_KEYS.PROFILE);
-      localStorage.removeItem(STORAGE_KEYS.CASH_DENOMINATIONS);
-      localStorage.removeItem(STORAGE_KEYS.LIVE_BUSINESS_BALANCE);
-      localStorage.setItem('finmech_fresh_v3', 'true');
-    }
-  } catch {}
-}
 
 export const DEFAULT_PROFILE: UserProfile = {
   id: 'user_default',
@@ -47,13 +36,19 @@ export const DEFAULT_DENOMINATIONS: CashDenominationCount = {
 
 export const DEFAULT_TRANSACTIONS: Transaction[] = [];
 
-export function getStoredTransactions(): Transaction[] {
+export function getStoredTransactions(userId?: string | null): Transaction[] {
   if (typeof window === 'undefined') return DEFAULT_TRANSACTIONS;
-  ensureFreshStart();
+  const key = getUserKey('txs', userId);
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
+    const raw = localStorage.getItem(key);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(DEFAULT_TRANSACTIONS));
+      // Check legacy fallback for seamless migration
+      const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEYS.TRANSACTIONS);
+      if (legacyRaw) {
+        const parsed = JSON.parse(legacyRaw);
+        saveTransactions(parsed, userId);
+        return parsed;
+      }
       return DEFAULT_TRANSACTIONS;
     }
     return JSON.parse(raw);
@@ -62,22 +57,28 @@ export function getStoredTransactions(): Transaction[] {
   }
 }
 
-export function saveTransactions(transactions: Transaction[]) {
+export function saveTransactions(transactions: Transaction[], userId?: string | null) {
   if (typeof window === 'undefined') return;
+  const key = getUserKey('txs', userId);
   try {
-    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(transactions));
+    localStorage.setItem(key, JSON.stringify(transactions));
   } catch (err) {
     console.error('Failed to save transactions to localStorage', err);
   }
 }
 
-export function getStoredProfile(): UserProfile {
+export function getStoredProfile(userId?: string | null): UserProfile {
   if (typeof window === 'undefined') return DEFAULT_PROFILE;
-  ensureFreshStart();
+  const key = getUserKey('profile', userId);
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.PROFILE);
+    const raw = localStorage.getItem(key);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(DEFAULT_PROFILE));
+      const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEYS.PROFILE);
+      if (legacyRaw) {
+        const parsed = JSON.parse(legacyRaw);
+        saveProfile(parsed, userId);
+        return parsed;
+      }
       return DEFAULT_PROFILE;
     }
     return JSON.parse(raw);
@@ -86,22 +87,28 @@ export function getStoredProfile(): UserProfile {
   }
 }
 
-export function saveProfile(profile: UserProfile) {
+export function saveProfile(profile: UserProfile, userId?: string | null) {
   if (typeof window === 'undefined') return;
+  const key = getUserKey('profile', userId);
   try {
-    localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
+    localStorage.setItem(key, JSON.stringify(profile));
   } catch (err) {
     console.error('Failed to save profile to localStorage', err);
   }
 }
 
-export function getStoredDenominations(): CashDenominationCount {
+export function getStoredDenominations(userId?: string | null): CashDenominationCount {
   if (typeof window === 'undefined') return DEFAULT_DENOMINATIONS;
-  ensureFreshStart();
+  const key = getUserKey('denoms', userId);
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.CASH_DENOMINATIONS);
+    const raw = localStorage.getItem(key);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.CASH_DENOMINATIONS, JSON.stringify(DEFAULT_DENOMINATIONS));
+      const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEYS.CASH_DENOMINATIONS);
+      if (legacyRaw) {
+        const parsed = JSON.parse(legacyRaw);
+        saveDenominations(parsed, userId);
+        return parsed;
+      }
       return DEFAULT_DENOMINATIONS;
     }
     return JSON.parse(raw);
@@ -110,21 +117,31 @@ export function getStoredDenominations(): CashDenominationCount {
   }
 }
 
-export function saveDenominations(counts: CashDenominationCount) {
+export function saveDenominations(counts: CashDenominationCount, userId?: string | null) {
   if (typeof window === 'undefined') return;
+  const key = getUserKey('denoms', userId);
   try {
-    localStorage.setItem(STORAGE_KEYS.CASH_DENOMINATIONS, JSON.stringify(counts));
+    localStorage.setItem(key, JSON.stringify(counts));
   } catch (err) {
     console.error('Failed to save denominations to localStorage', err);
   }
 }
 
-export function getStoredLiveBusinessBalance(): number {
+export function getStoredLiveBusinessBalance(userId?: string | null): number {
   if (typeof window === 'undefined') return 0;
-  ensureFreshStart();
+  const key = getUserKey('biz', userId);
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.LIVE_BUSINESS_BALANCE);
-    if (!raw) return 0;
+    const raw = localStorage.getItem(key);
+    if (!raw) {
+      const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEYS.LIVE_BUSINESS_BALANCE);
+      if (legacyRaw) {
+        const num = parseFloat(legacyRaw);
+        const val = isNaN(num) ? 0 : num;
+        saveLiveBusinessBalance(val, userId);
+        return val;
+      }
+      return 0;
+    }
     const num = parseFloat(raw);
     return isNaN(num) ? 0 : num;
   } catch {
@@ -132,23 +149,60 @@ export function getStoredLiveBusinessBalance(): number {
   }
 }
 
-export function saveLiveBusinessBalance(balance: number) {
+export function saveLiveBusinessBalance(balance: number, userId?: string | null) {
   if (typeof window === 'undefined') return;
+  const key = getUserKey('biz', userId);
   try {
-    localStorage.setItem(STORAGE_KEYS.LIVE_BUSINESS_BALANCE, balance.toString());
+    localStorage.setItem(key, balance.toString());
   } catch (err) {
     console.error('Failed to save business balance to localStorage', err);
   }
 }
 
-export function exportFinancialDataJson(transactions: Transaction[], profile: UserProfile): string {
+// Clear specific user's local data
+export function clearUserData(userId?: string | null) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(getUserKey('txs', userId));
+    localStorage.removeItem(getUserKey('profile', userId));
+    localStorage.removeItem(getUserKey('denoms', userId));
+    localStorage.removeItem(getUserKey('biz', userId));
+  } catch (err) {
+    console.warn('Failed to clear user data:', err);
+  }
+}
+
+// Completely clear all Finmech local data
+export function clearAllLocalFinmechData() {
+  if (typeof window === 'undefined') return;
+  try {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('finmech_')) {
+        keysToRemove.push(k);
+      }
+    }
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
+  } catch (err) {
+    console.warn('Failed to clear all Finmech local data:', err);
+  }
+}
+
+export function exportFinancialDataJson(
+  transactions: Transaction[], 
+  profile: UserProfile,
+  denominations?: CashDenominationCount,
+  businessBalance?: number
+): string {
   const payload = {
     app: 'finmech',
     version: '2.0',
     exportDate: new Date().toISOString(),
     profile,
+    denominations: denominations || DEFAULT_DENOMINATIONS,
+    businessBalance: businessBalance || 0,
     transactions,
   };
   return JSON.stringify(payload, null, 2);
 }
-

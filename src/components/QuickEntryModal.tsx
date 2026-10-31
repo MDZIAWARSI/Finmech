@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ArrowRight, Delete, Check, Wallet, Landmark, Briefcase } from 'lucide-react';
 import { TransactionType, PocketType } from '@/types/finance';
 
@@ -16,6 +16,10 @@ interface QuickEntryModalProps {
     note: string;
   }) => void;
   currency?: string;
+  initialType?: TransactionType;
+  initialPocket?: PocketType;
+  initialToPocket?: PocketType;
+  initialCategory?: string;
 }
 
 const EXPENSE_CATEGORIES = [
@@ -49,14 +53,40 @@ export function QuickEntryModal({
   onClose,
   onAddTransaction,
   currency = '₹',
+  initialType,
+  initialPocket,
+  initialToPocket,
+  initialCategory,
 }: QuickEntryModalProps) {
-  const [type, setType] = useState<TransactionType>('expense');
-  const [pocket, setPocket] = useState<PocketType>('cash');
-  const [toPocket, setToPocket] = useState<PocketType>('bank');
+  const [type, setType] = useState<TransactionType>(initialType || 'expense');
+  const [pocket, setPocket] = useState<PocketType>(initialPocket || 'cash');
+  const [toPocket, setToPocket] = useState<PocketType>(initialToPocket || 'bank');
   const [amountStr, setAmountStr] = useState<string>('0');
-  const [category, setCategory] = useState<string>('Food & Dining');
+  const [category, setCategory] = useState<string>(initialCategory || 'Food & Dining');
   const [note, setNote] = useState<string>('');
   const [showCategoryPicker, setShowCategoryPicker] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const defaultType = initialType || 'expense';
+      const defaultPocket = initialPocket || 'cash';
+      const defaultToPocket = initialToPocket || 'bank';
+      const defaultCategory = initialCategory || (
+        defaultType === 'income' 
+          ? (defaultPocket === 'business' ? 'Client Payment' : 'Salary / Retainer')
+          : defaultType === 'transfer'
+          ? (defaultPocket === 'business' ? 'Business to Personal Draw' : 'ATM Cash Withdrawal')
+          : (defaultPocket === 'business' ? 'Software & Tools' : 'Food & Dining')
+      );
+      setType(defaultType);
+      setPocket(defaultPocket);
+      setToPocket(defaultToPocket);
+      setCategory(defaultCategory);
+      setAmountStr('0');
+      setNote('');
+      setShowCategoryPicker(false);
+    }
+  }, [isOpen, initialType, initialPocket, initialToPocket, initialCategory]);
 
   if (!isOpen) return null;
 

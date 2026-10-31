@@ -109,7 +109,12 @@ export function computeFinancialSummary(
   if (typeof manualCashAdjusted === 'number') {
     cashBalance = manualCashAdjusted;
   }
-  if (typeof manualBusinessAdjusted === 'number') {
+  // When transactions exist for business, the ledger calculation is authoritative so new entries update the balance.
+  // If no business transactions exist yet, use manualBusinessAdjusted as starting baseline.
+  const hasBusinessTransactions = transactions.some(
+    (t) => t.pocket === 'business' || t.toPocket === 'business'
+  );
+  if (!hasBusinessTransactions && typeof manualBusinessAdjusted === 'number') {
     businessBalance = manualBusinessAdjusted;
   }
 

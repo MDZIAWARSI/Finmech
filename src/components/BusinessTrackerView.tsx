@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Briefcase, 
   Plus, 
@@ -13,14 +13,19 @@ import {
   Landmark,
   Trash2
 } from 'lucide-react';
-import { FinancialSummary, Transaction } from '@/types/finance';
+import { FinancialSummary, Transaction, TransactionType, PocketType } from '@/types/finance';
 
 interface BusinessTrackerViewProps {
   summary: FinancialSummary;
   businessTransactions: Transaction[];
   currency?: string;
   onUpdateBusinessBalance: (newBalance: number) => void;
-  onOpenQuickEntry: () => void;
+  onOpenQuickEntry: (params?: {
+    type?: TransactionType;
+    pocket?: PocketType;
+    toPocket?: PocketType;
+    category?: string;
+  }) => void;
   onTransferToPersonal: (amount: number) => void;
   onDeleteTransaction?: (id: string) => void;
   onEditTransaction?: (tx: Transaction) => void;
@@ -40,6 +45,12 @@ export function BusinessTrackerView({
   const [manualCountInput, setManualCountInput] = useState(summary.businessBalance.toString());
   const [transferAmountInput, setTransferAmountInput] = useState('');
   const [showTransferBox, setShowTransferBox] = useState(false);
+
+  useEffect(() => {
+    if (!isEditingCount) {
+      setManualCountInput(summary.businessBalance.toString());
+    }
+  }, [summary.businessBalance, isEditingCount]);
 
   const handleSaveManualCount = () => {
     const val = parseFloat(manualCountInput);
@@ -120,16 +131,16 @@ export function BusinessTrackerView({
         {/* 3 Quick Action Buttons */}
         <div className="grid grid-cols-3 gap-2 pt-6">
           <button
-            onClick={onOpenQuickEntry}
-            className="py-3 px-2 rounded-2xl bg-neutral-100/70 dark:bg-[#141417] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-1.5 text-xs font-semibold transition-all active:scale-95"
+            onClick={() => onOpenQuickEntry({ type: 'income', pocket: 'business', category: 'Client Payment' })}
+            className="py-3 px-2 rounded-2xl bg-neutral-100/70 dark:bg-[#141417] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-1.5 text-xs font-semibold transition-all active:scale-95 shadow-xs"
           >
             <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-500" />
             + Inflow
           </button>
 
           <button
-            onClick={onOpenQuickEntry}
-            className="py-3 px-2 rounded-2xl bg-neutral-100/70 dark:bg-[#141417] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-1.5 text-xs font-semibold transition-all active:scale-95"
+            onClick={() => onOpenQuickEntry({ type: 'expense', pocket: 'business', category: 'Software & Tools' })}
+            className="py-3 px-2 rounded-2xl bg-neutral-100/70 dark:bg-[#141417] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-1.5 text-xs font-semibold transition-all active:scale-95 shadow-xs"
           >
             <ArrowUpRight className="w-3.5 h-3.5 text-neutral-500" />
             - Tool Spend
@@ -137,7 +148,7 @@ export function BusinessTrackerView({
 
           <button
             onClick={() => setShowTransferBox(!showTransferBox)}
-            className="py-3 px-2 rounded-2xl bg-neutral-100/70 dark:bg-[#141417] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-1.5 text-xs font-semibold transition-all active:scale-95"
+            className="py-3 px-2 rounded-2xl bg-neutral-100/70 dark:bg-[#141417] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-1.5 text-xs font-semibold transition-all active:scale-95 shadow-xs"
           >
             <ArrowLeftRight className="w-3.5 h-3.5" />
             Draw to Bank

@@ -61,9 +61,25 @@ export default function Home() {
 
   // Modals state
   const [isQuickEntryOpen, setIsQuickEntryOpen] = useState(false);
+  const [quickEntryDefaults, setQuickEntryDefaults] = useState<{
+    type?: TransactionType;
+    pocket?: PocketType;
+    toPocket?: PocketType;
+    category?: string;
+  }>({});
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [isTargetModalOpen, setIsTargetModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const handleOpenQuickEntry = (params?: {
+    type?: TransactionType;
+    pocket?: PocketType;
+    toPocket?: PocketType;
+    category?: string;
+  }) => {
+    setQuickEntryDefaults(params || {});
+    setIsQuickEntryOpen(true);
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -142,6 +158,14 @@ export default function Home() {
     manualBusinessBalance,
     currentDate
   );
+
+  // Keep live business balance in sync with ledger calculations
+  useEffect(() => {
+    if (mounted && user?.uid && typeof summary.businessBalance === 'number') {
+      saveLiveBusinessBalance(summary.businessBalance, user.uid);
+      updateBusinessBalanceInCloud(user.uid, summary.businessBalance);
+    }
+  }, [summary.businessBalance, mounted, user?.uid]);
 
   // Actions
   const handleAddTransaction = (entry: {
@@ -367,7 +391,7 @@ export default function Home() {
       <Navbar
         currentTab={currentTab}
         onTabChange={setCurrentTab}
-        onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
+        onOpenQuickEntry={() => handleOpenQuickEntry()}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         userName={user?.displayName || profile.name || (user?.email ? user.email.split('@')[0] : undefined)}
         userPhoto={user?.photoURL || profile.photoURL || null}
@@ -382,7 +406,7 @@ export default function Home() {
             recentTransactions={transactions}
             currency={profile.currency}
             onNavigateTab={setCurrentTab}
-            onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
+            onOpenQuickEntry={() => handleOpenQuickEntry()}
             onOpenTargetModal={() => setIsTargetModalOpen(true)}
             onDeleteTransaction={handleDeleteTransaction}
             onEditTransaction={setEditingTransaction}
@@ -394,7 +418,7 @@ export default function Home() {
             summary={summary}
             transactions={transactions}
             currency={profile.currency}
-            onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
+            onOpenQuickEntry={() => handleOpenQuickEntry()}
             onDeleteTransaction={handleDeleteTransaction}
             onEditTransaction={setEditingTransaction}
             onExportData={handleExportData}
@@ -408,7 +432,7 @@ export default function Home() {
             currency={profile.currency}
             onUpdateDenominations={handleUpdateDenominations}
             onAtmWithdrawal={handleAtmWithdrawal}
-            onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
+            onOpenQuickEntry={() => handleOpenQuickEntry({ pocket: 'cash' })}
           />
         )}
 
@@ -418,7 +442,7 @@ export default function Home() {
             businessTransactions={transactions.filter((t) => t.pocket === 'business' || t.toPocket === 'business')}
             currency={profile.currency}
             onUpdateBusinessBalance={handleUpdateBusinessBalance}
-            onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
+            onOpenQuickEntry={handleOpenQuickEntry}
             onTransferToPersonal={handleTransferBusinessToPersonal}
             onDeleteTransaction={handleDeleteTransaction}
             onEditTransaction={setEditingTransaction}
@@ -442,6 +466,10 @@ export default function Home() {
         onClose={() => setIsQuickEntryOpen(false)}
         onAddTransaction={handleAddTransaction}
         currency={profile.currency}
+        initialType={quickEntryDefaults.type}
+        initialPocket={quickEntryDefaults.pocket}
+        initialToPocket={quickEntryDefaults.toPocket}
+        initialCategory={quickEntryDefaults.category}
       />
 
       {/* Edit / Redo / Reassign Transaction Modal */}

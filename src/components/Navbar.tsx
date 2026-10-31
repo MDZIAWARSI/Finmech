@@ -35,7 +35,7 @@ export function Navbar({
   onOpenQuickEntry,
   onOpenAuthModal,
   userName = 'Zia',
-  userPhoto,
+  userPhoto = '/avatar.jpg',
   userEmail,
 }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
@@ -103,7 +103,7 @@ export function Navbar({
                 <img
                   src={userPhoto}
                   alt={userName}
-                  className="w-10 h-10 rounded-full object-cover shadow-sm group-hover:scale-105 transition-transform"
+                  className="w-10 h-10 rounded-full object-cover border border-neutral-200/80 dark:border-neutral-800 shadow-xs group-hover:scale-105 transition-transform"
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center font-bold text-sm tracking-tight shadow-sm select-none group-hover:scale-105 transition-transform">

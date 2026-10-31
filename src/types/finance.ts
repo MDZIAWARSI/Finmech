@@ -19,6 +19,7 @@ export interface UserProfile {
   currency: string;
   monthlySavingsTarget: number;
   monthlyBudget: number;
+  photoURL?: string;
 }
 
 export interface SavingsGoal {

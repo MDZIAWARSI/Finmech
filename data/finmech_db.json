@@ -1,0 +1,125 @@
+[
+  {
+    "id": "tx_b1",
+    "type": "income",
+    "pocket": "business",
+    "category": "Client Project",
+    "amount": 14500,
+    "date": "2026-10-29T10:30:00.000Z",
+    "note": "Website UI redesign milestone 1 (Campus Cafe)",
+    "businessDetails": {
+      "clientName": "Campus Cafe",
+      "status": "received"
+    },
+    "createdAt": 1793269800000
+  },
+  {
+    "id": "tx_b2",
+    "type": "expense",
+    "pocket": "business",
+    "category": "Software & Tools",
+    "amount": 1200,
+    "date": "2026-10-28T14:15:00.000Z",
+    "note": "Domain + Cloud hosting subscription",
+    "businessDetails": {
+      "clientName": "Vercel / Namecheap",
+      "status": "received"
+    },
+    "createdAt": 1793183400000
+  },
+  {
+    "id": "tx_b3",
+    "type": "income",
+    "pocket": "business",
+    "category": "Tutoring",
+    "amount": 4000,
+    "date": "2026-10-26T17:00:00.000Z",
+    "note": "Python & Web Dev tutoring session fees",
+    "businessDetails": {
+      "clientName": "Junior Batch",
+      "status": "received"
+    },
+    "createdAt": 1793010000000
+  },
+  {
+    "id": "tx_c1",
+    "type": "transfer",
+    "pocket": "bank",
+    "toPocket": "cash",
+    "category": "ATM Withdrawal",
+    "amount": 3000,
+    "date": "2026-10-27T11:00:00.000Z",
+    "note": "Campus ATM cash refill for pocket money",
+    "createdAt": 1793096400000
+  },
+  {
+    "id": "tx_c2",
+    "type": "expense",
+    "pocket": "cash",
+    "category": "Food & Dining",
+    "amount": 60,
+    "date": "2026-10-30T13:20:00.000Z",
+    "note": "Chai and samosa at university canteen",
+    "createdAt": 1793356200000
+  },
+  {
+    "id": "tx_c3",
+    "type": "expense",
+    "pocket": "cash",
+    "category": "Commute & Travel",
+    "amount": 120,
+    "date": "2026-10-30T18:45:00.000Z",
+    "note": "Auto rickshaw to railway station",
+    "createdAt": 1793375400000
+  },
+  {
+    "id": "tx_c4",
+    "type": "expense",
+    "pocket": "cash",
+    "category": "Education & Xerox",
+    "amount": 180,
+    "date": "2026-10-29T16:10:00.000Z",
+    "note": "Exam notes photocopies and stationery",
+    "createdAt": 1793289000000
+  },
+  {
+    "id": "tx_p1",
+    "type": "expense",
+    "pocket": "bank",
+    "category": "Food & Dining",
+    "amount": 420,
+    "date": "2026-10-30T21:00:00.000Z",
+    "note": "Late night pizza with study group (Zomato/UPI)",
+    "createdAt": 1793383800000
+  },
+  {
+    "id": "tx_p2",
+    "type": "expense",
+    "pocket": "bank",
+    "category": "Subscriptions",
+    "amount": 499,
+    "date": "2026-10-25T09:30:00.000Z",
+    "note": "Spotify Student + OTT plan",
+    "createdAt": 1792923600000
+  },
+  {
+    "id": "tx_p3",
+    "type": "expense",
+    "pocket": "bank",
+    "category": "Shopping",
+    "amount": 1899,
+    "date": "2026-10-24T15:20:00.000Z",
+    "note": "New wireless earbuds on sale",
+    "createdAt": 1792857900000
+  },
+  {
+    "id": "tx_p4",
+    "type": "income",
+    "pocket": "bank",
+    "category": "Monthly Allowance",
+    "amount": 8000,
+    "date": "2026-10-20T10:00:00.000Z",
+    "note": "Parents monthly college allowance / stipend",
+    "createdAt": 1792490400000
+  }
+]

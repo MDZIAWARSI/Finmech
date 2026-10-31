@@ -322,6 +322,7 @@ export default function Home() {
             summary={summary}
             currency={profile.currency}
             onOpenTargetModal={() => setIsTargetModalOpen(true)}
+            onClose={() => setCurrentTab('dashboard')}
           />
         )}
       </main>

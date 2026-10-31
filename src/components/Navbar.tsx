@@ -9,7 +9,7 @@ import {
   Plus, 
   Banknote, 
   Briefcase, 
-  Sparkles, 
+  Bot, 
   Sun, 
   Moon,
   PieChart as PieIcon,
@@ -144,8 +144,18 @@ export function Navbar({
             </div>
           </div>
 
-          {/* Right Action: Clean Theme Toggle */}
+          {/* Right Action: Clean Theme Toggle & Header Exit AI button */}
           <div className="flex items-center gap-2">
+            {currentTab === 'copilot' && (
+              <button
+                onClick={() => onTabChange('dashboard')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border border-neutral-200/80 dark:border-neutral-800 transition-colors shadow-xs"
+                aria-label="Exit AI Copilot"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>Close AI</span>
+              </button>
+            )}
             <button
               onClick={toggleTheme}
               className="w-10 h-10 rounded-full bg-white dark:bg-[#141417] border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-center text-neutral-700 dark:text-neutral-200 hover:border-neutral-400 dark:hover:border-neutral-600 active:scale-95 transition-all shadow-xs touch-manipulation cursor-pointer"
@@ -161,61 +171,48 @@ export function Navbar({
         </div>
       </header>
 
-      {/* Floating AI Button ("ai should just be an icon when clicked it should say finmech ai then if i clikc agian the page opens") */}
-      <div ref={aiButtonRef} className="fixed bottom-24 right-4 sm:right-8 z-40 pointer-events-auto">
-        <motion.button
-          layout
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleAiClick}
-          className={`relative flex items-center justify-center transition-all border shadow-[0_12px_30px_rgba(0,0,0,0.22)] dark:shadow-[0_12px_30px_rgba(255,255,255,0.18)] focus:outline-none ${
-            currentTab === 'copilot'
-              ? 'h-11 px-4 rounded-full bg-emerald-500 text-white border-emerald-400 gap-1.5'
-              : isAiExpanded
-              ? 'h-11 px-4 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-700/60 dark:border-neutral-300/60 gap-2'
-              : 'w-11 h-11 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-700/60 dark:border-neutral-300/60'
-          }`}
-          aria-label={
-            currentTab === 'copilot'
-              ? 'Close AI Copilot'
-              : isAiExpanded
-              ? 'Confirm and open Finmech AI'
-              : 'Finmech AI'
-          }
-          title={
-            currentTab === 'copilot'
-              ? 'Close AI'
-              : isAiExpanded
-              ? 'Click again to open'
-              : 'Finmech AI'
-          }
-        >
-          {currentTab === 'copilot' ? (
-            <>
-              <X className="w-4 h-4 text-white shrink-0" />
-              <span className="text-xs font-bold tracking-tight">Close AI</span>
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4 text-emerald-400 dark:text-emerald-500 shrink-0" />
-              <AnimatePresence>
-                {isAiExpanded && (
-                  <motion.div
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className="flex items-center gap-1 overflow-hidden whitespace-nowrap select-none"
-                  >
-                    <span className="text-xs font-bold tracking-tight">Finmech AI</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-emerald-400 dark:text-emerald-500 ml-0.5" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </>
-          )}
-        </motion.button>
-      </div>
+      {/* Floating AI Button: Only rendered when NOT in copilot view so it NEVER overlaps the AI chat! */}
+      {currentTab !== 'copilot' && (
+        <div ref={aiButtonRef} className="fixed bottom-24 right-4 sm:right-8 z-40 pointer-events-auto">
+          <motion.button
+            layout
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleAiClick}
+            className={`relative flex items-center justify-center transition-all border focus:outline-none ${
+              isAiExpanded
+                ? 'h-11 px-4 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-indigo-400/50 shadow-[0_10px_28px_rgba(99,102,241,0.35)] gap-2'
+                : 'w-11 h-11 rounded-full bg-white dark:bg-[#121215] text-neutral-900 dark:text-white border-neutral-200/90 dark:border-neutral-800 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-[0_8px_24px_rgba(99,102,241,0.18)] dark:shadow-[0_8px_24px_rgba(99,102,241,0.22)]'
+            }`}
+            aria-label={
+              isAiExpanded
+                ? 'Confirm and open Finmech AI'
+                : 'Finmech AI'
+            }
+            title={
+              isAiExpanded
+                ? 'Click again to open'
+                : 'Finmech AI'
+            }
+          >
+            <Bot className={`w-4 h-4 shrink-0 ${isAiExpanded ? 'text-white' : 'text-indigo-500 dark:text-indigo-400'}`} />
+            <AnimatePresence>
+              {isAiExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: 'auto' }}
+                  exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="flex items-center gap-1 overflow-hidden whitespace-nowrap select-none"
+                >
+                  <span className="text-xs font-bold tracking-tight">Finmech AI</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-indigo-200 ml-0.5" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
+      )}
 
       {/* 
         Floating Bottom Island Navigation Dock

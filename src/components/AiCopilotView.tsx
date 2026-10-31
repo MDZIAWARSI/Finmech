@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Sparkles, 
   Target, 
   Lightbulb, 
   Send, 
   RefreshCw, 
   Key, 
-  Bot
+  Bot,
+  X
 } from 'lucide-react';
 import { FinancialSummary, AiReport, ChatMessage } from '@/types/finance';
 import { generateFinancialDiagnosis, askAiCopilot } from '@/lib/gemini';
@@ -17,12 +17,14 @@ interface AiCopilotViewProps {
   summary: FinancialSummary;
   currency?: string;
   onOpenTargetModal: () => void;
+  onClose?: () => void;
 }
 
 export function AiCopilotView({
   summary,
   currency = '₹',
   onOpenTargetModal,
+  onClose,
 }: AiCopilotViewProps) {
   const [report, setReport] = useState<AiReport | null>(null);
   const [loadingReport, setLoadingReport] = useState(false);
@@ -103,7 +105,9 @@ export function AiCopilotView({
       <section aria-label="AI Copilot overview" className="pt-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-500" />
+            <div className="w-6 h-6 rounded-lg bg-indigo-500/10 dark:bg-indigo-400/10 border border-indigo-500/20 flex items-center justify-center shrink-0">
+              <Bot className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
+            </div>
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
               Finmech Intelligence
             </span>
@@ -124,7 +128,7 @@ export function AiCopilotView({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:opacity-90 disabled:opacity-50 transition-all shadow-xs"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loadingReport ? 'animate-spin' : ''}`} />
-              {loadingReport ? 'Auditing...' : 'Refresh Audit'}
+              {loadingReport ? 'Auditing...' : 'Refresh'}
             </button>
           </div>
         </div>
@@ -246,7 +250,7 @@ export function AiCopilotView({
       <section aria-label="AI financial chat" className="space-y-4 pt-2">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
-            <Bot className="w-3.5 h-3.5 text-neutral-500" />
+            <Bot className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
             Financial Copilot Chat
           </h2>
           <span className="text-[11px] text-neutral-400">Live intelligence</span>
@@ -258,7 +262,7 @@ export function AiCopilotView({
             <button
               key={prompt}
               onClick={() => handleSendMessage(prompt)}
-              className="px-3 py-1.5 rounded-full text-xs font-medium bg-neutral-100 dark:bg-[#141417] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 whitespace-nowrap transition-colors"
+              className="px-3 py-1.5 rounded-full text-xs font-medium bg-neutral-100 dark:bg-[#141417] hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 text-neutral-700 dark:text-neutral-300 whitespace-nowrap transition-colors border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800/50"
             >
               {prompt}
             </button>
@@ -292,7 +296,7 @@ export function AiCopilotView({
 
           {sendingChat && (
             <div className="flex items-center gap-1.5 text-xs text-neutral-400 px-2">
-              <Sparkles className="w-3.5 h-3.5 animate-spin text-emerald-500" />
+              <Bot className="w-3.5 h-3.5 animate-pulse text-indigo-500 dark:text-indigo-400" />
               <span>Finmech Copilot is computing recommendations...</span>
             </div>
           )}
@@ -312,12 +316,12 @@ export function AiCopilotView({
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             disabled={sendingChat}
-            className="w-full pl-4 pr-12 py-3 bg-neutral-100/70 dark:bg-[#141417] rounded-2xl text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white transition-all"
+            className="w-full pl-4 pr-12 py-3 bg-neutral-100/70 dark:bg-[#141417] rounded-2xl text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
           />
           <button
             type="submit"
             disabled={!chatInput.trim() || sendingChat}
-            className="absolute right-2 top-1/2 -translate-y-1/2 mt-1 w-8 h-8 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center hover:opacity-90 disabled:opacity-30 transition-opacity"
+            className="absolute right-2 top-1/2 -translate-y-1/2 mt-1 w-8 h-8 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-800 disabled:opacity-40 flex items-center justify-center shadow-xs transition-colors"
             aria-label="Send query"
           >
             <Send className="w-3.5 h-3.5" />

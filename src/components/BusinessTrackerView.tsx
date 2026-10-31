@@ -101,7 +101,7 @@ export function BusinessTrackerView({
             </div>
           ) : (
             <div>
-              <div className="text-5xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white tabular-nums">
+              <div className="text-5xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white tabular-nums display-amount">
                 {currency}{summary.businessBalance.toLocaleString('en-IN')}
               </div>
               <div className="text-xs text-neutral-400 dark:text-neutral-500 mt-2 flex items-center gap-2">

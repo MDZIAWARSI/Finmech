@@ -95,7 +95,7 @@ export function ExpenditureView({
         </div>
 
         {/* Big Typography Total */}
-        <div className="text-5xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white tabular-nums mt-2">
+        <div className="text-5xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white tabular-nums display-amount mt-2">
           {currency}{summary.monthlyExpenditure.toLocaleString('en-IN')}
         </div>
 

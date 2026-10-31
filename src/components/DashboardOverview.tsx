@@ -109,7 +109,7 @@ export function DashboardOverview({
         </div>
 
         {/* Large Stark Typographic Display */}
-        <div className="text-5xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white tabular-nums">
+        <div className="text-5xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white tabular-nums display-amount">
           {formatAmount(summary.totalNetWorth)}
         </div>
 

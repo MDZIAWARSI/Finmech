@@ -317,3 +317,4 @@ export function SpendingTrendGraph({
     </div>
   );
 }
+

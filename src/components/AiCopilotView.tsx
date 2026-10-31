@@ -39,7 +39,7 @@ export function AiCopilotView({
     {
       id: 'msg_init',
       role: 'assistant',
-      content: `${initialGreeting} I am your Finmech AI copilot. Your net worth is ${currency}${summary.totalNetWorth.toLocaleString('en-IN')}, and you are ${summary.savingsGoal.percentage}% toward your ${currency}${summary.savingsGoal.targetAmount.toLocaleString()} savings target. Ask me how to hit your goal or optimize spending.`,
+      content: `${initialGreeting} I am your Finmech AI copilot. Your personal net balance is ${currency}${summary.personalNetWorth.toLocaleString('en-IN')}, and you are ${summary.savingsGoal.percentage}% toward your ${currency}${summary.savingsGoal.targetAmount.toLocaleString()} savings target. Ask me how to hit your goal or optimize spending.`,
       timestamp: 'Just now',
     },
   ]);
@@ -56,7 +56,7 @@ export function AiCopilotView({
           return [
             {
               ...prev[0],
-              content: `Hello ${first}! I am your Finmech AI copilot. Your net worth is ${currency}${summary.totalNetWorth.toLocaleString('en-IN')}, and you are ${summary.savingsGoal.percentage}% toward your ${currency}${summary.savingsGoal.targetAmount.toLocaleString()} savings target. Ask me how to hit your goal or optimize spending.`,
+              content: `Hello ${first}! I am your Finmech AI copilot. Your personal net balance is ${currency}${summary.personalNetWorth.toLocaleString('en-IN')}, and you are ${summary.savingsGoal.percentage}% toward your ${currency}${summary.savingsGoal.targetAmount.toLocaleString()} savings target. Ask me how to hit your goal or optimize spending.`,
             },
             ...prev.slice(1),
           ];
@@ -64,7 +64,7 @@ export function AiCopilotView({
         return prev;
       });
     }
-  }, [userName, currency, summary.totalNetWorth, summary.savingsGoal.percentage, summary.savingsGoal.targetAmount]);
+  }, [userName, currency, summary.personalNetWorth, summary.savingsGoal.percentage, summary.savingsGoal.targetAmount]);
 
   useEffect(() => {
     const storedKey = localStorage.getItem('finmech_gemini_key') || '';

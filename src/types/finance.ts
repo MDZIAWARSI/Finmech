@@ -32,6 +32,7 @@ export interface SavingsGoal {
 
 export interface FinancialSummary {
   totalNetWorth: number;
+  personalNetWorth: number; // Pure personal capital: Cash in Hand + Bank Balance (excludes business capital)
   cashInHand: number;
   bankBalance: number;
   businessBalance: number; // Live count of the business money

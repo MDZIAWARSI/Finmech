@@ -63,12 +63,15 @@ export function computeFinancialSummary(
       }
 
       if (isCurrentMonth) {
-        monthlyExpenditure += tx.amount;
-        if (!categoryTotals[tx.category]) {
-          categoryTotals[tx.category] = { amount: 0, count: 0 };
+        // Keep business spends separate: only personal spends (cash/bank) count towards personal monthly expenditure
+        if (tx.pocket !== 'business') {
+          monthlyExpenditure += tx.amount;
+          if (!categoryTotals[tx.category]) {
+            categoryTotals[tx.category] = { amount: 0, count: 0 };
+          }
+          categoryTotals[tx.category].amount += tx.amount;
+          categoryTotals[tx.category].count += 1;
         }
-        categoryTotals[tx.category].amount += tx.amount;
-        categoryTotals[tx.category].count += 1;
       }
     } else if (tx.type === 'income') {
       if (tx.pocket === 'cash') cashBalance += tx.amount;
@@ -79,7 +82,10 @@ export function computeFinancialSummary(
       }
 
       if (isCurrentMonth) {
-        monthlyIncome += tx.amount;
+        // Keep business revenue separate: business inflows are NOT personal savings or personal income
+        if (tx.pocket !== 'business') {
+          monthlyIncome += tx.amount;
+        }
       }
     } else if (tx.type === 'transfer') {
       // Subtraction from source pocket
@@ -89,6 +95,11 @@ export function computeFinancialSummary(
         businessBalance -= tx.amount;
         if (tx.toPocket === 'bank' || tx.toPocket === 'cash') {
           transferredToPersonal += tx.amount;
+          // When business funds are transferred to personal bank or cash (Owner Draw),
+          // it officially enters personal income towards monthly savings
+          if (isCurrentMonth) {
+            monthlyIncome += tx.amount;
+          }
         }
       }
 
@@ -118,8 +129,10 @@ export function computeFinancialSummary(
     businessBalance = manualBusinessAdjusted;
   }
 
-  // Calculate Net Worth
-  const totalNetWorth = cashBalance + bankBalance + businessBalance;
+  // Pure personal liquid net balance: Cash in Hand + Personal Bank
+  const personalNetWorth = cashBalance + bankBalance;
+  // Combined capital across personal and business
+  const totalNetWorth = personalNetWorth + businessBalance;
 
   // Day calculation for daily average spend
   const dayOfMonth = Math.max(1, now.getDate());
@@ -176,6 +189,7 @@ export function computeFinancialSummary(
 
   return {
     totalNetWorth,
+    personalNetWorth,
     cashInHand: cashBalance,
     bankBalance,
     businessBalance,

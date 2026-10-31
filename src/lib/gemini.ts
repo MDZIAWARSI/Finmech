@@ -20,7 +20,7 @@ Monthly Income: ${summary.monthlyIncome}
 Monthly Expenditure: ${summary.monthlyExpenditure}
 Daily Average Spend: ${summary.dailyAverageSpend}
 Savings Goal Target: ${summary.savingsGoal.targetAmount}
-Current Amount Saved This Month: ${summary.savingsGoal.currentSaved} (${summary.savingsGoal.percentage}%)
+Personal Savings (Cash in Hand + Bank, business excluded): ${summary.savingsGoal.currentSaved} (${summary.savingsGoal.percentage}%)
 Remaining to Save: ${summary.savingsGoal.remaining}
 Category Breakdown: ${JSON.stringify(summary.categoryBreakdown)}
 Flagged Leaks: ${JSON.stringify(summary.leaks)}
@@ -72,7 +72,7 @@ Respond in valid JSON format ONLY with this schema:
 
   let executiveDiagnosis = '';
   if (summary.savingsGoal.status === 'achieved') {
-    executiveDiagnosis = `Outstanding fiscal discipline: you have achieved 100% of your ${currency}${target.toLocaleString()} savings goal! Current net surplus stands at ${currency}${currentSaved.toLocaleString()} across your cash, bank, and business reserves.`;
+    executiveDiagnosis = `Outstanding fiscal discipline: you have achieved 100% of your ${currency}${target.toLocaleString()} savings goal! Current personal savings stand at ${currency}${currentSaved.toLocaleString()} across your cash in hand and bank accounts.`;
   } else if (summary.savingsGoal.status === 'on_track') {
     executiveDiagnosis = `Strong financial velocity. You have banked ${currency}${currentSaved.toLocaleString()} (${summary.savingsGoal.percentage}% of target). Your current burn rate of ${currency}${Math.round(summary.dailyAverageSpend).toLocaleString()}/day preserves healthy margin.`;
   } else {

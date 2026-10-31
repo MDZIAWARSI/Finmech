@@ -205,6 +205,9 @@ export function DashboardOverview({
             <div className="text-xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight truncate">
               {formatAmount(summary.savingsGoal.currentSaved)}
             </div>
+            <div className="text-[10px] sm:text-[11px] text-neutral-400 dark:text-neutral-500 font-medium mt-0.5">
+              Cash in Hand + Bank
+            </div>
 
             <div className="mt-2.5 space-y-1.5">
               <div className="w-full h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">

@@ -158,8 +158,8 @@ export function computeFinancialSummary(
       concern: `${c.category} consumes ${c.percentage.toFixed(0)}% of your monthly expenditure. Trimming 15% recovers ₹${Math.round(c.amount * 0.15).toLocaleString()}.`,
     }));
 
-  // Savings Goal calculation
-  const currentSaved = Math.max(0, monthlyIncome - monthlyExpenditure);
+  // Savings Goal calculation: strictly personal liquid holdings (Cash in Hand + Bank Balance; business funds excluded)
+  const currentSaved = Math.max(0, cashBalance + bankBalance);
   const percentage = monthlySavingsTarget > 0 ? Math.min(100, Math.round((currentSaved / monthlySavingsTarget) * 100)) : 0;
   const remaining = Math.max(0, monthlySavingsTarget - currentSaved);
   let goalStatus: SavingsGoal['status'] = 'on_track';

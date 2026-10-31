@@ -72,10 +72,10 @@ export function SavingsTargetModal({
             </div>
             <div>
               <h2 id="target-modal-title" className="text-base font-semibold text-neutral-900 dark:text-white">
-                Monthly Savings Target
+                Personal Savings Target
               </h2>
               <p className="text-xs text-neutral-500">
-                AI analyzes your habits against this goal
+                Cash in Hand + Bank balance (Business capital excluded)
               </p>
             </div>
           </div>
@@ -132,7 +132,7 @@ export function SavingsTargetModal({
           {/* Goal Progress Projection Box */}
           <div className="p-4 rounded-xl bg-neutral-50 dark:bg-[#18181b] border border-neutral-200/60 dark:border-neutral-800 space-y-2.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-neutral-500">Current Progress</span>
+              <span className="text-neutral-500">Cash in Hand + Bank</span>
               <span className="font-semibold text-neutral-900 dark:text-white tabular-nums">
                 {currency}{currentSaved.toLocaleString()} / {currency}{parsedTarget.toLocaleString()} ({percentage}%)
               </span>

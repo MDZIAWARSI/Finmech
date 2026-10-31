@@ -5,7 +5,6 @@ import {
   Sparkles,
   ShieldCheck,
   Key,
-  TrendingDown,
   AlertTriangle,
   Lightbulb,
   Send,
@@ -13,10 +12,7 @@ import {
   User,
   Copy,
   Check,
-  FileText,
   RotateCw,
-  ArrowRight,
-  DollarSign,
 } from 'lucide-react';
 import { FinancialSummary } from '@/lib/financeCalculations';
 import { Transaction, ApiKeyConfig, AiSavingSuggestion, ChatMessage } from '@/types/finance';
@@ -54,7 +50,6 @@ export default function AiAdvisorView({
 
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
-  // Load audit on mount or when transactions change
   useEffect(() => {
     runAudit();
   }, [transactions.length]);
@@ -141,23 +136,23 @@ export default function AiAdvisorView({
   );
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-4 sm:space-y-6 pb-24">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/60 via-[#0d1322] to-indigo-950/50 p-6 sm:p-8 border border-emerald-500/30 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-[var(--bg-surface)] p-6 sm:p-8 border border-[var(--border-color)] shadow-[var(--shadow-card)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400">
-                <Sparkles className="h-4 w-4" />
+              <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-500">
+                <Sparkles className="h-4 w-4" aria-hidden="true" />
               </span>
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
+              <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">
                 FINMECH AI Financial Copilot
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white mt-2 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mt-2 tracking-tight">
               Where You Spend More & How to Fix It
             </h1>
-            <p className="text-xs text-slate-300 mt-1 max-w-xl">
+            <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-xl">
               Continuous analysis of your expenditure, physical pocket cash, and live business cashflow with tailored fixes.
             </p>
           </div>
@@ -165,45 +160,46 @@ export default function AiAdvisorView({
           <div className="flex flex-col sm:items-end gap-2 shrink-0">
             <button
               onClick={onOpenApiKeyModal}
-              className={`flex items-center gap-1.5 rounded-2xl px-3.5 py-2 text-xs font-semibold border transition-all ${
+              className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-bold border transition-transform duration-150 active:scale-[0.96] min-h-[44px] ${
                 apiKeyConfig.isValidated
-                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40 hover:bg-emerald-900/60'
-                  : 'bg-amber-950/60 text-amber-300 border-amber-500/40 hover:bg-amber-900/50'
+                  ? 'bg-emerald-500/15 text-emerald-500 border-emerald-500/40'
+                  : 'bg-amber-500/15 text-amber-500 border-amber-500/40'
               }`}
+              aria-label="Manage Protected API Key"
             >
               {apiKeyConfig.isValidated ? (
                 <>
-                  <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                  <ShieldCheck className="h-4 w-4 text-emerald-500" aria-hidden="true" />
                   <span>Gemini 2.5 Flash Connected</span>
                 </>
               ) : (
                 <>
-                  <Key className="h-4 w-4 text-amber-400" />
+                  <Key className="h-4 w-4 text-amber-500" aria-hidden="true" />
                   <span>Free AI Mode (Add Your Key)</span>
                 </>
               )}
             </button>
-            <span className="text-[10px] text-slate-400">
-              Keys are encrypted locally and never transmitted to our servers.
+            <span className="text-[10px] text-[var(--text-muted)]">
+              Keys are encrypted in browser sandbox and never leaked.
             </span>
           </div>
         </div>
 
         {/* Executive Summary Snippet */}
-        <div className="mt-6 pt-5 border-t border-emerald-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="mt-6 pt-5 border-t border-[var(--border-color)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex-1">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+            <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">
               AI Diagnostic Verdict:
             </p>
-            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
               {isLoadingAudit ? 'Analyzing spending patterns...' : executiveReport}
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="rounded-2xl bg-emerald-500/10 px-4 py-2.5 border border-emerald-500/20 text-center">
-              <span className="text-[10px] text-slate-400 block">Identified Monthly Savings</span>
-              <span className="text-lg font-black text-emerald-400">
+          <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto justify-between sm:justify-start">
+            <div className="rounded-2xl bg-emerald-500/15 px-4 py-2 border border-emerald-500/30 text-center">
+              <span className="text-[10px] text-[var(--text-muted)] block font-medium">Monthly Savings</span>
+              <span className="text-lg font-black text-emerald-500 tabular-nums">
                 +₹{totalPotentialSavings.toLocaleString('en-IN')}/mo
               </span>
             </div>
@@ -211,10 +207,11 @@ export default function AiAdvisorView({
             <button
               onClick={runAudit}
               disabled={isLoadingAudit}
-              className="p-2.5 rounded-2xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-50"
+              className="p-3 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] hover:border-emerald-500/40 disabled:opacity-50 transition-transform duration-150 active:scale-[0.94] min-h-[44px] min-w-[44px] flex items-center justify-center"
               title="Re-run AI Analysis"
+              aria-label="Re-run AI Spending Analysis"
             >
-              <RotateCw className={`h-4 w-4 ${isLoadingAudit ? 'animate-spin' : ''}`} />
+              <RotateCw className={`h-4 w-4 ${isLoadingAudit ? 'animate-spin' : ''}`} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -224,67 +221,68 @@ export default function AiAdvisorView({
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-400" />
-            <h2 className="text-sm font-bold text-slate-200">
+            <AlertTriangle className="h-4 w-4 text-amber-500" aria-hidden="true" />
+            <h2 className="text-sm font-bold text-[var(--text-primary)]">
               Targeted Spending Leaks & Actionable Fixes
             </h2>
           </div>
           <button
             onClick={handleCopyReport}
-            className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200"
+            className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] min-h-[36px]"
+            aria-label="Copy AI Financial Report"
           >
             {copiedReport ? (
               <>
-                <Check className="h-3.5 w-3.5 text-emerald-400" />
-                <span className="text-emerald-400">Copied!</span>
+                <Check className="h-3.5 w-3.5 text-emerald-500" aria-hidden="true" />
+                <span className="text-emerald-500">Copied!</span>
               </>
             ) : (
               <>
-                <Copy className="h-3.5 w-3.5" />
+                <Copy className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Copy Report</span>
               </>
             )}
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           {suggestions.map((sug) => {
             const isHigh = sug.severity === 'high';
             return (
               <div
                 key={sug.id}
-                className="rounded-3xl bg-[#0d1322] border border-slate-800 p-5 shadow-xl flex flex-col justify-between hover:border-slate-700 transition-all"
+                className="rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
                     <span
                       className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                         isHigh
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                          : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                          ? 'bg-rose-500/15 text-rose-500 border border-rose-500/30'
+                          : 'bg-amber-500/15 text-amber-500 border border-amber-500/30'
                       }`}
                     >
                       {sug.category}
                     </span>
-                    <span className="text-xs font-black text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                    <span className="text-xs font-black text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 tabular-nums">
                       Save ₹{sug.potentialMonthlySavings.toLocaleString('en-IN')}/mo
                     </span>
                   </div>
 
-                  <h3 className="text-sm font-bold text-slate-100 mt-2.5">{sug.title}</h3>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  <h3 className="text-sm font-bold text-[var(--text-primary)] mt-2.5">{sug.title}</h3>
+                  <p className="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
                     {sug.description}
                   </p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-800/80 bg-slate-900/60 -mx-5 -mb-5 p-4 rounded-b-3xl">
+                <div className="mt-4 pt-3 border-t border-[var(--border-color)] bg-[var(--bg-surface-elevated)] -mx-5 -mb-5 p-4 rounded-b-3xl">
                   <div className="flex items-start gap-2">
-                    <Lightbulb className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <Lightbulb className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" aria-hidden="true" />
                     <div>
-                      <p className="text-[11px] font-semibold text-emerald-300 uppercase tracking-wide">
+                      <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
                         How to fix this:
                       </p>
-                      <p className="text-xs text-slate-200 mt-0.5 leading-snug">
+                      <p className="text-xs text-[var(--text-primary)] mt-0.5 leading-snug">
                         {sug.actionableStep}
                       </p>
                     </div>
@@ -296,25 +294,25 @@ export default function AiAdvisorView({
         </div>
       </div>
 
-      {/* Interactive AI Chat Section */}
-      <div className="rounded-3xl bg-[#0d1322] border border-slate-800 p-6 shadow-xl flex flex-col h-[520px]">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+      {/* Interactive AI Chat Section (Mobile Optimized) */}
+      <div className="rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] p-4 sm:p-6 shadow-[var(--shadow-card)] flex flex-col h-[520px]">
+        <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)] shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-500 to-indigo-600 text-slate-950 font-bold">
-              <Bot className="h-4 w-4 text-slate-950" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-indigo-600 text-slate-950 font-bold">
+              <Bot className="h-4 w-4 text-slate-950" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-100">FinMech AI Copilot Chat</h3>
-              <p className="text-[11px] text-slate-400">Ask about your budget, purchases, or business</p>
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">FinMech AI Copilot Chat</h3>
+              <p className="text-[11px] text-[var(--text-muted)]">Ask about your budget, purchases, or business</p>
             </div>
           </div>
-          <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-            Live Context Synced
+          <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-bold">
+            Live Synced
           </span>
         </div>
 
         {/* Quick Question Pills */}
-        <div className="py-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0 border-b border-slate-800/50">
+        <div className="py-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0 border-b border-[var(--border-color)]">
           {[
             'Where am I spending more this month?',
             'Can I afford a ₹3,000 purchase today?',
@@ -324,7 +322,7 @@ export default function AiAdvisorView({
             <button
               key={i}
               onClick={() => handleSendMessage(prompt)}
-              className="rounded-full bg-slate-900 px-3 py-1 text-[11px] text-slate-300 border border-slate-700/80 hover:border-emerald-500/50 hover:text-emerald-300 whitespace-nowrap transition-all shrink-0"
+              className="rounded-full bg-[var(--bg-surface-elevated)] px-3.5 py-1.5 text-[11px] font-medium text-[var(--text-secondary)] border border-[var(--border-color)] hover:border-emerald-500 hover:text-emerald-500 whitespace-nowrap transition-transform duration-150 active:scale-[0.96] shrink-0 min-h-[36px]"
             >
               {prompt}
             </button>
@@ -341,23 +339,23 @@ export default function AiAdvisorView({
                 className={`flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : ''}`}
               >
                 <div
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                     isUser
                       ? 'bg-indigo-600 text-white'
-                      : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30'
                   }`}
                 >
-                  {isUser ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
+                  {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                 </div>
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed ${
+                  className={`max-w-[85%] sm:max-w-[80%] rounded-3xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${
                     isUser
                       ? 'bg-indigo-600 text-white rounded-tr-none'
-                      : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-tl-none'
+                      : 'bg-[var(--bg-surface-elevated)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-tl-none shadow-sm'
                   }`}
                 >
                   <p className="whitespace-pre-line">{msg.content}</p>
-                  <span className="block text-[9px] text-slate-400 mt-1 text-right">
+                  <span className="block text-[9px] opacity-60 mt-1 text-right">
                     {msg.timestamp}
                   </span>
                 </div>
@@ -366,8 +364,8 @@ export default function AiAdvisorView({
           })}
 
           {isAiReplying && (
-            <div className="flex items-center gap-2 text-xs text-slate-400 pl-9">
-              <Sparkles className="h-3.5 w-3.5 text-emerald-400 animate-spin" />
+            <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] pl-10">
+              <Sparkles className="h-4 w-4 text-emerald-500 animate-spin" aria-hidden="true" />
               <span>FinMech AI is analyzing your cashflow...</span>
             </div>
           )}
@@ -380,21 +378,23 @@ export default function AiAdvisorView({
             e.preventDefault();
             handleSendMessage();
           }}
-          className="pt-3 border-t border-slate-800 shrink-0 flex gap-2"
+          className="pt-3 border-t border-[var(--border-color)] shrink-0 flex gap-2"
         >
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Ask FinMech: 'How do I cut down on dining out?'..."
-            className="flex-1 rounded-2xl bg-slate-900 border border-slate-700 px-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+            className="flex-1 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-2.5 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-emerald-500 min-h-[44px]"
+            aria-label="Message to FinMech Copilot"
           />
           <button
             type="submit"
             disabled={!inputText.trim() || isAiReplying}
-            className="flex items-center justify-center rounded-2xl bg-emerald-600 px-4 py-2.5 text-white hover:bg-emerald-500 disabled:opacity-50 transition-all"
+            className="flex items-center justify-center rounded-2xl bg-emerald-600 px-4 py-2.5 text-white hover:bg-emerald-500 disabled:opacity-50 transition-transform duration-150 active:scale-[0.94] min-h-[44px] min-w-[44px]"
+            aria-label="Send message"
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-4 w-4" aria-hidden="true" />
           </button>
         </form>
       </div>

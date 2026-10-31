@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'FINMECH | Live Money, Business Tracker & AI Copilot',
   description:
-    'Track expenditures, live business money, and cash in hand with smart AI suggestions on savings.',
+    'Mobile-first fintech app to track expenditures, live business money, and cash in hand with smart AI suggestions on savings.',
   manifest: '/manifest.json',
   icons: {
     icon: '/icons/icon-192.svg',
@@ -33,8 +34,6 @@ export const viewport: Viewport = {
   themeColor: '#090d16',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -46,10 +45,13 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-[#090d16] text-slate-100 selection:bg-emerald-500/30 selection:text-emerald-300 font-sans">
-        <ServiceWorkerRegister />
-        {children}
+      <body className="min-h-full flex flex-col font-sans transition-colors duration-200">
+        <ThemeProvider>
+          <ServiceWorkerRegister />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

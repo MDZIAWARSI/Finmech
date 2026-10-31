@@ -10,6 +10,7 @@ import AiAdvisorView from '@/components/AiAdvisorView';
 import QuickInputModal from '@/components/QuickInputModal';
 import ApiKeySettingsModal from '@/components/ApiKeySettingsModal';
 import AuthModal from '@/components/AuthModal';
+import { Plus } from 'lucide-react';
 
 import { Transaction, UserProfile, ApiKeyConfig } from '@/types/finance';
 import { StorageService, DEFAULT_PROFILE, INITIAL_TRANSACTIONS } from '@/lib/storage';
@@ -51,7 +52,6 @@ export default function Home() {
       .then((data) => {
         if (data && Array.isArray(data.transactions) && data.transactions.length > 0) {
           // If server has more data or fresh session
-          // We keep local client state responsive
         }
       })
       .catch(() => {});
@@ -106,17 +106,17 @@ export default function Home() {
 
   if (!mounted) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#090d16] text-emerald-400">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-page)] text-emerald-500">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-          <span className="text-xs font-mono tracking-wider">FINMECH ENGINE STARTING...</span>
+          <span className="text-xs font-mono font-bold tracking-wider">FINMECH ENGINE STARTING...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30">
+    <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-500 transition-colors duration-200">
       {/* Top Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -132,7 +132,7 @@ export default function Home() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 mx-auto w-full max-w-7xl px-4 py-6">
+      <main className="flex-1 mx-auto w-full max-w-7xl px-3 sm:px-6 py-4 sm:py-6">
         {activeTab === 'overview' && (
           <DashboardOverview
             summary={summary}
@@ -179,6 +179,17 @@ export default function Home() {
           />
         )}
       </main>
+
+      {/* Mobile Floating Action Button (FAB) for Ergonomic 1-Thumb Quick Add */}
+      <div className="md:hidden fixed bottom-20 right-4 z-30">
+        <button
+          onClick={() => setIsQuickAddOpen(true)}
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 text-slate-950 shadow-xl shadow-emerald-500/35 active:scale-[0.92] transition-transform duration-150"
+          aria-label="Quick Add Spend"
+        >
+          <Plus className="h-7 w-7" aria-hidden="true" />
+        </button>
+      </div>
 
       {/* Quick Input Modal */}
       <QuickInputModal

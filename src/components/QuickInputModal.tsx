@@ -13,7 +13,6 @@ import {
   Coffee,
   Bus,
   BookOpen,
-  ShoppingBag,
   Laptop,
   Utensils,
   PlusCircle,
@@ -134,7 +133,6 @@ export default function QuickInputModal({
           : undefined,
     });
 
-    // Celebration confetti on income or savings
     if (type === 'income') {
       try {
         confetti({
@@ -145,7 +143,6 @@ export default function QuickInputModal({
       } catch {}
     }
 
-    // Reset form
     setAmount('');
     setNote('');
     setNaturalText('');
@@ -154,36 +151,37 @@ export default function QuickInputModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
       <div
-        className="relative w-full max-w-lg rounded-3xl bg-[#0d1322] border border-slate-800 p-6 shadow-2xl shadow-emerald-950/40 max-h-[92vh] overflow-y-auto no-scrollbar"
+        className="relative w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800/80">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400">
-              <PlusCircle className="h-5 w-5" />
+        <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-[var(--border-color)]">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-500">
+              <PlusCircle className="h-5 w-5" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-100">Quick Log Transaction</h2>
-              <p className="text-xs text-slate-400">Fast entry for cash, bank, & business money</p>
+              <h2 className="text-base font-bold text-[var(--text-primary)]">Quick Log Transaction</h2>
+              <p className="text-xs text-[var(--text-muted)]">Fast entry for cash, bank, & business</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="rounded-full p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
+            className="p-2 rounded-full text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-transform duration-150 active:scale-[0.94] min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close modal"
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
         {/* Natural Language AI Entry */}
-        <div className="mt-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-teal-950/20 to-indigo-950/30 p-3.5 border border-emerald-500/20">
-          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-300 mb-2">
-            <Sparkles className="h-3.5 w-3.5 text-emerald-400 animate-spin" style={{ animationDuration: '6s' }} />
+        <div className="mt-4 rounded-2xl bg-[var(--bg-surface-elevated)] p-3.5 border border-[var(--border-color)]">
+          <div className="flex items-center gap-2 text-xs font-bold text-emerald-500 mb-2">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-500 animate-spin" style={{ animationDuration: '6s' }} aria-hidden="true" />
             <span>Smart Natural Input</span>
-            <span className="text-[10px] text-slate-400 font-normal">
+            <span className="text-[10px] text-[var(--text-muted)] font-normal hidden sm:inline">
               (e.g., &quot;Spent 120 on auto rickshaw via cash&quot;)
             </span>
           </div>
@@ -198,20 +196,22 @@ export default function QuickInputModal({
                   handleNaturalParse();
                 }
               }}
-              placeholder="Type in plain words: 'spent 60 chai in cash'..."
-              className="flex-1 rounded-xl bg-slate-900/90 border border-slate-700/80 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+              placeholder="Type: 'spent 60 chai in cash'..."
+              className="flex-1 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-color)] px-3.5 py-2.5 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-emerald-500 min-h-[44px]"
+              aria-label="Natural language transaction description"
             />
             <button
               type="button"
               onClick={handleNaturalParse}
               disabled={isParsing || !naturalText.trim()}
-              className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-medium text-white hover:bg-emerald-500 disabled:opacity-50 transition-all"
+              className="flex items-center gap-1.5 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-50 transition-transform duration-150 active:scale-[0.96] min-h-[44px]"
+              aria-label="Parse transaction text"
             >
               {isParsing ? (
                 <span className="animate-pulse">Parsing...</span>
               ) : (
                 <>
-                  <Send className="h-3 w-3" />
+                  <Send className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>Parse</span>
                 </>
               )}
@@ -221,9 +221,9 @@ export default function QuickInputModal({
 
         {/* Rapid Preset Chips */}
         <div className="mt-4">
-          <div className="text-[11px] font-medium text-slate-400 mb-2 flex items-center justify-between">
+          <div className="text-[11px] font-semibold text-[var(--text-muted)] mb-2 flex items-center justify-between">
             <span>⚡ Student & Founder Presets</span>
-            <span className="text-[10px] text-slate-500">Tap to auto-fill</span>
+            <span className="text-[10px]">1-Tap Fill</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {PRESETS.map((p, idx) => {
@@ -233,14 +233,15 @@ export default function QuickInputModal({
                   key={idx}
                   type="button"
                   onClick={() => handleApplyPreset(p)}
-                  className="flex items-center gap-2 rounded-xl bg-slate-900/70 p-2 border border-slate-800 text-left hover:border-emerald-500/50 hover:bg-slate-800/80 transition-all text-xs"
+                  className="flex items-center gap-2 rounded-2xl bg-[var(--bg-surface-elevated)] p-2.5 border border-[var(--border-color)] text-left hover:border-emerald-500/50 transition-transform duration-150 active:scale-[0.96] min-h-[48px]"
+                  aria-label={`Preset ${p.label}: ${p.amount} rupees`}
                 >
-                  <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-                    <Icon className="h-3.5 w-3.5" />
+                  <div className="p-1.5 rounded-xl bg-emerald-500/15 text-emerald-500 shrink-0">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-slate-200 text-[11px]">{p.label}</p>
-                    <p className="text-[10px] text-slate-400">
+                    <p className="truncate font-bold text-[var(--text-primary)] text-[11px]">{p.label}</p>
+                    <p className="text-[10px] text-[var(--text-muted)] tabular-nums">
                       {p.type === 'income' ? '+' : '-'}₹{p.amount} • {p.pocket}
                     </p>
                   </div>
@@ -251,23 +252,24 @@ export default function QuickInputModal({
         </div>
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-          {/* Type Selector: Expense / Income / Transfer */}
+          {/* Flow Type: Expense / Income / Transfer */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">Flow Type</label>
-            <div className="grid grid-cols-3 gap-2 p-1 rounded-xl bg-slate-900 border border-slate-800">
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">Flow Type</label>
+            <div className="grid grid-cols-3 gap-2 p-1 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)]">
               <button
                 type="button"
                 onClick={() => {
                   setType('expense');
                   setCategory(CATEGORIES.expense[0]);
                 }}
-                className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-transform duration-150 active:scale-[0.96] min-h-[40px] ${
                   type === 'expense'
-                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-rose-500 text-white shadow-sm'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
+                aria-pressed={type === 'expense'}
               >
-                <TrendingDown className="h-3.5 w-3.5 text-rose-400" />
+                <TrendingDown className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Expense</span>
               </button>
               <button
@@ -276,13 +278,14 @@ export default function QuickInputModal({
                   setType('income');
                   setCategory(CATEGORIES.income[0]);
                 }}
-                className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-transform duration-150 active:scale-[0.96] min-h-[40px] ${
                   type === 'income'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-emerald-500 text-white shadow-sm'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
+                aria-pressed={type === 'income'}
               >
-                <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
+                <TrendingUp className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Income</span>
               </button>
               <button
@@ -293,58 +296,62 @@ export default function QuickInputModal({
                   setPocket('bank');
                   setToPocket('cash');
                 }}
-                className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-transform duration-150 active:scale-[0.96] min-h-[40px] ${
                   type === 'transfer'
-                    ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
+                aria-pressed={type === 'transfer'}
               >
-                <ArrowRightLeft className="h-3.5 w-3.5 text-indigo-400" />
+                <ArrowRightLeft className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Transfer</span>
               </button>
             </div>
           </div>
 
-          {/* Pocket Bucket Selector */}
+          {/* Pocket Selector */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
               {type === 'transfer' ? 'From Pocket' : 'Account / Pocket'}
             </label>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setPocket('cash')}
-                className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex items-center justify-center gap-1.5 p-3 rounded-2xl border text-xs font-bold transition-transform duration-150 active:scale-[0.96] min-h-[44px] ${
                   pocket === 'cash'
-                    ? 'bg-amber-500/15 border-amber-500/50 text-amber-300 ring-1 ring-amber-500/30'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    ? 'bg-amber-500/20 border-amber-500 text-amber-500 ring-1 ring-amber-500/30'
+                    : 'bg-[var(--bg-surface-elevated)] border-[var(--border-color)] text-[var(--text-secondary)]'
                 }`}
+                aria-pressed={pocket === 'cash'}
               >
-                <Banknote className="h-4 w-4 text-amber-400" />
+                <Banknote className="h-4 w-4 text-amber-500" aria-hidden="true" />
                 <span>Cash in Hand</span>
               </button>
               <button
                 type="button"
                 onClick={() => setPocket('bank')}
-                className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex items-center justify-center gap-1.5 p-3 rounded-2xl border text-xs font-bold transition-transform duration-150 active:scale-[0.96] min-h-[44px] ${
                   pocket === 'bank'
-                    ? 'bg-indigo-500/15 border-indigo-500/50 text-indigo-300 ring-1 ring-indigo-500/30'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    ? 'bg-indigo-500/20 border-indigo-500 text-indigo-500 ring-1 ring-indigo-500/30'
+                    : 'bg-[var(--bg-surface-elevated)] border-[var(--border-color)] text-[var(--text-secondary)]'
                 }`}
+                aria-pressed={pocket === 'bank'}
               >
-                <Building2 className="h-4 w-4 text-indigo-400" />
+                <Building2 className="h-4 w-4 text-indigo-500" aria-hidden="true" />
                 <span>Bank / UPI</span>
               </button>
               <button
                 type="button"
                 onClick={() => setPocket('business')}
-                className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex items-center justify-center gap-1.5 p-3 rounded-2xl border text-xs font-bold transition-transform duration-150 active:scale-[0.96] min-h-[44px] ${
                   pocket === 'business'
-                    ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-300 ring-1 ring-cyan-500/30'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    ? 'bg-cyan-500/20 border-cyan-500 text-cyan-500 ring-1 ring-cyan-500/30'
+                    : 'bg-[var(--bg-surface-elevated)] border-[var(--border-color)] text-[var(--text-secondary)]'
                 }`}
+                aria-pressed={pocket === 'business'}
               >
-                <Briefcase className="h-4 w-4 text-cyan-400" />
+                <Briefcase className="h-4 w-4 text-cyan-500" aria-hidden="true" />
                 <span>Business</span>
               </button>
             </div>
@@ -353,42 +360,45 @@ export default function QuickInputModal({
           {/* If Transfer: Destination Pocket */}
           {type === 'transfer' && (
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">To Pocket</label>
+              <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">To Pocket</label>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setToPocket('cash')}
-                  className={`flex items-center justify-center gap-2 p-2 rounded-xl border text-xs font-medium transition-all ${
+                  className={`flex items-center justify-center gap-1.5 p-3 rounded-2xl border text-xs font-bold min-h-[44px] ${
                     toPocket === 'cash'
-                      ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
-                      : 'bg-slate-900 border-slate-800 text-slate-400'
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-500'
+                      : 'bg-[var(--bg-surface-elevated)] border-[var(--border-color)] text-[var(--text-secondary)]'
                   }`}
+                  aria-pressed={toPocket === 'cash'}
                 >
-                  <Banknote className="h-3.5 w-3.5 text-amber-400" />
+                  <Banknote className="h-4 w-4 text-amber-500" aria-hidden="true" />
                   <span>Cash in Hand</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setToPocket('bank')}
-                  className={`flex items-center justify-center gap-2 p-2 rounded-xl border text-xs font-medium transition-all ${
+                  className={`flex items-center justify-center gap-1.5 p-3 rounded-2xl border text-xs font-bold min-h-[44px] ${
                     toPocket === 'bank'
-                      ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-300'
-                      : 'bg-slate-900 border-slate-800 text-slate-400'
+                      ? 'bg-indigo-500/20 border-indigo-500 text-indigo-500'
+                      : 'bg-[var(--bg-surface-elevated)] border-[var(--border-color)] text-[var(--text-secondary)]'
                   }`}
+                  aria-pressed={toPocket === 'bank'}
                 >
-                  <Building2 className="h-3.5 w-3.5 text-indigo-400" />
+                  <Building2 className="h-4 w-4 text-indigo-500" aria-hidden="true" />
                   <span>Bank</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setToPocket('business')}
-                  className={`flex items-center justify-center gap-2 p-2 rounded-xl border text-xs font-medium transition-all ${
+                  className={`flex items-center justify-center gap-1.5 p-3 rounded-2xl border text-xs font-bold min-h-[44px] ${
                     toPocket === 'business'
-                      ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300'
-                      : 'bg-slate-900 border-slate-800 text-slate-400'
+                      ? 'bg-cyan-500/20 border-cyan-500 text-cyan-500'
+                      : 'bg-[var(--bg-surface-elevated)] border-[var(--border-color)] text-[var(--text-secondary)]'
                   }`}
+                  aria-pressed={toPocket === 'business'}
                 >
-                  <Briefcase className="h-3.5 w-3.5 text-cyan-400" />
+                  <Briefcase className="h-4 w-4 text-cyan-500" aria-hidden="true" />
                   <span>Business</span>
                 </button>
               </div>
@@ -397,9 +407,9 @@ export default function QuickInputModal({
 
           {/* Amount Input */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">Amount (₹)</label>
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">Amount (₹)</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-slate-400">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-[var(--text-muted)] select-none">
                 ₹
               </span>
               <input
@@ -409,18 +419,20 @@ export default function QuickInputModal({
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full rounded-2xl bg-slate-900 border border-slate-700 py-3.5 pl-10 pr-4 text-xl font-bold text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] py-3.5 pl-10 pr-4 text-xl font-extrabold text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-emerald-500 tabular-nums min-h-[48px]"
+                aria-label="Transaction amount in rupees"
               />
             </div>
           </div>
 
           {/* Category Selector */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">Category</label>
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">Category</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+              className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-3 text-xs font-semibold text-[var(--text-primary)] focus:outline-none focus:border-emerald-500 min-h-[44px]"
+              aria-label="Transaction category"
             >
               {CATEGORIES[type].map((cat) => (
                 <option key={cat} value={cat}>
@@ -430,38 +442,38 @@ export default function QuickInputModal({
             </select>
           </div>
 
-          {/* Optional Business Client Details */}
+          {/* Client Details if Business */}
           {pocket === 'business' && (
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">Client / Brand Name</label>
+              <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">Client / Brand Name</label>
               <input
                 type="text"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 placeholder="e.g. Acme Studio, Campus Fest, Freelance Client"
-                className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"
+                className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-3 text-xs text-[var(--text-primary)] min-h-[44px]"
               />
             </div>
           )}
 
           {/* Note / Memo */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">Note / Memo</label>
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">Note / Memo</label>
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="e.g. Lunch with roommates, printing assignments"
-              className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-3 text-xs text-[var(--text-primary)] min-h-[44px]"
             />
           </div>
 
           {/* Submit Action */}
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 py-3.5 text-sm font-bold text-slate-950 shadow-xl shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all"
+            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 py-4 text-sm font-extrabold text-slate-950 shadow-lg shadow-emerald-500/25 hover:from-emerald-400 hover:to-teal-400 transition-transform duration-150 active:scale-[0.96] min-h-[48px]"
           >
-            <Check className="h-4 w-4" />
+            <Check className="h-5 w-5" aria-hidden="true" />
             <span>Save to FINMECH</span>
           </button>
         </form>
@@ -469,4 +481,3 @@ export default function QuickInputModal({
     </div>
   );
 }
-

@@ -7,7 +7,6 @@ import {
   CreditCard,
   Sparkles,
   TrendingUp,
-  TrendingDown,
   ArrowRight,
   ArrowUpRight,
   ArrowDownRight,
@@ -18,9 +17,10 @@ import {
   Layers,
   Search,
   CheckCircle2,
+  Zap,
 } from 'lucide-react';
 import { FinancialSummary } from '@/lib/financeCalculations';
-import { Transaction, PocketType } from '@/types/finance';
+import { Transaction } from '@/types/finance';
 
 interface DashboardOverviewProps {
   summary: FinancialSummary;
@@ -53,280 +53,342 @@ export default function DashboardOverview({
   const topLeak = summary.leaks[0];
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-4 sm:space-y-6 pb-24">
       {/* AI Spending Leak Highlight Banner */}
       {topLeak ? (
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/60 via-slate-900 to-emerald-950/40 p-5 border border-amber-500/30 shadow-xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500/10 via-[var(--bg-surface-elevated)] to-emerald-500/10 p-4 sm:p-6 border border-amber-500/30 shadow-md">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3.5">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                <AlertTriangle className="h-6 w-6" />
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                <AlertTriangle className="h-6 w-6" aria-hidden="true" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 uppercase tracking-wider">
+                  <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                     AI Leak Scanner
                   </span>
-                  <span className="text-xs text-slate-400">High Outflow Alert</span>
+                  <span className="text-xs text-[var(--text-muted)]">High Outflow Alert</span>
                 </div>
-                <h3 className="text-sm sm:text-base font-bold text-slate-100 mt-1">
-                  High spend detected in <span className="text-amber-400">{topLeak.category}</span>
-                </h3>
-                <p className="text-xs text-slate-300 mt-0.5">
-                  Consuming {topLeak.ratioOfExpenses}% of your monthly expenses (₹{topLeak.amount.toLocaleString('en-IN')}). FinMech AI found fixes to save up to ₹{Math.round(topLeak.amount * 0.35).toLocaleString('en-IN')}/mo.
+                <h2 className="text-sm sm:text-base font-bold text-[var(--text-primary)] mt-1">
+                  High spend detected in <span className="text-amber-500">{topLeak.category}</span>
+                </h2>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">
+                  Consuming {topLeak.ratioOfExpenses}% of your monthly expenses (₹
+                  <span className="tabular-nums">{topLeak.amount.toLocaleString('en-IN')}</span>
+                  ). FinMech AI found fixes to save up to ₹
+                  <span className="tabular-nums">
+                    {Math.round(topLeak.amount * 0.35).toLocaleString('en-IN')}
+                  </span>
+                  /mo.
                 </p>
               </div>
             </div>
             <button
               onClick={() => onNavigateTab('ai')}
-              className="flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-bold text-slate-950 hover:bg-amber-400 transition-all shrink-0 shadow-lg shadow-amber-500/20"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl bg-amber-500 ps-4 pe-3 py-2.5 text-xs font-bold text-slate-950 hover:bg-amber-400 transition-transform duration-150 active:scale-[0.96] shadow-md shadow-amber-500/20 shrink-0 min-h-[44px]"
+              aria-label="View AI Savings Plan"
             >
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>View AI Savings Plan</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
+              <span>View AI Plan</span>
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
       ) : (
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-indigo-950/40 p-4 border border-emerald-500/20">
-          <div className="flex items-center justify-between">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500/10 via-[var(--bg-surface-elevated)] to-indigo-500/10 p-4 border border-emerald-500/30 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
-                <CheckCircle2 className="h-5 w-5" />
+              <div className="p-2 rounded-2xl bg-emerald-500/20 text-emerald-500">
+                <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-xs font-bold text-emerald-400">Finances On Track</p>
-                <p className="text-xs text-slate-300">
-                  Spending burn is balanced across all pockets. Total net liquidity is healthy.
+                <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                  Finances Balanced
+                </p>
+                <p className="text-xs text-[var(--text-secondary)]">
+                  Spending burn is healthy across cash in hand, digital and business funds.
                 </p>
               </div>
             </div>
             <button
               onClick={() => onNavigateTab('ai')}
-              className="flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:text-emerald-300"
+              className="flex items-center gap-1 text-xs font-bold text-emerald-500 hover:text-emerald-600 shrink-0 min-h-[44px] ps-2"
+              aria-label="Ask AI Copilot"
             >
-              <span>Ask AI Copilot</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <span>Ask AI</span>
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
           </div>
         </div>
       )}
 
-      {/* Main 4 Core Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* 1. Total Net Liquidity */}
-        <div className="relative overflow-hidden rounded-3xl bg-[#0d1322] p-5 border border-slate-800 shadow-xl group hover:border-slate-700 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Total Net Worth</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
-              <Layers className="h-4 w-4" />
+      {/* Bento Grid: 4 Core Pockets & Financial Engines */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* 1. Bento Hero: Total Liquid Net Worth */}
+        <div className="rounded-3xl bg-[var(--bg-surface)] p-5 border border-[var(--border-color)] shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-[var(--text-secondary)]">
+                Total Net Worth
+              </span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
+                <Layers className="h-4 w-4" aria-hidden="true" />
+              </div>
+            </div>
+            <div className="mt-3">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight tabular-nums">
+                ₹{summary.totalNetWorth.toLocaleString('en-IN')}
+              </h3>
+              <p className="text-[11px] text-[var(--text-muted)] mt-1 flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Active Liquid Capital</span>
+              </p>
             </div>
           </div>
-          <div className="mt-3">
-            <h2 className="text-2xl font-extrabold text-white tracking-tight">
-              ₹{summary.totalNetWorth.toLocaleString('en-IN')}
-            </h2>
-            <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-              <span className="text-emerald-400 font-semibold">Active Liquid Capital</span>
-            </p>
-          </div>
-          {/* Distribution bar */}
-          <div className="mt-4 pt-3 border-t border-slate-800/60">
-            <div className="flex justify-between text-[10px] text-slate-400 mb-1">
-              <span>Distribution</span>
-              <span>Cash {summary.pocketDistribution[0].percentage}% • Biz {summary.pocketDistribution[2].percentage}%</span>
+
+          {/* Pocket distribution visual bar */}
+          <div className="mt-4 pt-3 border-t border-[var(--border-color)]">
+            <div className="flex justify-between text-[10px] text-[var(--text-muted)] mb-1.5 font-medium">
+              <span>Pockets Distribution</span>
+              <span>
+                Cash {summary.pocketDistribution[0].percentage}% • Biz{' '}
+                {summary.pocketDistribution[2].percentage}%
+              </span>
             </div>
-            <div className="h-1.5 w-full rounded-full bg-slate-800 flex overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-[var(--bg-surface-elevated)] flex overflow-hidden">
               <div
                 style={{ width: `${summary.pocketDistribution[0].percentage}%` }}
-                className="bg-amber-400"
-                title="Cash"
+                className="bg-amber-500 transition-[width] duration-300"
+                title={`Cash: ${summary.pocketDistribution[0].percentage}%`}
               />
               <div
                 style={{ width: `${summary.pocketDistribution[1].percentage}%` }}
-                className="bg-indigo-400"
-                title="Bank"
+                className="bg-indigo-500 transition-[width] duration-300"
+                title={`Bank: ${summary.pocketDistribution[1].percentage}%`}
               />
               <div
                 style={{ width: `${summary.pocketDistribution[2].percentage}%` }}
-                className="bg-cyan-400"
-                title="Business"
+                className="bg-cyan-500 transition-[width] duration-300"
+                title={`Business: ${summary.pocketDistribution[2].percentage}%`}
               />
             </div>
           </div>
         </div>
 
-        {/* 2. Cash in Hand Card */}
-        <div className="relative overflow-hidden rounded-3xl bg-[#0d1322] p-5 border border-slate-800 shadow-xl group hover:border-amber-500/40 transition-all">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-medium text-slate-400">Cash in Hand</span>
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+        {/* 2. Bento Tile: Cash in Hand (Physical Wallet) */}
+        <div className="rounded-3xl bg-[var(--bg-surface)] p-5 border border-[var(--border-color)] shadow-[var(--shadow-card)] hover:border-amber-500/40 transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-[var(--text-secondary)]">
+                  Cash in Hand
+                </span>
+                <span className="h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" />
+              </div>
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+                <Banknote className="h-4 w-4" aria-hidden="true" />
+              </div>
             </div>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
-              <Banknote className="h-4 w-4" />
+            <div className="mt-3">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-amber-500 tracking-tight tabular-nums">
+                ₹{summary.cashInHand.toLocaleString('en-IN')}
+              </h3>
+              <p className="text-[11px] text-[var(--text-muted)] mt-1">
+                Physical pocket notes & coins
+              </p>
             </div>
           </div>
-          <div className="mt-3">
-            <h2 className="text-2xl font-extrabold text-amber-300 tracking-tight">
-              ₹{summary.cashInHand.toLocaleString('en-IN')}
-            </h2>
-            <p className="text-[11px] text-slate-400 mt-1">Physical pocket money balance</p>
-          </div>
-          <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between">
+
+          <div className="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center justify-between">
             <button
               onClick={() => onNavigateTab('cash')}
-              className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+              className="text-xs font-bold text-amber-500 hover:text-amber-600 flex items-center gap-1 transition-transform duration-150 active:scale-[0.96] min-h-[36px]"
+              aria-label="Audit physical cash wallet notes"
             >
               <span>Audit Wallet</span>
-              <ArrowRight className="h-3 w-3" />
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
-            <span className="text-[10px] text-slate-500">Live Count</span>
+            <span className="text-[10px] text-[var(--text-muted)] font-medium">Live Count</span>
           </div>
         </div>
 
-        {/* 3. Live Business Money Card */}
-        <div className="relative overflow-hidden rounded-3xl bg-[#0d1322] p-5 border border-slate-800 shadow-xl group hover:border-cyan-500/40 transition-all">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-medium text-slate-400">Live Business Money</span>
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+        {/* 3. Bento Tile: Live Business Money */}
+        <div className="rounded-3xl bg-[var(--bg-surface)] p-5 border border-[var(--border-color)] shadow-[var(--shadow-card)] hover:border-cyan-500/40 transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-[var(--text-secondary)]">
+                  Live Business
+                </span>
+                <span className="h-2 w-2 rounded-full bg-cyan-500" aria-hidden="true" />
+              </div>
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-500">
+                <Briefcase className="h-4 w-4" aria-hidden="true" />
+              </div>
             </div>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
-              <Briefcase className="h-4 w-4" />
+            <div className="mt-3">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-cyan-500 tracking-tight tabular-nums">
+                ₹{summary.businessBalance.toLocaleString('en-IN')}
+              </h3>
+              <p className="text-[11px] text-[var(--text-muted)] mt-1 flex items-center gap-1.5">
+                <span className="text-cyan-500 font-bold tabular-nums">
+                  {summary.businessMetrics.profitMargin}% Margin
+                </span>
+                <span>
+                  • ₹
+                  <span className="tabular-nums">
+                    {summary.businessMetrics.grossRevenue.toLocaleString('en-IN')}
+                  </span>{' '}
+                  Rev
+                </span>
+              </p>
             </div>
           </div>
-          <div className="mt-3">
-            <h2 className="text-2xl font-extrabold text-cyan-300 tracking-tight">
-              ₹{summary.businessBalance.toLocaleString('en-IN')}
-            </h2>
-            <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5">
-              <span className="text-cyan-400 font-semibold">{summary.businessMetrics.profitMargin}% Margin</span>
-              <span>• ₹{summary.businessMetrics.grossRevenue.toLocaleString('en-IN')} Rev</span>
-            </p>
-          </div>
-          <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between">
+
+          <div className="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center justify-between">
             <button
               onClick={() => onNavigateTab('business')}
-              className="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+              className="text-xs font-bold text-cyan-500 hover:text-cyan-600 flex items-center gap-1 transition-transform duration-150 active:scale-[0.96] min-h-[36px]"
+              aria-label="Open Business Treasury Hub"
             >
               <span>Business Hub</span>
-              <ArrowRight className="h-3 w-3" />
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-[var(--text-muted)] font-medium">
               {summary.businessMetrics.pendingReceivables > 0
                 ? `₹${summary.businessMetrics.pendingReceivables} Due`
-                : 'No Dues'}
+                : 'No Invoices Due'}
             </span>
           </div>
         </div>
 
-        {/* 4. Monthly Expenditure Card */}
-        <div className="relative overflow-hidden rounded-3xl bg-[#0d1322] p-5 border border-slate-800 shadow-xl group hover:border-rose-500/40 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Month Burn Rate</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/10 text-rose-400">
-              <CreditCard className="h-4 w-4" />
+        {/* 4. Bento Tile: Monthly Expenditure & Burn Rate */}
+        <div className="rounded-3xl bg-[var(--bg-surface)] p-5 border border-[var(--border-color)] shadow-[var(--shadow-card)] hover:border-rose-500/40 transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-[var(--text-secondary)]">
+                Month Burn Rate
+              </span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500">
+                <CreditCard className="h-4 w-4" aria-hidden="true" />
+              </div>
+            </div>
+            <div className="mt-3">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-rose-500 tracking-tight tabular-nums">
+                ₹{summary.monthlyExpenditure.toLocaleString('en-IN')}
+              </h3>
+              <p className="text-[11px] text-[var(--text-muted)] mt-1">
+                ₹<span className="tabular-nums">{summary.dailyAverageSpend}</span>/day avg burn
+              </p>
             </div>
           </div>
-          <div className="mt-3">
-            <h2 className="text-2xl font-extrabold text-rose-300 tracking-tight">
-              ₹{summary.monthlyExpenditure.toLocaleString('en-IN')}
-            </h2>
-            <p className="text-[11px] text-slate-400 mt-1">
-              ₹{summary.dailyAverageSpend}/day avg burn rate
-            </p>
-          </div>
-          <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between">
+
+          <div className="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center justify-between">
             <button
               onClick={() => onNavigateTab('expenditure')}
-              className="text-[11px] font-semibold text-rose-400 hover:text-rose-300 flex items-center gap-1"
+              className="text-xs font-bold text-rose-500 hover:text-rose-600 flex items-center gap-1 transition-transform duration-150 active:scale-[0.96] min-h-[36px]"
+              aria-label="View expenditure breakdown"
             >
-              <span>View Breakdown</span>
-              <ArrowRight className="h-3 w-3" />
+              <span>Spends Log</span>
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-[var(--text-muted)] font-medium">
               {summary.categoryBreakdown.length} Categories
             </span>
           </div>
         </div>
       </div>
 
-      {/* Quick Action Shortcuts Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Quick Action Buttons (Thumb-Friendly Ergonomic Grid) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
         <button
           onClick={onOpenQuickAdd}
-          className="flex items-center justify-center gap-2 rounded-2xl bg-slate-900/90 p-3.5 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-800 transition-all group"
+          className="flex items-center justify-center gap-2 rounded-2xl bg-[var(--bg-surface)] p-3.5 border border-[var(--border-color)] hover:border-emerald-500/50 shadow-sm transition-transform duration-150 active:scale-[0.96] min-h-[48px]"
+          aria-label="Log New Spend or Income"
         >
-          <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
-            <Plus className="h-4 w-4" />
+          <div className="p-1.5 rounded-xl bg-emerald-500/15 text-emerald-500">
+            <Plus className="h-4 w-4" aria-hidden="true" />
           </div>
-          <span className="text-xs font-semibold text-slate-200">Log Spend</span>
+          <span className="text-xs font-bold text-[var(--text-primary)]">Log Spend</span>
         </button>
 
         <button
           onClick={() => onNavigateTab('cash')}
-          className="flex items-center justify-center gap-2 rounded-2xl bg-slate-900/90 p-3.5 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-800 transition-all group"
+          className="flex items-center justify-center gap-2 rounded-2xl bg-[var(--bg-surface)] p-3.5 border border-[var(--border-color)] hover:border-amber-500/50 shadow-sm transition-transform duration-150 active:scale-[0.96] min-h-[48px]"
+          aria-label="Audit Physical Cash Notes"
         >
-          <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">
-            <Banknote className="h-4 w-4" />
+          <div className="p-1.5 rounded-xl bg-amber-500/15 text-amber-500">
+            <Banknote className="h-4 w-4" aria-hidden="true" />
           </div>
-          <span className="text-xs font-semibold text-slate-200">Audit Cash</span>
+          <span className="text-xs font-bold text-[var(--text-primary)]">Audit Cash</span>
         </button>
 
         <button
           onClick={() => onNavigateTab('business')}
-          className="flex items-center justify-center gap-2 rounded-2xl bg-slate-900/90 p-3.5 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-800 transition-all group"
+          className="flex items-center justify-center gap-2 rounded-2xl bg-[var(--bg-surface)] p-3.5 border border-[var(--border-color)] hover:border-cyan-500/50 shadow-sm transition-transform duration-150 active:scale-[0.96] min-h-[48px]"
+          aria-label="View Business Sales and Invoices"
         >
-          <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:scale-110 transition-transform">
-            <Briefcase className="h-4 w-4" />
+          <div className="p-1.5 rounded-xl bg-cyan-500/15 text-cyan-500">
+            <Briefcase className="h-4 w-4" aria-hidden="true" />
           </div>
-          <span className="text-xs font-semibold text-slate-200">Business Sales</span>
+          <span className="text-xs font-bold text-[var(--text-primary)]">Biz Sales</span>
         </button>
 
         <button
           onClick={() => onNavigateTab('ai')}
-          className="flex items-center justify-center gap-2 rounded-2xl bg-slate-900/90 p-3.5 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800 transition-all group"
+          className="flex items-center justify-center gap-2 rounded-2xl bg-[var(--bg-surface)] p-3.5 border border-[var(--border-color)] hover:border-indigo-500/50 shadow-sm transition-transform duration-150 active:scale-[0.96] min-h-[48px]"
+          aria-label="Ask AI Financial Copilot"
         >
-          <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 group-hover:scale-110 transition-transform">
-            <Sparkles className="h-4 w-4" />
+          <div className="p-1.5 rounded-xl bg-indigo-500/15 text-indigo-500">
+            <Sparkles className="h-4 w-4" aria-hidden="true" />
           </div>
-          <span className="text-xs font-semibold text-slate-200">Ask AI Copilot</span>
+          <span className="text-xs font-bold text-[var(--text-primary)]">AI Copilot</span>
         </button>
       </div>
 
-      {/* Live Transaction Activity Log */}
-      <div className="rounded-3xl bg-[#0d1322] border border-slate-800 p-5 shadow-xl">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+      {/* Live Transaction Activity Log (Bento Card) */}
+      <div className="rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] p-4 sm:p-6 shadow-[var(--shadow-card)]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-[var(--border-color)]">
           <div>
-            <h3 className="text-base font-bold text-slate-100">Live Money Stream</h3>
-            <p className="text-xs text-slate-400">Real-time ledger across cash, digital & business</p>
+            <h2 className="text-base font-bold text-[var(--text-primary)]">Live Money Ledger</h2>
+            <p className="text-xs text-[var(--text-muted)]">
+              Real-time audit across physical cash, bank, and business funds
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            {/* Search */}
+            {/* Search Input (16px font on mobile prevents auto-zoom) */}
             <div className="relative flex-1 sm:w-48">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)]"
+                aria-hidden="true"
+              />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search..."
-                className="w-full rounded-xl bg-slate-900 border border-slate-700/80 pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+                className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] pl-9 pr-3 py-2 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-emerald-500 min-h-[40px]"
+                aria-label="Search transactions"
               />
             </div>
 
-            {/* Filter Pills */}
-            <div className="flex items-center gap-1 rounded-xl bg-slate-900 p-1 border border-slate-800">
+            {/* Filter Pills with min-height */}
+            <div
+              className="flex items-center gap-1 rounded-2xl bg-[var(--bg-surface-elevated)] p-1 border border-[var(--border-color)]"
+              role="group"
+              aria-label="Filter transactions by pocket"
+            >
               {['all', 'cash', 'bank', 'business'].map((p) => (
                 <button
                   key={p}
                   onClick={() => setFilterPocket(p)}
-                  className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize transition-all ${
+                  className={`rounded-xl px-2.5 py-1.5 text-[11px] font-semibold capitalize transition-transform duration-150 active:scale-[0.96] min-h-[32px] ${
                     filterPocket === p
-                      ? 'bg-slate-800 text-emerald-400 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-emerald-500 text-white shadow-sm'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
+                  aria-pressed={filterPocket === p}
                 >
                   {p}
                 </button>
@@ -336,16 +398,16 @@ export default function DashboardOverview({
         </div>
 
         {/* Transactions List */}
-        <div className="mt-4 divide-y divide-slate-800/60">
+        <div className="mt-4 divide-y divide-[var(--border-color)]">
           {filteredTransactions.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="text-sm text-slate-400">No transactions match your filter.</p>
+              <p className="text-sm text-[var(--text-secondary)]">No transactions match your filter.</p>
               <button
                 onClick={onOpenQuickAdd}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-emerald-500 transition-all"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition-transform duration-150 active:scale-[0.96] min-h-[44px]"
               >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Log First Transaction</span>
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span>Log Transaction</span>
               </button>
             </div>
           ) : (
@@ -356,48 +418,48 @@ export default function DashboardOverview({
               return (
                 <div
                   key={tx.id}
-                  className="flex items-center justify-between py-3.5 group hover:bg-slate-800/30 px-2 rounded-xl transition-colors"
+                  className="flex items-center justify-between py-3.5 group hover:bg-[var(--bg-surface-elevated)] px-2 rounded-2xl transition-colors duration-150"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
                         isIncome
-                          ? 'bg-emerald-500/15 text-emerald-400'
+                          ? 'bg-emerald-500/15 text-emerald-500'
                           : isTransfer
-                          ? 'bg-indigo-500/15 text-indigo-400'
-                          : 'bg-rose-500/15 text-rose-400'
+                          ? 'bg-indigo-500/15 text-indigo-500'
+                          : 'bg-rose-500/15 text-rose-500'
                       }`}
                     >
                       {isIncome ? (
-                        <ArrowDownRight className="h-5 w-5" />
+                        <ArrowDownRight className="h-5 w-5" aria-hidden="true" />
                       ) : isTransfer ? (
-                        <TrendingUp className="h-5 w-5 rotate-45" />
+                        <TrendingUp className="h-5 w-5 rotate-45" aria-hidden="true" />
                       ) : (
-                        <ArrowUpRight className="h-5 w-5" />
+                        <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
                       )}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-xs sm:text-sm font-semibold text-slate-200 truncate">
+                        <p className="text-xs sm:text-sm font-bold text-[var(--text-primary)] truncate">
                           {tx.note || tx.category}
                         </p>
                         <span
                           className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                             tx.pocket === 'cash'
-                              ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
                               : tx.pocket === 'business'
-                              ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
-                              : 'bg-indigo-500/15 text-indigo-300 border border-indigo-500/30'
+                              ? 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30'
+                              : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30'
                           }`}
                         >
                           {tx.pocket}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                      <div className="flex items-center gap-2 text-[11px] text-[var(--text-muted)] mt-0.5">
                         <span>{tx.category}</span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
+                          <Calendar className="h-3 w-3" aria-hidden="true" />
                           {new Date(tx.date).toLocaleDateString('en-IN', {
                             month: 'short',
                             day: 'numeric',
@@ -406,7 +468,7 @@ export default function DashboardOverview({
                         {tx.businessDetails?.clientName && (
                           <>
                             <span>•</span>
-                            <span className="text-cyan-400">
+                            <span className="text-cyan-500 font-medium">
                               Client: {tx.businessDetails.clientName}
                             </span>
                           </>
@@ -415,29 +477,32 @@ export default function DashboardOverview({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0 ml-3">
+                  <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 ml-2">
                     <div className="text-right">
                       <p
-                        className={`text-sm sm:text-base font-bold ${
+                        className={`text-sm sm:text-base font-extrabold tabular-nums ${
                           isIncome
-                            ? 'text-emerald-400'
+                            ? 'text-emerald-500'
                             : isTransfer
-                            ? 'text-indigo-300'
-                            : 'text-slate-200'
+                            ? 'text-indigo-500'
+                            : 'text-[var(--text-primary)]'
                         }`}
                       >
                         {isIncome ? '+' : isTransfer ? '↔ ' : '-'}₹
                         {tx.amount.toLocaleString('en-IN')}
                       </p>
-                      <span className="text-[10px] text-slate-500 capitalize">{tx.type}</span>
+                      <span className="text-[10px] text-[var(--text-muted)] capitalize">
+                        {tx.type}
+                      </span>
                     </div>
 
                     <button
                       onClick={() => onDeleteTransaction(tx.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+                      className="p-2 rounded-xl text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-500/10 transition-transform duration-150 active:scale-[0.96] min-h-[44px] min-w-[44px] flex items-center justify-center"
                       title="Delete entry"
+                      aria-label={`Delete ${tx.note || tx.category} transaction`}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -449,4 +514,3 @@ export default function DashboardOverview({
     </div>
   );
 }
-

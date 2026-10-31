@@ -109,6 +109,26 @@ export const DEFAULT_TRANSACTIONS: Transaction[] = [
     note: 'Transfer from business to personal savings',
     createdAt: Date.now() - 4 * 86400000,
   },
+  {
+    id: 'tx_seed_9',
+    type: 'expense',
+    pocket: 'bank',
+    category: 'Equipment & Hardware',
+    amount: 18500,
+    date: new Date(Date.now() - 40 * 86400000).toISOString(),
+    note: '4K monitor & ergonomics desk',
+    createdAt: Date.now() - 40 * 86400000,
+  },
+  {
+    id: 'tx_seed_10',
+    type: 'expense',
+    pocket: 'cash',
+    category: 'Food & Dining',
+    amount: 1450,
+    date: new Date(Date.now() - 45 * 86400000).toISOString(),
+    note: 'Weekend family banquet',
+    createdAt: Date.now() - 45 * 86400000,
+  },
 ];
 
 export function getStoredTransactions(): Transaction[] {

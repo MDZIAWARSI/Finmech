@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
 import { 
   LayoutDashboard, 
@@ -12,7 +12,9 @@ import {
   Sparkles, 
   Sun, 
   Moon,
-  PieChart as PieIcon
+  PieChart as PieIcon,
+  X,
+  ArrowRight
 } from 'lucide-react';
 
 export type NavTab = 'dashboard' | 'spends' | 'cash' | 'business' | 'copilot';
@@ -37,6 +39,42 @@ export function Navbar({
   userEmail,
 }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
+  const [isAiExpanded, setIsAiExpanded] = useState(false);
+  const aiButtonRef = useRef<HTMLDivElement>(null);
+
+  // Auto-collapse if user doesn't click again within 4.5 seconds
+  useEffect(() => {
+    if (!isAiExpanded) return;
+    const timer = setTimeout(() => {
+      setIsAiExpanded(false);
+    }, 4500);
+    return () => clearTimeout(timer);
+  }, [isAiExpanded]);
+
+  // Collapse if user clicks outside
+  useEffect(() => {
+    if (!isAiExpanded) return;
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (aiButtonRef.current && !aiButtonRef.current.contains(e.target as Node)) {
+        setIsAiExpanded(false);
+      }
+    };
+    document.addEventListener('pointerdown', handleClickOutside);
+    return () => document.removeEventListener('pointerdown', handleClickOutside);
+  }, [isAiExpanded]);
+
+  // Two-step click protection: 1st click reveals "Finmech AI", 2nd click opens AI copilot
+  const handleAiClick = () => {
+    if (currentTab === 'copilot') {
+      onTabChange('dashboard');
+      setIsAiExpanded(false);
+    } else if (!isAiExpanded) {
+      setIsAiExpanded(true);
+    } else {
+      onTabChange('copilot');
+      setIsAiExpanded(false);
+    }
+  };
 
   // 4 balanced navigation tabs: 2 on left, 2 on right
   const leftTabs = [
@@ -109,23 +147,59 @@ export function Navbar({
         </div>
       </header>
 
-      {/* Floating AI Button ("ai wala floating button") */}
-      <div className="fixed bottom-24 right-4 sm:right-8 z-40 pointer-events-auto">
+      {/* Floating AI Button ("ai should just be an icon when clicked it should say finmech ai then if i clikc agian the page opens") */}
+      <div ref={aiButtonRef} className="fixed bottom-24 right-4 sm:right-8 z-40 pointer-events-auto">
         <motion.button
+          layout
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => onTabChange(currentTab === 'copilot' ? 'dashboard' : 'copilot')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-full shadow-[0_12px_30px_rgba(0,0,0,0.22)] dark:shadow-[0_12px_30px_rgba(255,255,255,0.18)] border transition-all ${
+          onClick={handleAiClick}
+          className={`relative flex items-center justify-center transition-all border shadow-[0_12px_30px_rgba(0,0,0,0.22)] dark:shadow-[0_12px_30px_rgba(255,255,255,0.18)] focus:outline-none ${
             currentTab === 'copilot'
-              ? 'bg-emerald-500 text-white border-emerald-400'
-              : 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-700/60 dark:border-neutral-300/60'
+              ? 'h-11 px-4 rounded-full bg-emerald-500 text-white border-emerald-400 gap-1.5'
+              : isAiExpanded
+              ? 'h-11 px-4 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-700/60 dark:border-neutral-300/60 gap-2'
+              : 'w-11 h-11 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-700/60 dark:border-neutral-300/60'
           }`}
-          aria-label="Open AI Copilot"
+          aria-label={
+            currentTab === 'copilot'
+              ? 'Close AI Copilot'
+              : isAiExpanded
+              ? 'Confirm and open Finmech AI'
+              : 'Finmech AI'
+          }
+          title={
+            currentTab === 'copilot'
+              ? 'Close AI'
+              : isAiExpanded
+              ? 'Click again to open'
+              : 'Finmech AI'
+          }
         >
-          <Sparkles className={`w-4 h-4 ${currentTab === 'copilot' ? 'text-white' : 'text-emerald-400 dark:text-emerald-500'}`} />
-          <span className="text-xs font-bold tracking-tight">
-            {currentTab === 'copilot' ? 'Close AI' : 'Finmech AI'}
-          </span>
+          {currentTab === 'copilot' ? (
+            <>
+              <X className="w-4 h-4 text-white shrink-0" />
+              <span className="text-xs font-bold tracking-tight">Close AI</span>
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 text-emerald-400 dark:text-emerald-500 shrink-0" />
+              <AnimatePresence>
+                {isAiExpanded && (
+                  <motion.div
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: 'auto' }}
+                    exit={{ opacity: 0, width: 0 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                    className="flex items-center gap-1 overflow-hidden whitespace-nowrap select-none"
+                  >
+                    <span className="text-xs font-bold tracking-tight">Finmech AI</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-emerald-400 dark:text-emerald-500 ml-0.5" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
         </motion.button>
       </div>
 

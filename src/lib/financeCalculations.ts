@@ -8,6 +8,15 @@ export interface FinancialSummary {
   monthlyExpenditure: number;
   monthlyIncome: number;
   dailyAverageSpend: number;
+  businessDivision: {
+    totalInflow: number;
+    totalOutflow: number;
+    netCapital: number;
+    drawnToPersonal: number;
+    allocatedFromPersonal: number;
+    divisionShare: number;
+    personalShare: number;
+  };
   businessMetrics: {
     grossRevenue: number;
     operatingExpenses: number;
@@ -33,6 +42,15 @@ export const EMPTY_SUMMARY: FinancialSummary = {
   monthlyExpenditure: 0,
   monthlyIncome: 0,
   dailyAverageSpend: 0,
+  businessDivision: {
+    totalInflow: 0,
+    totalOutflow: 0,
+    netCapital: 0,
+    drawnToPersonal: 0,
+    allocatedFromPersonal: 0,
+    divisionShare: 0,
+    personalShare: 100,
+  },
   businessMetrics: {
     grossRevenue: 0,
     operatingExpenses: 0,
@@ -64,6 +82,8 @@ export function calculateFinancialSummary(
   let businessGrossRevenue = 0;
   let businessOperatingExpenses = 0;
   let businessPendingReceivables = 0;
+  let businessDrawnToPersonal = 0;
+  let businessAllocatedFromPersonal = 0;
 
   const categoryExpenseMap: Record<string, { amount: number; count: number }> = {};
 
@@ -108,12 +128,22 @@ export function calculateFinancialSummary(
       // Outflow from origin pocket
       if (tx.pocket === 'cash') cashInHand -= tx.amount;
       else if (tx.pocket === 'bank') bankBalance -= tx.amount;
-      else if (tx.pocket === 'business') businessBalance -= tx.amount;
+      else if (tx.pocket === 'business') {
+        businessBalance -= tx.amount;
+        if (tx.toPocket === 'bank' || tx.toPocket === 'cash') {
+          businessDrawnToPersonal += tx.amount;
+        }
+      }
 
       // Inflow to destination pocket
       if (tx.toPocket === 'cash') cashInHand += tx.amount;
       else if (tx.toPocket === 'bank') bankBalance += tx.amount;
-      else if (tx.toPocket === 'business') businessBalance += tx.amount;
+      else if (tx.toPocket === 'business') {
+        businessBalance += tx.amount;
+        if (tx.pocket === 'bank' || tx.pocket === 'cash') {
+          businessAllocatedFromPersonal += tx.amount;
+        }
+      }
     }
 
     // Pending business receivables
@@ -175,6 +205,12 @@ export function calculateFinancialSummary(
   const profitMargin =
     businessGrossRevenue > 0 ? Math.round((netProfit / businessGrossRevenue) * 100) : 0;
 
+  const divisionShare =
+    totalPositiveBalances > 0
+      ? Math.round((Math.max(0, businessBalance) / totalPositiveBalances) * 100)
+      : 0;
+  const personalShare = Math.max(0, 100 - divisionShare);
+
   return {
     cashInHand,
     bankBalance,
@@ -183,6 +219,15 @@ export function calculateFinancialSummary(
     monthlyExpenditure: totalExpenseThisMonth,
     monthlyIncome: totalIncomeThisMonth,
     dailyAverageSpend,
+    businessDivision: {
+      totalInflow: businessGrossRevenue,
+      totalOutflow: businessOperatingExpenses,
+      netCapital: businessBalance,
+      drawnToPersonal: businessDrawnToPersonal,
+      allocatedFromPersonal: businessAllocatedFromPersonal,
+      divisionShare,
+      personalShare,
+    },
     businessMetrics: {
       grossRevenue: businessGrossRevenue,
       operatingExpenses: businessOperatingExpenses,

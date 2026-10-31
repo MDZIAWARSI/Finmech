@@ -212,13 +212,13 @@ export default function DashboardOverview({
           </div>
         </div>
 
-        {/* 3. Bento Tile: Live Business Money */}
+        {/* 3. Bento Tile: Business Money Division */}
         <div className="rounded-3xl bg-[var(--bg-surface)] p-5 border border-[var(--border-color)] shadow-[var(--shadow-card)] hover:border-cyan-500/40 transition-all flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-semibold text-[var(--text-secondary)]">
-                  Live Business
+                  Business Division
                 </span>
                 <span className="h-2 w-2 rounded-full bg-cyan-500" aria-hidden="true" />
               </div>
@@ -232,15 +232,9 @@ export default function DashboardOverview({
               </h3>
               <p className="text-[11px] text-[var(--text-muted)] mt-1 flex items-center gap-1.5">
                 <span className="text-cyan-500 font-bold tabular-nums">
-                  {summary.businessMetrics.profitMargin}% Margin
+                  {summary.businessDivision?.divisionShare ?? 0}% Share
                 </span>
-                <span>
-                  • ₹
-                  <span className="tabular-nums">
-                    {summary.businessMetrics.grossRevenue.toLocaleString('en-IN')}
-                  </span>{' '}
-                  Rev
-                </span>
+                <span>• Divided & Protected</span>
               </p>
             </div>
           </div>
@@ -249,15 +243,13 @@ export default function DashboardOverview({
             <button
               onClick={() => onNavigateTab('business')}
               className="text-xs font-bold text-cyan-500 hover:text-cyan-600 flex items-center gap-1 transition-transform duration-150 active:scale-[0.96] min-h-[36px]"
-              aria-label="Open Business Treasury Hub"
+              aria-label="Open Business Money Division"
             >
-              <span>Business Hub</span>
+              <span>View Division</span>
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
             <span className="text-[10px] text-[var(--text-muted)] font-medium">
-              {summary.businessMetrics.pendingReceivables > 0
-                ? `₹${summary.businessMetrics.pendingReceivables} Due`
-                : 'No Invoices Due'}
+              Fund Segregation
             </span>
           </div>
         </div>

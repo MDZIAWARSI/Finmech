@@ -14,20 +14,6 @@
     "createdAt": 1793269800000
   },
   {
-    "id": "tx_b2",
-    "type": "expense",
-    "pocket": "business",
-    "category": "Software & Tools",
-    "amount": 1200,
-    "date": "2026-10-28T14:15:00.000Z",
-    "note": "Domain + Cloud hosting subscription",
-    "businessDetails": {
-      "clientName": "Vercel / Namecheap",
-      "status": "received"
-    },
-    "createdAt": 1793183400000
-  },
-  {
     "id": "tx_b3",
     "type": "income",
     "pocket": "business",

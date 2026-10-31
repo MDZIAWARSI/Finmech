@@ -352,7 +352,7 @@ export default function QuickInputModal({
                 aria-pressed={pocket === 'business'}
               >
                 <Briefcase className="h-4 w-4 text-cyan-500" aria-hidden="true" />
-                <span>Business</span>
+                <span>Biz Division</span>
               </button>
             </div>
           </div>
@@ -399,7 +399,7 @@ export default function QuickInputModal({
                   aria-pressed={toPocket === 'business'}
                 >
                   <Briefcase className="h-4 w-4 text-cyan-500" aria-hidden="true" />
-                  <span>Business</span>
+                  <span>Biz Division</span>
                 </button>
               </div>
             </div>
@@ -442,15 +442,15 @@ export default function QuickInputModal({
             </select>
           </div>
 
-          {/* Client Details if Business */}
+          {/* Venture Tag if Business */}
           {pocket === 'business' && (
             <div>
-              <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">Client / Brand Name</label>
+              <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">Project / Venture Tag (Optional)</label>
               <input
                 type="text"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
-                placeholder="e.g. Acme Studio, Campus Fest, Freelance Client"
+                placeholder="e.g. Portfolio site, side gig, design work"
                 className="w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] px-4 py-3 text-xs text-[var(--text-primary)] min-h-[44px]"
               />
             </div>

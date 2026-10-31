@@ -58,7 +58,7 @@ export default function Navbar({
     },
     {
       id: 'business',
-      label: 'Business',
+      label: 'Biz Division',
       icon: Briefcase,
       badge: `₹${summary.businessBalance.toLocaleString('en-IN')}`,
     },
@@ -96,7 +96,7 @@ export default function Navbar({
 
           <div className="flex items-center gap-1.5 whitespace-nowrap">
             <Briefcase className="h-3.5 w-3.5 text-cyan-500" aria-hidden="true" />
-            <span className="text-[var(--text-muted)]">Business:</span>
+            <span className="text-[var(--text-muted)]">Biz Division:</span>
             <span className="font-semibold text-[var(--text-primary)] tabular-nums">
               ₹{summary.businessBalance.toLocaleString('en-IN')}
             </span>

@@ -130,55 +130,53 @@ export function DashboardOverview({
       </section>
 
       {/* =========================================================================
-          2x2 BENTO GRID: Inspired directly by Reference Image 7 & Image 2
-          Clean equal-column tiles with rich metrics & micro-sparklines
+          2x2 BENTO GRID FOR MOBILES: Inspired directly by Reference Image 7 & Image 2
+          2 columns on all devices (mobile first) with rich metrics & micro-sparklines
           ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 pt-1">
         {/* Bento Tile 1: Spent This Month + Mini Sparkline Chart */}
         <div
           onClick={() => onNavigateTab('spends')}
-          className="rounded-3xl p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between"
+          className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 active:scale-[0.97] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
-                <ReceiptText className="w-3.5 h-3.5" />
-                Spent This Month
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1 sm:gap-1.5 truncate">
+                <ReceiptText className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">Spent</span>
               </span>
-              <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
+              <ChevronRight className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors shrink-0" />
             </div>
 
-            <div className="flex items-baseline justify-between">
-              <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight">
-                {formatAmount(summary.monthlyExpenditure)}
-              </div>
+            <div className="text-xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight truncate">
+              {formatAmount(summary.monthlyExpenditure)}
+            </div>
 
-              {/* Mini Sparkline Graph inside the tile (Reference Image 7) */}
-              <div className="w-[100px] h-[28px] shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                <svg viewBox={`0 0 ${sparkWidth} ${sparkHeight}`} className="w-full h-full overflow-visible">
-                  <path
-                    d={sparkPath}
-                    fill="none"
-                    className="stroke-neutral-900 dark:stroke-white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <circle
-                    cx={sparkWidth}
-                    cy={sparkHeight - (miniSparklinePoints[miniSparklinePoints.length - 1] / maxSpark) * (sparkHeight - 4)}
-                    r="3"
-                    className="fill-emerald-500"
-                  />
-                </svg>
-              </div>
+            {/* Mini Sparkline Graph inside the tile (Reference Image 7) */}
+            <div className="mt-2 w-full h-[22px] sm:h-[28px] opacity-80 group-hover:opacity-100 transition-opacity">
+              <svg viewBox={`0 0 ${sparkWidth} ${sparkHeight}`} className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                <path
+                  d={sparkPath}
+                  fill="none"
+                  className="stroke-neutral-900 dark:stroke-white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle
+                  cx={sparkWidth}
+                  cy={sparkHeight - (miniSparklinePoints[miniSparklinePoints.length - 1] / maxSpark) * (sparkHeight - 4)}
+                  r="3"
+                  className="fill-emerald-500"
+                />
+              </svg>
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-xs text-neutral-400">
-            <span>Burn: <strong>{formatAmount(Math.round(summary.dailyAverageSpend))}/day</strong></span>
-            <span className="font-semibold text-neutral-700 dark:text-neutral-300 group-hover:underline">
-              View Spends →
+          <div className="mt-3 pt-2.5 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] sm:text-xs text-neutral-400">
+            <span className="truncate">Burn: <strong className="text-neutral-700 dark:text-neutral-300">{formatAmount(Math.round(summary.dailyAverageSpend))}/d</strong></span>
+            <span className="font-semibold text-neutral-700 dark:text-neutral-300 hidden sm:inline group-hover:underline">
+              Spends →
             </span>
           </div>
         </div>
@@ -186,63 +184,70 @@ export function DashboardOverview({
         {/* Bento Tile 2: Savings Goal Target + Progress Bar */}
         <div
           onClick={onOpenTargetModal}
-          className="rounded-3xl p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between"
+          className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 active:scale-[0.97] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
-                <Target className="w-3.5 h-3.5 text-emerald-500" />
-                Savings Goal
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1 sm:gap-1.5 truncate">
+                <Target className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="truncate">Savings</span>
               </span>
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                {summary.savingsGoal.percentage}% locked
+              <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums shrink-0">
+                {summary.savingsGoal.percentage}%
               </span>
             </div>
 
-            <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight">
+            <div className="text-xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight truncate">
               {formatAmount(summary.savingsGoal.currentSaved)}
+            </div>
+
+            <div className="mt-2.5 space-y-1.5">
+              <div className="w-full h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, summary.savingsGoal.percentage)}%` }}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/60 space-y-1.5">
-            <div className="w-full h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, summary.savingsGoal.percentage)}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between text-xs text-neutral-400">
-              <span>Goal: {formatAmount(summary.savingsGoal.targetAmount)}</span>
-              <span className="font-semibold text-neutral-700 dark:text-neutral-300 group-hover:underline">
-                Adjust Goal →
-              </span>
-            </div>
+          <div className="mt-3 pt-2.5 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] sm:text-xs text-neutral-400">
+            <span className="truncate">Goal: {formatAmount(summary.savingsGoal.targetAmount)}</span>
+            <span className="font-semibold text-neutral-700 dark:text-neutral-300 hidden sm:inline group-hover:underline">
+              Target →
+            </span>
           </div>
         </div>
 
-        {/* Bento Tile 3: Cash in Hand + Notes Audit */}
+        {/* Bento Tile 3: Cash in Hand + Pocket Wallet */}
         <div
           onClick={() => onNavigateTab('cash')}
-          className="rounded-3xl p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between"
+          className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 active:scale-[0.97] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
-                <Wallet className="w-3.5 h-3.5" />
-                Cash in Hand
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1 sm:gap-1.5 truncate">
+                <Wallet className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">Cash in Hand</span>
               </span>
-              <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
+              <ChevronRight className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors shrink-0" />
             </div>
 
-            <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight">
+            <div className="text-xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight truncate">
               {formatAmount(summary.cashInHand)}
+            </div>
+
+            <div className="mt-2.5 flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[10px] font-semibold text-neutral-600 dark:text-neutral-400">
+                Wallet Cash
+              </span>
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-xs text-neutral-400">
-            <span>Physical pocket cash</span>
-            <span className="font-semibold text-neutral-700 dark:text-neutral-300 group-hover:underline">
-              Audit Notes →
+          <div className="mt-3 pt-2.5 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] sm:text-xs text-neutral-400">
+            <span className="truncate">Physical notes</span>
+            <span className="font-semibold text-neutral-700 dark:text-neutral-300 hidden sm:inline group-hover:underline">
+              Audit →
             </span>
           </div>
         </div>
@@ -250,26 +255,33 @@ export function DashboardOverview({
         {/* Bento Tile 4: Live Business Capital + Revenue Inflow */}
         <div
           onClick={() => onNavigateTab('business')}
-          className="rounded-3xl p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 transition-all cursor-pointer group flex flex-col justify-between"
+          className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 active:scale-[0.97] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
-                <Briefcase className="w-3.5 h-3.5" />
-                Live Business Money
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1 sm:gap-1.5 truncate">
+                <Briefcase className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">Business</span>
               </span>
-              <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
+              <ChevronRight className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors shrink-0" />
             </div>
 
-            <div className="text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight">
+            <div className="text-xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight truncate">
               {formatAmount(summary.businessBalance)}
+            </div>
+
+            <div className="mt-2.5 flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200/40 dark:border-emerald-900/40">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live Count
+              </span>
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-xs text-neutral-400">
-            <span>Manual live count</span>
-            <span className="font-semibold text-neutral-700 dark:text-neutral-300 group-hover:underline">
-              Manage Funds →
+          <div className="mt-3 pt-2.5 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] sm:text-xs text-neutral-400">
+            <span className="truncate">Active Capital</span>
+            <span className="font-semibold text-neutral-700 dark:text-neutral-300 hidden sm:inline group-hover:underline">
+              Manage →
             </span>
           </div>
         </div>
@@ -280,7 +292,7 @@ export function DashboardOverview({
           ========================================================================= */}
       <section 
         aria-label="Visual Analytics Bento"
-        className="rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-4"
+        className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-4"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#1c1c21] p-1 rounded-full text-xs font-semibold">
@@ -331,11 +343,11 @@ export function DashboardOverview({
       </section>
 
       {/* =========================================================================
-          BENTO TILE 6: Recent Movements Activity Stream
+          BENTO TILE 6: Recent Movements Activity Stream (Full-Width Bento Tile)
           ========================================================================= */}
       <section 
         aria-label="Recent Movements Bento"
-        className="rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-3"
+        className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-3"
       >
         <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-neutral-800/60">
           <h2 className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">

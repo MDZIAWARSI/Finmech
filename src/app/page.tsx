@@ -31,6 +31,8 @@ import { ExpenditureView } from '@/components/ExpenditureView';
 import { AiCopilotView } from '@/components/AiCopilotView';
 import { QuickEntryModal } from '@/components/QuickEntryModal';
 import { SavingsTargetModal } from '@/components/SavingsTargetModal';
+import { AuthModal } from '@/components/AuthModal';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -40,10 +42,12 @@ export default function Home() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [denominations, setDenominations] = useState<CashDenominationCount>(DEFAULT_DENOMINATIONS);
   const [manualBusinessBalance, setManualBusinessBalance] = useState<number | undefined>(undefined);
+  const { user, syncWithCloud } = useAuth();
 
   // Modals state
   const [isQuickEntryOpen, setIsQuickEntryOpen] = useState(false);
   const [isTargetModalOpen, setIsTargetModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -209,7 +213,10 @@ export default function Home() {
         currentTab={currentTab}
         onTabChange={setCurrentTab}
         onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
-        userName={profile.name}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+        userName={user?.displayName || user?.email?.split('@')[0] || profile.name}
+        userPhoto={user?.photoURL}
+        userEmail={user?.email}
       />
 
       {/* Main Container - Mobile First with Desktop Max Width */}
@@ -283,6 +290,12 @@ export default function Home() {
         currentSaved={summary.savingsGoal.currentSaved}
         currency={profile.currency}
         onSaveTarget={handleSaveTarget}
+      />
+
+      {/* Cloud Account & Database Sync Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </div>
   );

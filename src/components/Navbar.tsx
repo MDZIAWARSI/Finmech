@@ -21,14 +21,20 @@ interface NavbarProps {
   currentTab: NavTab;
   onTabChange: (tab: NavTab) => void;
   onOpenQuickEntry: () => void;
+  onOpenAuthModal?: () => void;
   userName?: string;
+  userPhoto?: string | null;
+  userEmail?: string | null;
 }
 
 export function Navbar({
   currentTab,
   onTabChange,
   onOpenQuickEntry,
+  onOpenAuthModal,
   userName = 'Zia',
+  userPhoto,
+  userEmail,
 }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
 
@@ -50,12 +56,24 @@ export function Navbar({
         <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
           {/* User profile & App branding */}
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center font-bold text-sm tracking-tight shadow-sm select-none">
-                {userName.charAt(0).toUpperCase()}
-              </div>
+            <button
+              onClick={onOpenAuthModal}
+              className="relative group focus:outline-none"
+              title={userEmail ? `Signed in as ${userEmail}` : 'Sign in / Cloud Sync'}
+            >
+              {userPhoto ? (
+                <img
+                  src={userPhoto}
+                  alt={userName}
+                  className="w-10 h-10 rounded-full object-cover shadow-sm group-hover:scale-105 transition-transform"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center font-bold text-sm tracking-tight shadow-sm select-none group-hover:scale-105 transition-transform">
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+              )}
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#09090b]" />
-            </div>
+            </button>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
@@ -65,9 +83,12 @@ export function Navbar({
                   v2.0
                 </span>
               </div>
-              <h1 className="text-sm font-bold text-neutral-900 dark:text-white leading-tight">
+              <button
+                onClick={onOpenAuthModal}
+                className="text-left text-sm font-bold text-neutral-900 dark:text-white leading-tight hover:opacity-80 transition-opacity"
+              >
                 Hi, {userName}
-              </h1>
+              </button>
             </div>
           </div>
 

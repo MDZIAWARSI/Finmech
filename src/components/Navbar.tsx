@@ -87,6 +87,18 @@ export function Navbar({
     { id: 'business' as NavTab, label: 'Business', icon: Briefcase },
   ];
 
+  // Dynamic wing widths: locks center + at 50vw and adjusts left/right pill boundaries independently
+  const isLeftActive = currentTab === 'dashboard' || currentTab === 'spends';
+  const isRightActive = currentTab === 'cash' || currentTab === 'business';
+
+  const leftWingWidth = isLeftActive 
+    ? (currentTab === 'dashboard' ? 128 : 120) 
+    : 76;
+
+  const rightWingWidth = isRightActive 
+    ? (currentTab === 'business' ? 128 : 112) 
+    : 76;
+
   return (
     <>
       {/* Top Header Bar (Ultra Clean, No Cryptic Pills) */}
@@ -204,115 +216,134 @@ export function Navbar({
       </div>
 
       {/* Sleek, Compact Floating Bottom Navigation Dock:
-          - Hugs contents snugly with zero empty void
-          - Refined dimensions (48px sleek height, ~255px width)
-          - Elevated, tactile center + button perfectly proportioned
-          - Fluid spring transitions when switching tabs
+          - Center + button is permanently locked at the exact 50vw midpoint (never moves)
+          - Left & right pill boundaries adjust dynamically based on active tab
+          - Zero empty void: hugs contents with balanced padding
       */}
       <nav
         aria-label="Bottom navigation dock"
-        className="fixed bottom-5 left-0 right-0 z-40 px-3 pointer-events-none flex justify-center"
+        className="fixed bottom-7 left-1/2 z-40 pointer-events-none"
       >
-        <motion.div 
-          layout
-          transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-          className="bg-white/90 dark:bg-[#121215]/90 backdrop-blur-2xl border border-neutral-200/80 dark:border-neutral-800/80 shadow-[0_16px_40px_rgba(0,0,0,0.16)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.65)] rounded-full p-1.5 flex items-center gap-1 sm:gap-1.5 pointer-events-auto"
-        >
-          {/* Left 2 Tabs (Overview, Spends) */}
-          {leftTabs.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onTabChange(item.id)}
-                className={`relative h-9.5 rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
-                  isActive ? 'px-3.5' : 'w-9'
-                }`}
-                aria-label={item.label}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-                <Icon
-                  className={`w-4 h-4 relative z-10 transition-colors shrink-0 ${
-                    isActive
-                      ? 'text-white dark:text-neutral-900'
-                      : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
-                  }`}
-                />
-                {isActive && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
-              </button>
-            );
-          })}
+        <div className="relative pointer-events-none">
+          {/* Background Pill: Expands left and right independently while keeping the center anchor fixed */}
+          <motion.div
+            animate={{
+              left: -(leftWingWidth + 30),
+              right: -(rightWingWidth + 30),
+            }}
+            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            className="absolute top-0 -translate-y-1/2 h-12 bg-white/90 dark:bg-[#121215]/90 backdrop-blur-2xl border border-neutral-200/80 dark:border-neutral-800/80 shadow-[0_16px_40px_rgba(0,0,0,0.16)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.65)] rounded-full -z-10 pointer-events-none"
+          />
 
-          {/* Center Elevated Quick Add Button */}
-          <motion.button
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
-            onClick={onOpenQuickEntry}
-            className="w-10.5 h-10.5 mx-0.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-md active:scale-90 transition-transform shrink-0 focus:outline-none"
-            aria-label="Add transaction"
+          {/* Left Wing Tabs: Sits strictly to the left of the center + button */}
+          <motion.div
+            animate={{ width: leftWingWidth }}
+            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            className="absolute right-[24px] top-0 -translate-y-1/2 flex items-center justify-end gap-1 pointer-events-auto overflow-hidden pr-0.5"
           >
-            <Plus className="w-5 h-5 stroke-[2.8]" />
-          </motion.button>
-
-          {/* Right 2 Tabs (Cash, Business) */}
-          {rightTabs.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onTabChange(item.id)}
-                className={`relative h-9.5 rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
-                  isActive ? 'px-3.5' : 'w-9'
-                }`}
-                aria-label={item.label}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-                <Icon
-                  className={`w-4 h-4 relative z-10 transition-colors shrink-0 ${
-                    isActive
-                      ? 'text-white dark:text-neutral-900'
-                      : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
+            {leftTabs.map((item) => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onTabChange(item.id)}
+                  className={`relative h-9 rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
+                    isActive ? 'px-3' : 'w-8.5'
                   }`}
-                />
-                {isActive && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
-              </button>
-            );
-          })}
-        </motion.div>
+                  aria-label={item.label}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabIndicator"
+                      className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+                  <Icon
+                    className={`w-4 h-4 relative z-10 transition-colors shrink-0 ${
+                      isActive
+                        ? 'text-white dark:text-neutral-900'
+                        : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
+                    }`}
+                  />
+                  {isActive && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: 'auto' }}
+                      exit={{ opacity: 0, width: 0 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </button>
+              );
+            })}
+          </motion.div>
+
+          {/* Center Elevated Quick Add Button: Anchored dead-center at 50vw, NEVER MOVES */}
+          <div className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
+            <motion.button
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={onOpenQuickEntry}
+              className="w-10 h-10 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-md active:scale-90 transition-transform shrink-0 focus:outline-none"
+              aria-label="Add transaction"
+            >
+              <Plus className="w-5 h-5 stroke-[2.8]" />
+            </motion.button>
+          </div>
+
+          {/* Right Wing Tabs: Sits strictly to the right of the center + button */}
+          <motion.div
+            animate={{ width: rightWingWidth }}
+            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            className="absolute left-[24px] top-0 -translate-y-1/2 flex items-center justify-start gap-1 pointer-events-auto overflow-hidden pl-0.5"
+          >
+            {rightTabs.map((item) => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onTabChange(item.id)}
+                  className={`relative h-9 rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
+                    isActive ? 'px-3' : 'w-8.5'
+                  }`}
+                  aria-label={item.label}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabIndicator"
+                      className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+                  <Icon
+                    className={`w-4 h-4 relative z-10 transition-colors shrink-0 ${
+                      isActive
+                        ? 'text-white dark:text-neutral-900'
+                        : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
+                    }`}
+                  />
+                  {isActive && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: 'auto' }}
+                      exit={{ opacity: 0, width: 0 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </button>
+              );
+            })}
+          </motion.div>
+        </div>
       </nav>
     </>
   );

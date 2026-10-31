@@ -15,6 +15,8 @@ import {
   saveProfile, 
   getStoredDenominations, 
   saveDenominations, 
+  getStoredLiveBusinessBalance,
+  saveLiveBusinessBalance,
   exportFinancialDataJson,
   DEFAULT_PROFILE,
   DEFAULT_DENOMINATIONS
@@ -63,6 +65,7 @@ export default function Home() {
     setTransactions(getStoredTransactions());
     setProfile(getStoredProfile());
     setDenominations(getStoredDenominations());
+    setManualBusinessBalance(getStoredLiveBusinessBalance());
   }, []);
 
   // Real-time Cloud Firestore synchronization when user is signed in
@@ -176,6 +179,7 @@ export default function Home() {
 
   const handleUpdateBusinessBalance = (newBalance: number) => {
     setManualBusinessBalance(newBalance);
+    saveLiveBusinessBalance(newBalance);
     if (user?.uid) {
       updateBusinessBalanceInCloud(user.uid, newBalance);
     }

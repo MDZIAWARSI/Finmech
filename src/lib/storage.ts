@@ -1,138 +1,55 @@
 import { Transaction, UserProfile, CashDenominationCount } from '@/types/finance';
 
 const STORAGE_KEYS = {
-  TRANSACTIONS: 'finmech_transactions_v2',
-  PROFILE: 'finmech_profile_v2',
-  CASH_DENOMINATIONS: 'finmech_cash_denominations_v2',
-  LIVE_BUSINESS_BALANCE: 'finmech_live_business_balance_v2',
+  TRANSACTIONS: 'finmech_transactions_v3',
+  PROFILE: 'finmech_profile_v3',
+  CASH_DENOMINATIONS: 'finmech_cash_denominations_v3',
+  LIVE_BUSINESS_BALANCE: 'finmech_live_business_balance_v3',
 };
 
+// Clean one-time reset for freshly starting at 0
+function ensureFreshStart() {
+  if (typeof window === 'undefined') return;
+  try {
+    if (!localStorage.getItem('finmech_fresh_v3')) {
+      localStorage.removeItem('finmech_transactions_v2');
+      localStorage.removeItem('finmech_profile_v2');
+      localStorage.removeItem('finmech_cash_denominations_v2');
+      localStorage.removeItem('finmech_live_business_balance_v2');
+      localStorage.removeItem('finmech_local_user');
+      localStorage.removeItem('finmech_firebase_config');
+      localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS);
+      localStorage.removeItem(STORAGE_KEYS.PROFILE);
+      localStorage.removeItem(STORAGE_KEYS.CASH_DENOMINATIONS);
+      localStorage.removeItem(STORAGE_KEYS.LIVE_BUSINESS_BALANCE);
+      localStorage.setItem('finmech_fresh_v3', 'true');
+    }
+  } catch {}
+}
+
 export const DEFAULT_PROFILE: UserProfile = {
-  id: 'user_zia',
-  name: 'Zia',
+  id: 'user_default',
+  name: '',
   currency: '₹',
-  monthlySavingsTarget: 15000,
-  monthlyBudget: 35000,
+  monthlySavingsTarget: 0,
+  monthlyBudget: 0,
 };
 
 export const DEFAULT_DENOMINATIONS: CashDenominationCount = {
-  500: 5,   // ₹2,500
-  200: 4,   // ₹800
-  100: 8,   // ₹800
-  50: 4,    // ₹200
-  20: 3,    // ₹60
-  10: 4,    // ₹40
-  coins: 20,// ₹20
-  // Total default physical cash: ₹4,420
+  500: 0,
+  200: 0,
+  100: 0,
+  50: 0,
+  20: 0,
+  10: 0,
+  coins: 0,
 };
 
-export const DEFAULT_TRANSACTIONS: Transaction[] = [
-  {
-    id: 'tx_seed_1',
-    type: 'income',
-    pocket: 'bank',
-    category: 'Salary / Client Retainer',
-    amount: 65000,
-    date: new Date(Date.now() - 22 * 86400000).toISOString(),
-    note: 'Monthly retainer payout',
-    createdAt: Date.now() - 22 * 86400000,
-  },
-  {
-    id: 'tx_seed_2',
-    type: 'income',
-    pocket: 'business',
-    category: 'Project Milestone',
-    amount: 42000,
-    date: new Date(Date.now() - 15 * 86400000).toISOString(),
-    note: 'Direct client project advance',
-    createdAt: Date.now() - 15 * 86400000,
-  },
-  {
-    id: 'tx_seed_3',
-    type: 'transfer',
-    pocket: 'bank',
-    toPocket: 'cash',
-    category: 'ATM Withdrawal',
-    amount: 5000,
-    date: new Date(Date.now() - 10 * 86400000).toISOString(),
-    note: 'ATM cash replenishment',
-    createdAt: Date.now() - 10 * 86400000,
-  },
-  {
-    id: 'tx_seed_4',
-    type: 'expense',
-    pocket: 'cash',
-    category: 'Food & Dining',
-    amount: 580,
-    date: new Date(Date.now() - 2 * 86400000).toISOString(),
-    note: 'Café & team lunch',
-    createdAt: Date.now() - 2 * 86400000,
-  },
-  {
-    id: 'tx_seed_5',
-    type: 'expense',
-    pocket: 'business',
-    category: 'Software & Tools',
-    amount: 3200,
-    date: new Date(Date.now() - 7 * 86400000).toISOString(),
-    note: 'Cloud infra & Figma plan',
-    createdAt: Date.now() - 7 * 86400000,
-  },
-  {
-    id: 'tx_seed_6',
-    type: 'expense',
-    pocket: 'bank',
-    category: 'Rent & Utilities',
-    amount: 14000,
-    date: new Date(Date.now() - 20 * 86400000).toISOString(),
-    note: 'Monthly studio rent',
-    createdAt: Date.now() - 20 * 86400000,
-  },
-  {
-    id: 'tx_seed_7',
-    type: 'expense',
-    pocket: 'bank',
-    category: 'Subscriptions',
-    amount: 1199,
-    date: new Date(Date.now() - 5 * 86400000).toISOString(),
-    note: 'Broadband & Streaming',
-    createdAt: Date.now() - 5 * 86400000,
-  },
-  {
-    id: 'tx_seed_8',
-    type: 'transfer',
-    pocket: 'business',
-    toPocket: 'bank',
-    category: 'Owner Draw',
-    amount: 10000,
-    date: new Date(Date.now() - 4 * 86400000).toISOString(),
-    note: 'Transfer from business to personal savings',
-    createdAt: Date.now() - 4 * 86400000,
-  },
-  {
-    id: 'tx_seed_9',
-    type: 'expense',
-    pocket: 'bank',
-    category: 'Equipment & Hardware',
-    amount: 18500,
-    date: new Date(Date.now() - 40 * 86400000).toISOString(),
-    note: '4K monitor & ergonomics desk',
-    createdAt: Date.now() - 40 * 86400000,
-  },
-  {
-    id: 'tx_seed_10',
-    type: 'expense',
-    pocket: 'cash',
-    category: 'Food & Dining',
-    amount: 1450,
-    date: new Date(Date.now() - 45 * 86400000).toISOString(),
-    note: 'Weekend family banquet',
-    createdAt: Date.now() - 45 * 86400000,
-  },
-];
+export const DEFAULT_TRANSACTIONS: Transaction[] = [];
 
 export function getStoredTransactions(): Transaction[] {
   if (typeof window === 'undefined') return DEFAULT_TRANSACTIONS;
+  ensureFreshStart();
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
     if (!raw) {
@@ -156,6 +73,7 @@ export function saveTransactions(transactions: Transaction[]) {
 
 export function getStoredProfile(): UserProfile {
   if (typeof window === 'undefined') return DEFAULT_PROFILE;
+  ensureFreshStart();
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.PROFILE);
     if (!raw) {
@@ -179,6 +97,7 @@ export function saveProfile(profile: UserProfile) {
 
 export function getStoredDenominations(): CashDenominationCount {
   if (typeof window === 'undefined') return DEFAULT_DENOMINATIONS;
+  ensureFreshStart();
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.CASH_DENOMINATIONS);
     if (!raw) {
@@ -201,14 +120,15 @@ export function saveDenominations(counts: CashDenominationCount) {
 }
 
 export function getStoredLiveBusinessBalance(): number {
-  if (typeof window === 'undefined') return 28800;
+  if (typeof window === 'undefined') return 0;
+  ensureFreshStart();
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.LIVE_BUSINESS_BALANCE);
-    if (!raw) return 28800;
+    if (!raw) return 0;
     const num = parseFloat(raw);
-    return isNaN(num) ? 28800 : num;
+    return isNaN(num) ? 0 : num;
   } catch {
-    return 28800;
+    return 0;
   }
 }
 

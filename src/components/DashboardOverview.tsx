@@ -362,54 +362,60 @@ export function DashboardOverview({
         </div>
 
         <div className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
-          {recentTransactions.slice(0, 5).map((tx) => {
-            const isIncome = tx.type === 'income';
-            const isTransfer = tx.type === 'transfer';
-            const dateStr = new Date(tx.date).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-            });
+          {recentTransactions.length === 0 ? (
+            <div className="py-8 text-center text-xs text-neutral-400">
+              No transactions recorded yet. Tap + to add your first entry.
+            </div>
+          ) : (
+            recentTransactions.slice(0, 5).map((tx) => {
+              const isIncome = tx.type === 'income';
+              const isTransfer = tx.type === 'transfer';
+              const dateStr = new Date(tx.date).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+              });
 
-            return (
-              <div
-                key={tx.id}
-                className="py-3 flex items-center justify-between hover:opacity-75 transition-opacity"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-neutral-800/80 flex items-center justify-center shrink-0">
-                    {getCategoryIcon(tx.category)}
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-neutral-900 dark:text-white">
-                      {tx.note || tx.category}
+              return (
+                <div
+                  key={tx.id}
+                  className="py-3 flex items-center justify-between hover:opacity-75 transition-opacity"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-neutral-800/80 flex items-center justify-center shrink-0">
+                      {getCategoryIcon(tx.category)}
                     </div>
-                    <div className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
-                      {dateStr} • <span className="capitalize">{tx.pocket}</span>
-                      {tx.toPocket && <span> → {tx.toPocket}</span>}
+                    <div>
+                      <div className="text-xs font-bold text-neutral-900 dark:text-white">
+                        {tx.note || tx.category}
+                      </div>
+                      <div className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                        {dateStr} • <span className="capitalize">{tx.pocket}</span>
+                        {tx.toPocket && <span> → {tx.toPocket}</span>}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <div
+                      className={`text-sm font-extrabold tabular-nums ${
+                        isIncome
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : isTransfer
+                          ? 'text-neutral-900 dark:text-white'
+                          : 'text-neutral-900 dark:text-white'
+                      }`}
+                    >
+                      {isIncome ? '+' : isTransfer ? '' : '-'}
+                      {formatAmount(tx.amount)}
+                    </div>
+                    <div className="text-[10px] text-neutral-400 uppercase tracking-wider mt-0.5">
+                      {tx.category}
                     </div>
                   </div>
                 </div>
-
-                <div className="text-right">
-                  <div
-                    className={`text-sm font-extrabold tabular-nums ${
-                      isIncome
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : isTransfer
-                        ? 'text-neutral-900 dark:text-white'
-                        : 'text-neutral-900 dark:text-white'
-                    }`}
-                  >
-                    {isIncome ? '+' : isTransfer ? '' : '-'}
-                    {formatAmount(tx.amount)}
-                  </div>
-                  <div className="text-[10px] text-neutral-400 uppercase tracking-wider mt-0.5">
-                    {tx.category}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </section>
     </div>

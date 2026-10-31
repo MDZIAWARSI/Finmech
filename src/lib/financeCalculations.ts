@@ -24,7 +24,7 @@ export function calculateDenominationTotal(counts: CashDenominationCount): numbe
 
 export function computeFinancialSummary(
   transactions: Transaction[],
-  monthlySavingsTarget: number = 10000,
+  monthlySavingsTarget: number = 0,
   manualCashAdjusted?: number,
   manualBusinessAdjusted?: number,
   referenceDate?: Date
@@ -145,7 +145,9 @@ export function computeFinancialSummary(
   const percentage = monthlySavingsTarget > 0 ? Math.min(100, Math.round((currentSaved / monthlySavingsTarget) * 100)) : 0;
   const remaining = Math.max(0, monthlySavingsTarget - currentSaved);
   let goalStatus: SavingsGoal['status'] = 'on_track';
-  if (percentage >= 100) {
+  if (monthlySavingsTarget <= 0) {
+    goalStatus = 'on_track';
+  } else if (percentage >= 100) {
     goalStatus = 'achieved';
   } else if (percentage < (dayOfMonth / 30) * 80) {
     goalStatus = 'needs_attention';

@@ -93,12 +93,12 @@ export function Navbar({
   const isRightActive = currentTab === 'cash' || currentTab === 'business';
 
   const leftWingWidth = isLeftActive 
-    ? (currentTab === 'dashboard' ? 128 : 120) 
-    : 76;
+    ? (currentTab === 'dashboard' ? 132 : 124) 
+    : 74;
 
   const rightWingWidth = isRightActive 
-    ? (currentTab === 'business' ? 128 : 112) 
-    : 76;
+    ? (currentTab === 'business' ? 132 : 114) 
+    : 74;
 
   return (
     <>
@@ -233,24 +233,24 @@ export function Navbar({
       */}
       <nav
         aria-label="Bottom navigation dock"
-        className="fixed bottom-7 left-1/2 z-40 pointer-events-none"
+        className="fixed bottom-6 left-1/2 z-40 pointer-events-none"
       >
         <div className="relative pointer-events-none">
           {/* Background Pill: Expands left and right independently while keeping the center anchor fixed */}
           <motion.div
             animate={{
-              left: -(leftWingWidth + 30),
-              right: -(rightWingWidth + 30),
+              left: -(leftWingWidth + 32),
+              right: -(rightWingWidth + 32),
             }}
             transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-            className="absolute top-0 -translate-y-1/2 h-12 bg-white/90 dark:bg-[#121215]/90 backdrop-blur-2xl border border-neutral-200/80 dark:border-neutral-800/80 shadow-[0_16px_40px_rgba(0,0,0,0.16)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.65)] rounded-full -z-10 pointer-events-none"
+            className="absolute top-0 -translate-y-1/2 h-12 bg-white/95 dark:bg-[#121215]/95 backdrop-blur-2xl border border-neutral-200/80 dark:border-neutral-800 shadow-[0_12px_36px_rgba(0,0,0,0.14)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.7)] rounded-full pointer-events-none z-0"
           />
 
           {/* Left Wing Tabs: Sits strictly to the left of the center + button */}
           <motion.div
             animate={{ width: leftWingWidth }}
             transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-            className="absolute right-[24px] top-0 -translate-y-1/2 flex items-center justify-end gap-1 pointer-events-auto overflow-hidden pr-0.5"
+            className="absolute right-[24px] top-0 -translate-y-1/2 flex items-center justify-end gap-1 pointer-events-auto pr-0.5 z-10"
           >
             {leftTabs.map((item) => {
               const Icon = item.icon;
@@ -259,8 +259,8 @@ export function Navbar({
                 <button
                   key={item.id}
                   onClick={() => onTabChange(item.id)}
-                  className={`relative h-9 rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
-                    isActive ? 'px-3' : 'w-8.5'
+                  className={`relative h-[34px] rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
+                    isActive ? 'px-2.5' : 'w-[34px]'
                   }`}
                   aria-label={item.label}
                 >
@@ -284,7 +284,7 @@ export function Navbar({
                       animate={{ opacity: 1, width: 'auto' }}
                       exit={{ opacity: 0, width: 0 }}
                       transition={{ duration: 0.18, ease: 'easeOut' }}
-                      className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
+                      className="relative z-10 font-bold text-[11.5px] whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
                     >
                       {item.label}
                     </motion.span>
@@ -300,7 +300,7 @@ export function Navbar({
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
               onClick={onOpenQuickEntry}
-              className="w-10 h-10 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-md active:scale-90 transition-transform shrink-0 focus:outline-none"
+              className="w-[42px] h-[42px] rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-lg active:scale-90 transition-transform shrink-0 focus:outline-none"
               aria-label="Add transaction"
             >
               <Plus className="w-5 h-5 stroke-[2.8]" />
@@ -311,7 +311,7 @@ export function Navbar({
           <motion.div
             animate={{ width: rightWingWidth }}
             transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-            className="absolute left-[24px] top-0 -translate-y-1/2 flex items-center justify-start gap-1 pointer-events-auto overflow-hidden pl-0.5"
+            className="absolute left-[24px] top-0 -translate-y-1/2 flex items-center justify-start gap-1 pointer-events-auto pl-0.5 z-10"
           >
             {rightTabs.map((item) => {
               const Icon = item.icon;
@@ -320,8 +320,8 @@ export function Navbar({
                 <button
                   key={item.id}
                   onClick={() => onTabChange(item.id)}
-                  className={`relative h-9 rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
-                    isActive ? 'px-3' : 'w-8.5'
+                  className={`relative h-[34px] rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
+                    isActive ? 'px-2.5' : 'w-[34px]'
                   }`}
                   aria-label={item.label}
                 >
@@ -345,7 +345,7 @@ export function Navbar({
                       animate={{ opacity: 1, width: 'auto' }}
                       exit={{ opacity: 0, width: 0 }}
                       transition={{ duration: 0.18, ease: 'easeOut' }}
-                      className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
+                      className="relative z-10 font-bold text-[11.5px] whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
                     >
                       {item.label}
                     </motion.span>

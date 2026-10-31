@@ -11,7 +11,8 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  TrendingDown
+  TrendingDown,
+  Edit3
 } from 'lucide-react';
 import { FinancialSummary, Transaction } from '@/types/finance';
 import { SpendingPieChart, SpendingTrendGraph } from './Charts';
@@ -22,6 +23,7 @@ interface ExpenditureViewProps {
   currency?: string;
   onOpenQuickEntry: () => void;
   onDeleteTransaction: (id: string) => void;
+  onEditTransaction?: (tx: Transaction) => void;
   onExportData: () => void;
 }
 
@@ -31,23 +33,31 @@ export function ExpenditureView({
   currency = '₹',
   onOpenQuickEntry,
   onDeleteTransaction,
+  onEditTransaction,
   onExportData,
 }: ExpenditureViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'expense' | 'income' | 'transfer'>('all');
   // Default to Weekly Curve as requested
   const [viewMode, setViewMode] = useState<'chart' | 'trend'>('trend');
 
-  // Filter only expense transactions
+  // Filter transactions by selected type
+  const typeFilteredTransactions = useMemo(() => {
+    if (typeFilter === 'all') return transactions;
+    return transactions.filter((t) => t.type === typeFilter);
+  }, [transactions, typeFilter]);
+
+  // Backward compatibility for analytics
   const expenseTransactions = useMemo(() => {
     return transactions.filter((t) => t.type === 'expense');
   }, [transactions]);
 
-  // Extract unique Year-Months from expenses
+  // Extract unique Year-Months from transactions
   const availableMonths = useMemo(() => {
     const monthMap = new Map<string, { key: string; label: string; year: number; month: number }>();
     
-    expenseTransactions.forEach((tx) => {
+    typeFilteredTransactions.forEach((tx) => {
       const d = new Date(tx.date);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
       if (!monthMap.has(key)) {
@@ -66,22 +76,22 @@ export function ExpenditureView({
 
     // Sort descending (latest month first)
     return Array.from(monthMap.values()).sort((a, b) => b.key.localeCompare(a.key));
-  }, [expenseTransactions]);
+  }, [typeFilteredTransactions]);
 
   // Selected month state (defaults to latest month)
   const [selectedMonthKey, setSelectedMonthKey] = useState<string>(
     availableMonths[0]?.key || 'all'
   );
 
-  // Filter expenses by selected month
+  // Filter transactions by selected month
   const monthFilteredExpenses = useMemo(() => {
-    if (selectedMonthKey === 'all') return expenseTransactions;
-    return expenseTransactions.filter((tx) => {
+    if (selectedMonthKey === 'all') return typeFilteredTransactions;
+    return typeFilteredTransactions.filter((tx) => {
       const d = new Date(tx.date);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
       return key === selectedMonthKey;
     });
-  }, [expenseTransactions, selectedMonthKey]);
+  }, [typeFilteredTransactions, selectedMonthKey]);
 
   // Compute stats for the selected month
   const activeMonthTotal = useMemo(() => {
@@ -300,6 +310,28 @@ export function ExpenditureView({
 
       {/* Search & Category Filter Pills */}
       <section aria-label="Spends breakdown list" className="space-y-4 pt-2">
+        {/* Type Filter Tabs: All Activity, Expenses, Income, Transfers */}
+        <div className="flex items-center bg-neutral-100 dark:bg-[#141417] p-1 rounded-2xl text-xs font-semibold">
+          {[
+            { id: 'all', label: 'All Activity' },
+            { id: 'expense', label: 'Expenses' },
+            { id: 'income', label: 'Income' },
+            { id: 'transfer', label: 'Transfers' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setTypeFilter(tab.id as any)}
+              className={`flex-1 py-1.5 rounded-xl transition-all ${
+                typeFilter === tab.id
+                  ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'
+                  : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         <div className="space-y-3">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
@@ -346,6 +378,8 @@ export function ExpenditureView({
               {/* Items in this date/month group */}
               <div className="divide-y divide-neutral-100/60 dark:divide-neutral-800/60">
                 {group.items.map((tx) => {
+                  const isIncome = tx.type === 'income';
+                  const isTransfer = tx.type === 'transfer';
                   const dateStr = new Date(tx.date).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -354,28 +388,54 @@ export function ExpenditureView({
                   return (
                     <div 
                       key={tx.id}
-                      className="py-3 flex items-center justify-between hover:opacity-75 transition-opacity group"
+                      onClick={() => onEditTransaction && onEditTransaction(tx)}
+                      className="py-3 px-2 rounded-2xl flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-[#18181b] transition-all group cursor-pointer"
+                      title="Click to edit, change account, or delete"
                     >
-                      <div>
-                        <div className="text-xs font-bold text-neutral-900 dark:text-white">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-neutral-900 dark:text-white truncate">
                           {tx.note || tx.category}
                         </div>
-                        <div className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
-                          {dateStr} • {tx.category} • from <span className="capitalize font-medium">{tx.pocket}</span>
+                        <div className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5 truncate">
+                          {dateStr} • {tx.category} • from <span className="capitalize font-medium text-neutral-700 dark:text-neutral-300">{tx.pocket}</span>
+                          {tx.toPocket && <span> → {tx.toPocket}</span>}
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-extrabold text-neutral-900 dark:text-white tabular-nums">
-                          -{currency}{tx.amount.toLocaleString()}
+                      <div className="flex items-center gap-2.5 shrink-0 ml-3">
+                        <span className={`text-sm font-extrabold tabular-nums ${
+                          isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-900 dark:text-white'
+                        }`}>
+                          {isIncome ? '+' : isTransfer ? '⇄ ' : '-'}{currency}{tx.amount.toLocaleString()}
                         </span>
-                        <button
-                          onClick={() => onDeleteTransaction(tx.id)}
-                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-neutral-400 hover:text-red-500 transition-all focus:opacity-100"
-                          aria-label="Delete spend"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="flex items-center gap-1">
+                          {onEditTransaction && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEditTransaction(tx);
+                              }}
+                              className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-neutral-700 transition-colors"
+                              title="Edit / Move account"
+                              aria-label="Edit entry"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteTransaction(tx.id);
+                            }}
+                            className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                            title="Delete entry"
+                            aria-label="Delete entry"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -386,7 +446,7 @@ export function ExpenditureView({
 
           {groupedSections.length === 0 && (
             <div className="py-12 text-center text-neutral-400 text-xs">
-              No expenses recorded for {activeMonthLabel}.
+              No entries recorded for {activeMonthLabel}.
             </div>
           )}
         </div>

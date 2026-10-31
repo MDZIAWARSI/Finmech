@@ -15,7 +15,9 @@ import {
   Home as HomeIcon,
   ShoppingBag,
   ArrowUpRight,
-  ReceiptText
+  ReceiptText,
+  Edit3,
+  Trash2
 } from 'lucide-react';
 import { FinancialSummary, Transaction } from '@/types/finance';
 import { NavTab } from './Navbar';
@@ -28,6 +30,8 @@ interface DashboardOverviewProps {
   onNavigateTab: (tab: NavTab) => void;
   onOpenQuickEntry: () => void;
   onOpenTargetModal: () => void;
+  onDeleteTransaction?: (id: string) => void;
+  onEditTransaction?: (tx: Transaction) => void;
 }
 
 export function DashboardOverview({
@@ -36,6 +40,8 @@ export function DashboardOverview({
   currency = '₹',
   onNavigateTab,
   onOpenTargetModal,
+  onDeleteTransaction,
+  onEditTransaction,
 }: DashboardOverviewProps) {
   const [hideBalances, setHideBalances] = useState(false);
   const [activeChartTab, setActiveChartTab] = useState<'distribution' | 'trend'>('distribution');
@@ -378,38 +384,73 @@ export function DashboardOverview({
               return (
                 <div
                   key={tx.id}
-                  className="py-3 flex items-center justify-between hover:opacity-75 transition-opacity"
+                  onClick={() => onEditTransaction && onEditTransaction(tx)}
+                  className="py-3 px-2 rounded-2xl flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-[#18181b] transition-all group cursor-pointer"
+                  title="Click to edit, reassign account, or delete"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-neutral-800/80 flex items-center justify-center shrink-0">
                       {getCategoryIcon(tx.category)}
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-neutral-900 dark:text-white">
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-neutral-900 dark:text-white truncate">
                         {tx.note || tx.category}
                       </div>
-                      <div className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
-                        {dateStr} • <span className="capitalize">{tx.pocket}</span>
+                      <div className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5 truncate">
+                        {dateStr} • <span className="capitalize font-medium text-neutral-600 dark:text-neutral-300">{tx.pocket}</span>
                         {tx.toPocket && <span> → {tx.toPocket}</span>}
                       </div>
                     </div>
                   </div>
 
-                  <div className="text-right">
-                    <div
-                      className={`text-sm font-extrabold tabular-nums ${
-                        isIncome
-                          ? 'text-emerald-600 dark:text-emerald-400'
-                          : isTransfer
-                          ? 'text-neutral-900 dark:text-white'
-                          : 'text-neutral-900 dark:text-white'
-                      }`}
-                    >
-                      {isIncome ? '+' : isTransfer ? '' : '-'}
-                      {formatAmount(tx.amount)}
+                  <div className="flex items-center gap-2.5 shrink-0 ml-2">
+                    <div className="text-right">
+                      <div
+                        className={`text-sm font-extrabold tabular-nums ${
+                          isIncome
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : isTransfer
+                            ? 'text-neutral-900 dark:text-white'
+                            : 'text-neutral-900 dark:text-white'
+                        }`}
+                      >
+                        {isIncome ? '+' : isTransfer ? '' : '-'}
+                        {formatAmount(tx.amount)}
+                      </div>
+                      <div className="text-[10px] text-neutral-400 uppercase tracking-wider mt-0.5">
+                        {tx.category}
+                      </div>
                     </div>
-                    <div className="text-[10px] text-neutral-400 uppercase tracking-wider mt-0.5">
-                      {tx.category}
+
+                    <div className="flex items-center gap-1">
+                      {onEditTransaction && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEditTransaction(tx);
+                          }}
+                          className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-neutral-700 transition-colors"
+                          title="Edit / Redo"
+                          aria-label="Edit transaction"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      {onDeleteTransaction && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteTransaction(tx.id);
+                          }}
+                          className="p-1.5 rounded-lg text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                          title="Delete entry"
+                          aria-label="Delete transaction"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

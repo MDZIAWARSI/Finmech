@@ -32,6 +32,7 @@ import { BusinessTrackerView } from '@/components/BusinessTrackerView';
 import { ExpenditureView } from '@/components/ExpenditureView';
 import { AiCopilotView } from '@/components/AiCopilotView';
 import { QuickEntryModal } from '@/components/QuickEntryModal';
+import { EditTransactionModal } from '@/components/EditTransactionModal';
 import { SavingsTargetModal } from '@/components/SavingsTargetModal';
 import { AuthModal } from '@/components/AuthModal';
 import { useAuth } from '@/context/AuthContext';
@@ -56,6 +57,7 @@ export default function Home() {
 
   // Modals state
   const [isQuickEntryOpen, setIsQuickEntryOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [isTargetModalOpen, setIsTargetModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -151,6 +153,16 @@ export default function Home() {
     if (user?.uid) {
       deleteTransactionFromCloud(user.uid, id);
     }
+  };
+
+  const handleUpdateTransaction = (updatedTx: Transaction) => {
+    const updated = transactions.map((t) => (t.id === updatedTx.id ? updatedTx : t));
+    setTransactions(updated);
+    saveTransactions(updated);
+    if (user?.uid) {
+      addTransactionToCloud(user.uid, updatedTx);
+    }
+    setEditingTransaction(null);
   };
 
   const handleUpdateDenominations = (newCounts: CashDenominationCount) => {
@@ -307,6 +319,8 @@ export default function Home() {
             onNavigateTab={setCurrentTab}
             onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
             onOpenTargetModal={() => setIsTargetModalOpen(true)}
+            onDeleteTransaction={handleDeleteTransaction}
+            onEditTransaction={setEditingTransaction}
           />
         )}
 
@@ -317,6 +331,7 @@ export default function Home() {
             currency={profile.currency}
             onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
             onDeleteTransaction={handleDeleteTransaction}
+            onEditTransaction={setEditingTransaction}
             onExportData={handleExportData}
           />
         )}
@@ -340,6 +355,8 @@ export default function Home() {
             onUpdateBusinessBalance={handleUpdateBusinessBalance}
             onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
             onTransferToPersonal={handleTransferBusinessToPersonal}
+            onDeleteTransaction={handleDeleteTransaction}
+            onEditTransaction={setEditingTransaction}
           />
         )}
 
@@ -359,6 +376,16 @@ export default function Home() {
         isOpen={isQuickEntryOpen}
         onClose={() => setIsQuickEntryOpen(false)}
         onAddTransaction={handleAddTransaction}
+        currency={profile.currency}
+      />
+
+      {/* Edit / Redo / Reassign Transaction Modal */}
+      <EditTransactionModal
+        isOpen={Boolean(editingTransaction)}
+        onClose={() => setEditingTransaction(null)}
+        transaction={editingTransaction}
+        onUpdateTransaction={handleUpdateTransaction}
+        onDeleteTransaction={handleDeleteTransaction}
         currency={profile.currency}
       />
 

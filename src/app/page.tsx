@@ -214,9 +214,9 @@ export default function Home() {
         onTabChange={setCurrentTab}
         onOpenQuickEntry={() => setIsQuickEntryOpen(true)}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        userName={user?.displayName || user?.email?.split('@')[0] || profile.name}
-        userPhoto={user?.photoURL || profile.photoURL || '/avatar.jpg'}
-        userEmail={user?.email}
+        userName={user ? (user.displayName || user.email?.split('@')[0]) : undefined}
+        userPhoto={user ? (user.photoURL || '/avatar.jpg') : null}
+        userEmail={user ? user.email : null}
       />
 
       {/* Main Container - Mobile First with Desktop Max Width */}

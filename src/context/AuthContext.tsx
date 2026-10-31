@@ -53,6 +53,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isFirebaseConfigured || !auth) {
+      // Check if user had signed in via local session
+      try {
+        const saved = localStorage.getItem('finmech_local_user');
+        if (saved) {
+          setUser(JSON.parse(saved));
+        }
+      } catch {}
       setLoading(false);
       return;
     }
@@ -66,34 +73,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
-    if (!auth || !googleProvider) {
-      throw new Error('Firebase credentials are not configured yet.');
+    if (auth && googleProvider) {
+      await signInWithPopup(auth, googleProvider);
+    } else {
+      // Offline/Local user fallback
+      const localUser: any = {
+        uid: 'local_user_zia',
+        displayName: 'Zia',
+        email: 'mdziawarsi14@gmail.com',
+        photoURL: '/avatar.jpg',
+      };
+      setUser(localUser);
+      localStorage.setItem('finmech_local_user', JSON.stringify(localUser));
     }
-    await signInWithPopup(auth, googleProvider);
   };
 
   const signInWithEmail = async (email: string, pass: string) => {
-    if (!auth) throw new Error('Firebase Auth is not configured.');
-    await signInWithEmailAndPassword(auth, email, pass);
+    if (auth) {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } else {
+      const localUser: any = {
+        uid: 'local_user_' + Date.now(),
+        displayName: email.split('@')[0],
+        email: email,
+        photoURL: '/avatar.jpg',
+      };
+      setUser(localUser);
+      localStorage.setItem('finmech_local_user', JSON.stringify(localUser));
+    }
   };
 
   const signUpWithEmail = async (email: string, pass: string, name: string) => {
-    if (!auth) throw new Error('Firebase Auth is not configured.');
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    if (db && cred.user) {
-      await setDoc(doc(db, 'users', cred.user.uid), {
-        name,
-        email,
-        createdAt: Date.now(),
-      }, { merge: true });
+    if (auth) {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      if (db && cred.user) {
+        await setDoc(doc(db, 'users', cred.user.uid), {
+          name,
+          email,
+          createdAt: Date.now(),
+        }, { merge: true });
+      }
+    } else {
+      const localUser: any = {
+        uid: 'local_user_' + Date.now(),
+        displayName: name || email.split('@')[0],
+        email: email,
+        photoURL: '/avatar.jpg',
+      };
+      setUser(localUser);
+      localStorage.setItem('finmech_local_user', JSON.stringify(localUser));
     }
   };
 
   const signOutUser = async () => {
     if (auth) {
-      await signOut(auth);
+      try {
+        await signOut(auth);
+      } catch {}
     }
     setUser(null);
+    localStorage.removeItem('finmech_local_user');
   };
 
   const syncWithCloud = async (data: {

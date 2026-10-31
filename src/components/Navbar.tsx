@@ -14,7 +14,8 @@ import {
   Moon,
   PieChart as PieIcon,
   X,
-  ArrowRight
+  ArrowRight,
+  User as UserIcon
 } from 'lucide-react';
 
 export type NavTab = 'dashboard' | 'spends' | 'cash' | 'business' | 'copilot';
@@ -34,8 +35,8 @@ export function Navbar({
   onTabChange,
   onOpenQuickEntry,
   onOpenAuthModal,
-  userName = 'Zia',
-  userPhoto = '/avatar.jpg',
+  userName,
+  userPhoto,
   userEmail,
 }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
@@ -114,15 +115,21 @@ export function Navbar({
               {userPhoto ? (
                 <img
                   src={userPhoto}
-                  alt={userName}
+                  alt={userName || 'User'}
                   className="w-10 h-10 rounded-full object-cover border border-neutral-200/80 dark:border-neutral-800 shadow-xs group-hover:scale-105 transition-transform"
                 />
-              ) : (
+              ) : userName ? (
                 <div className="w-10 h-10 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center font-bold text-sm tracking-tight shadow-sm select-none group-hover:scale-105 transition-transform">
                   {userName.charAt(0).toUpperCase()}
                 </div>
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-850 text-neutral-400 dark:text-neutral-500 border border-neutral-200/70 dark:border-neutral-800 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+                  <UserIcon className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
+                </div>
               )}
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#09090b]" />
+              {userEmail && (
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#09090b]" />
+              )}
             </button>
             <div>
               <div className="flex items-center gap-1.5">
@@ -137,7 +144,11 @@ export function Navbar({
                 onClick={onOpenAuthModal}
                 className="text-left text-sm font-bold text-neutral-900 dark:text-white leading-tight hover:opacity-80 transition-opacity"
               >
-                Hi, {userName}
+                {userName ? `Hi, ${userName}` : (
+                  <span className="text-neutral-500 dark:text-neutral-400 font-semibold hover:text-neutral-900 dark:hover:text-white flex items-center gap-1">
+                    Sign in <span className="text-xs">→</span>
+                  </span>
+                )}
               </button>
             </div>
           </div>

@@ -143,23 +143,36 @@ export function Navbar({
               <button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                className="relative px-3.5 py-2.5 rounded-full flex flex-col items-center justify-center text-xs transition-colors group focus:outline-none"
+                className={`relative py-2.5 rounded-full flex items-center justify-center gap-1.5 text-xs transition-all group focus:outline-none ${
+                  isActive ? 'px-4' : 'px-3'
+                }`}
                 aria-label={item.label}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full"
-                    transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                    className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
+                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
                 <Icon
-                  className={`w-5 h-5 relative z-10 transition-colors ${
+                  className={`w-4 h-4 relative z-10 transition-colors shrink-0 ${
                     isActive
                       ? 'text-white dark:text-neutral-900'
                       : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
                   }`}
                 />
+                {isActive && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: 'auto' }}
+                    exit={{ opacity: 0, width: 0 }}
+                    transition={{ duration: 0.18 }}
+                    className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
+                  >
+                    {item.label}
+                  </motion.span>
+                )}
               </button>
             );
           })}
@@ -167,7 +180,7 @@ export function Navbar({
           {/* Center Elevated Quick Add Button with spring pop interaction */}
           <button
             onClick={onOpenQuickEntry}
-            className="w-11 h-11 mx-1.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-transform"
+            className="w-11 h-11 mx-1 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-transform shrink-0"
             aria-label="Add transaction"
           >
             <Plus className="w-5 h-5 stroke-[2.8]" />
@@ -181,23 +194,36 @@ export function Navbar({
               <button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                className="relative px-3.5 py-2.5 rounded-full flex flex-col items-center justify-center text-xs transition-colors group focus:outline-none"
+                className={`relative py-2.5 rounded-full flex items-center justify-center gap-1.5 text-xs transition-all group focus:outline-none ${
+                  isActive ? 'px-4' : 'px-3'
+                }`}
                 aria-label={item.label}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full"
-                    transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                    className="absolute inset-0 bg-neutral-900 dark:bg-white rounded-full shadow-sm"
+                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
                 <Icon
-                  className={`w-5 h-5 relative z-10 transition-colors ${
+                  className={`w-4 h-4 relative z-10 transition-colors shrink-0 ${
                     isActive
                       ? 'text-white dark:text-neutral-900'
                       : 'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200'
                   }`}
                 />
+                {isActive && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: 'auto' }}
+                    exit={{ opacity: 0, width: 0 }}
+                    transition={{ duration: 0.18 }}
+                    className="relative z-10 font-bold text-xs whitespace-nowrap text-white dark:text-neutral-900 overflow-hidden select-none"
+                  >
+                    {item.label}
+                  </motion.span>
+                )}
               </button>
             );
           })}

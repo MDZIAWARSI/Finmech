@@ -201,6 +201,27 @@ export function saveDenominations(counts: CashDenominationCount) {
   }
 }
 
+export function getStoredLiveBusinessBalance(): number {
+  if (typeof window === 'undefined') return 28800;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.LIVE_BUSINESS_BALANCE);
+    if (!raw) return 28800;
+    const num = parseFloat(raw);
+    return isNaN(num) ? 28800 : num;
+  } catch {
+    return 28800;
+  }
+}
+
+export function saveLiveBusinessBalance(balance: number) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEYS.LIVE_BUSINESS_BALANCE, balance.toString());
+  } catch (err) {
+    console.error('Failed to save business balance to localStorage', err);
+  }
+}
+
 export function exportFinancialDataJson(transactions: Transaction[], profile: UserProfile): string {
   const payload = {
     app: 'finmech',

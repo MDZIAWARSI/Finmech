@@ -17,6 +17,60 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [name, setName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [configText, setConfigText] = useState('');
+  const [setupSuccess, setSetupSuccess] = useState(false);
+
+  const handleSaveFirebaseConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    try {
+      let configToSave: any = null;
+
+      try {
+        const parsed = JSON.parse(configText.trim());
+        if (parsed.apiKey && parsed.projectId) {
+          configToSave = parsed;
+        }
+      } catch {}
+
+      if (!configToSave) {
+        const apiKeyMatch = configText.match(/apiKey["']?\s*:\s*["']([^"']+)["']/i) || configText.match(/AIzaSy[a-zA-Z0-9_\-]+/);
+        const projectIdMatch = configText.match(/projectId["']?\s*:\s*["']([^"']+)["']/i);
+        const authDomainMatch = configText.match(/authDomain["']?\s*:\s*["']([^"']+)["']/i);
+        const storageBucketMatch = configText.match(/storageBucket["']?\s*:\s*["']([^"']+)["']/i);
+        const appIdMatch = configText.match(/appId["']?\s*:\s*["']([^"']+)["']/i);
+        const senderIdMatch = configText.match(/messagingSenderId["']?\s*:\s*["']([^"']+)["']/i);
+
+        if (apiKeyMatch && projectIdMatch) {
+          configToSave = {
+            apiKey: apiKeyMatch[1] || apiKeyMatch[0],
+            projectId: projectIdMatch[1],
+            authDomain: authDomainMatch ? authDomainMatch[1] : `${projectIdMatch[1]}.firebaseapp.com`,
+            storageBucket: storageBucketMatch ? storageBucketMatch[1] : `${projectIdMatch[1]}.appspot.com`,
+            messagingSenderId: senderIdMatch ? senderIdMatch[1] : '',
+            appId: appIdMatch ? appIdMatch[1] : '',
+          };
+        }
+      }
+
+      if (!configToSave || !configToSave.apiKey || !configToSave.projectId) {
+        throw new Error('Please paste your valid Firebase Web Config snippet (must contain apiKey and projectId).');
+      }
+
+      localStorage.setItem('finmech_firebase_config', JSON.stringify(configToSave));
+      setSetupSuccess(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to parse Firebase config.');
+    }
+  };
+
+  const handleClearConfig = () => {
+    localStorage.removeItem('finmech_firebase_config');
+    window.location.reload();
+  };
 
   if (!isOpen) return null;
 
@@ -159,25 +213,63 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
             {tab === 'setup' ? (
               <div className="space-y-3 text-xs">
-                <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#1a1a1e] border border-neutral-200/80 dark:border-neutral-800 space-y-2">
-                  <div className="font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
-                    <Database className="w-4 h-4 text-emerald-500" />
-                    Firebase Connection
+                {isConfigured ? (
+                  <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 space-y-2">
+                    <div className="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                      Cloud Firestore Connected
+                    </div>
+                    <p className="text-emerald-700/80 dark:text-emerald-400/80 leading-relaxed text-[11.5px]">
+                      Your permanent cloud database is active. All entries sync to Firestore in real-time.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleClearConfig}
+                      className="mt-1 px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 font-medium transition-colors text-[11px]"
+                    >
+                      Reset / Disconnect Custom DB
+                    </button>
                   </div>
-                  <p className="text-neutral-500 leading-relaxed">
-                    Finmech supports Google Cloud Firestore & Firebase Auth. Add your free project keys to <code>.env.local</code>:
-                  </p>
-                  <pre className="p-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 text-[11px] font-mono overflow-x-auto text-neutral-700 dark:text-neutral-300">
-NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=app.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=my-finmech
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=app.appspot.com
-NEXT_PUBLIC_FIREBASE_APP_ID=1:123:web:abc
-                  </pre>
-                  <p className="text-neutral-400 text-[11px]">
-                    While unconfigured, Finmech operates in <strong>local-first encrypted storage mode</strong> with offline support.
-                  </p>
-                </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#1a1a1e] border border-neutral-200/80 dark:border-neutral-800 space-y-2">
+                      <div className="font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+                        <Database className="w-4 h-4 text-emerald-500" />
+                        Connect Cloud Firestore
+                      </div>
+                      <p className="text-neutral-500 leading-relaxed text-[11.5px]">
+                        Paste your free Firebase Web App config snippet below to enable permanent cross-device cloud sync:
+                      </p>
+                      
+                      <form onSubmit={handleSaveFirebaseConfig} className="space-y-2.5 pt-1">
+                        <textarea
+                          rows={4}
+                          value={configText}
+                          onChange={(e) => setConfigText(e.target.value)}
+                          placeholder={`const firebaseConfig = {\n  apiKey: "AIzaSy...",\n  projectId: "your-project",\n  ...\n};`}
+                          className="w-full p-2.5 bg-white dark:bg-[#141417] border border-neutral-200 dark:border-neutral-800 rounded-xl font-mono text-[11px] text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white resize-none"
+                        />
+                        <button
+                          type="submit"
+                          className="w-full py-2.5 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-xl text-xs font-bold shadow-xs hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
+                        >
+                          <Database className="w-3.5 h-3.5" />
+                          Save & Connect Database
+                        </button>
+                      </form>
+
+                      {setupSuccess && (
+                        <div className="p-2 text-center text-emerald-600 dark:text-emerald-400 font-semibold text-xs">
+                          ✓ Configuration saved! Reloading...
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-neutral-50/60 dark:bg-[#141417]/60 border border-neutral-200/50 dark:border-neutral-800/50 text-[11px] text-neutral-400 leading-relaxed">
+                      Or populate <code>.env.local</code> in this repository with your <code>NEXT_PUBLIC_FIREBASE_*</code> keys.
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <>

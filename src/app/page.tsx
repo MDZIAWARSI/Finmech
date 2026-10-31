@@ -33,6 +33,14 @@ import { QuickEntryModal } from '@/components/QuickEntryModal';
 import { SavingsTargetModal } from '@/components/SavingsTargetModal';
 import { AuthModal } from '@/components/AuthModal';
 import { useAuth } from '@/context/AuthContext';
+import { 
+  subscribeToUserData, 
+  addTransactionToCloud, 
+  deleteTransactionFromCloud, 
+  updateProfileInCloud, 
+  updateDenominationsInCloud, 
+  updateBusinessBalanceInCloud 
+} from '@/lib/firestoreSync';
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -56,6 +64,18 @@ export default function Home() {
     setProfile(getStoredProfile());
     setDenominations(getStoredDenominations());
   }, []);
+
+  // Real-time Cloud Firestore synchronization when user is signed in
+  useEffect(() => {
+    if (!user?.uid) return;
+    const unsubscribe = subscribeToUserData(user.uid, {
+      onTransactionsChange: (txs) => setTransactions(txs),
+      onProfileChange: (p) => setProfile(p),
+      onDenominationsChange: (d) => setDenominations(d),
+      onBusinessBalanceChange: (b) => setManualBusinessBalance(b),
+    });
+    return () => unsubscribe();
+  }, [user?.uid]);
 
   // Compute live financial summary
   const summary = computeFinancialSummary(
@@ -90,17 +110,26 @@ export default function Home() {
     const updated = [newTx, ...transactions];
     setTransactions(updated);
     saveTransactions(updated);
+    if (user?.uid) {
+      addTransactionToCloud(user.uid, newTx);
+    }
   };
 
   const handleDeleteTransaction = (id: string) => {
     const updated = transactions.filter((t) => t.id !== id);
     setTransactions(updated);
     saveTransactions(updated);
+    if (user?.uid) {
+      deleteTransactionFromCloud(user.uid, id);
+    }
   };
 
   const handleUpdateDenominations = (newCounts: CashDenominationCount) => {
     setDenominations(newCounts);
     saveDenominations(newCounts);
+    if (user?.uid) {
+      updateDenominationsInCloud(user.uid, newCounts);
+    }
 
     // Calculate physical cash total and create an adjustment transaction if there is variance
     const physicalTotal = calculateDenominationTotal(newCounts);
@@ -119,6 +148,9 @@ export default function Home() {
       const updated = [adjustmentTx, ...transactions];
       setTransactions(updated);
       saveTransactions(updated);
+      if (user?.uid) {
+        addTransactionToCloud(user.uid, adjustmentTx);
+      }
     }
   };
 
@@ -137,10 +169,17 @@ export default function Home() {
     const updated = [atmTx, ...transactions];
     setTransactions(updated);
     saveTransactions(updated);
+    if (user?.uid) {
+      addTransactionToCloud(user.uid, atmTx);
+    }
   };
 
   const handleUpdateBusinessBalance = (newBalance: number) => {
     setManualBusinessBalance(newBalance);
+    if (user?.uid) {
+      updateBusinessBalanceInCloud(user.uid, newBalance);
+    }
+
     // Also record a business capital adjustment transaction for ledger alignment
     const variance = newBalance - summary.businessBalance;
     if (variance !== 0) {
@@ -157,6 +196,9 @@ export default function Home() {
       const updated = [adjTx, ...transactions];
       setTransactions(updated);
       saveTransactions(updated);
+      if (user?.uid) {
+        addTransactionToCloud(user.uid, adjTx);
+      }
     }
   };
 
@@ -175,6 +217,9 @@ export default function Home() {
     const updated = [transferTx, ...transactions];
     setTransactions(updated);
     saveTransactions(updated);
+    if (user?.uid) {
+      addTransactionToCloud(user.uid, transferTx);
+    }
   };
 
   const handleSaveTarget = (newTarget: number) => {
@@ -184,6 +229,9 @@ export default function Home() {
     };
     setProfile(updatedProfile);
     saveProfile(updatedProfile);
+    if (user?.uid) {
+      updateProfileInCloud(user.uid, updatedProfile);
+    }
   };
 
   const handleExportData = () => {

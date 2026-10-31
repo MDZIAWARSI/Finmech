@@ -1,0 +1,187 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: users
+// Document ID: {userId} (matches request.auth.uid)
+// Fields:
+//   - name: string (optional, 1..100 chars) - user's display name
+//   - email: string (optional, valid email format, <= 150 chars, immutable once set)
+//   - createdAt: number (optional, epoch timestamp in ms > 0, immutable once set)
+//   - lastSynced: number (optional, epoch timestamp in ms > 0)
+//   - businessBalance: number (optional, live business account balance, -1e12 <= n <= 1e12)
+//   - profile: map (optional) - user financial preferences
+//       * id: string (1..100 chars)
+//       * name: string (1..100 chars)
+//       * currency: string (1..10 chars)
+//       * monthlySavingsTarget: number (0 <= n <= 1e9)
+//       * monthlyBudget: number (0 <= n <= 1e9)
+//       * photoURL: string (optional, <= 500 chars, http/https or / relative URL)
+//   - denominations: map (optional) - count of physical cash notes and coins
+//       * '500': number (int >= 0, <= 1000000)
+//       * '200': number (int >= 0, <= 1000000)
+//       * '100': number (int >= 0, <= 1000000)
+//       * '50': number (int >= 0, <= 1000000)
+//       * '20': number (int >= 0, <= 1000000)
+//       * '10': number (int >= 0, <= 1000000)
+//       * 'coins': number (int >= 0, <= 1000000)
+//
+// Collection: users/{userId}/transactions
+// Document ID: {txId} (matches transaction.id)
+// Fields:
+//   - id: string (required, 1..100 chars, equals txId, immutable on update)
+//   - type: string (required, enum: 'expense', 'income', 'transfer')
+//   - pocket: string (required, enum: 'cash', 'bank', 'business')
+//   - toPocket: string (optional, enum: 'cash', 'bank', 'business')
+//   - category: string (required, 1..100 chars)
+//   - amount: number (required, > 0, <= 1e9)
+//   - date: string (required, ISO 8601 string, 10..40 chars)
+//   - note: string (required, <= 500 chars)
+//   - createdAt: number (required, epoch ms timestamp > 0, immutable on update)
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user owns the document path
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Validate email format
+    function isValidEmail(email) {
+      return email is string &&
+        email.size() <= 150 &&
+        email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // Validate ISO 8601 date string format (e.g. 2026-10-31T13:30:00.000Z)
+    function isValidDateString(dateStr) {
+      return dateStr is string &&
+        dateStr.size() >= 10 &&
+        dateStr.size() <= 40 &&
+        dateStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*Z?$");
+    }
+
+    // Validate optional avatar URL or relative path
+    function isValidPhotoUrl(url) {
+      return url is string &&
+        url.size() <= 500 &&
+        (url.matches("^https?://.*") || url.matches("^/.*"));
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    // Validate UserProfile nested map
+    function isValidUserProfile(profile) {
+      return profile is map &&
+        profile.keys().hasAll(['id', 'name', 'currency', 'monthlySavingsTarget', 'monthlyBudget']) &&
+        profile.keys().hasOnly(['id', 'name', 'currency', 'monthlySavingsTarget', 'monthlyBudget', 'photoURL']) &&
+        profile.id is string && profile.id.size() >= 1 && profile.id.size() <= 100 &&
+        profile.name is string && profile.name.size() >= 1 && profile.name.size() <= 100 &&
+        profile.currency is string && profile.currency.size() >= 1 && profile.currency.size() <= 10 &&
+        profile.monthlySavingsTarget is number && profile.monthlySavingsTarget >= 0 && profile.monthlySavingsTarget <= 1000000000 &&
+        profile.monthlyBudget is number && profile.monthlyBudget >= 0 && profile.monthlyBudget <= 1000000000 &&
+        (!('photoURL' in profile) || isValidPhotoUrl(profile.photoURL));
+    }
+
+    // Validate CashDenominationCount nested map
+    function isValidDenominations(denominations) {
+      return denominations is map &&
+        denominations.keys().hasAll(['500', '200', '100', '50', '20', '10', 'coins']) &&
+        denominations.keys().hasOnly(['500', '200', '100', '50', '20', '10', 'coins']) &&
+        denominations['500'] is number && denominations['500'] >= 0 && denominations['500'] <= 1000000 &&
+        denominations['200'] is number && denominations['200'] >= 0 && denominations['200'] <= 1000000 &&
+        denominations['100'] is number && denominations['100'] >= 0 && denominations['100'] <= 1000000 &&
+        denominations['50'] is number && denominations['50'] >= 0 && denominations['50'] <= 1000000 &&
+        denominations['20'] is number && denominations['20'] >= 0 && denominations['20'] <= 1000000 &&
+        denominations['10'] is number && denominations['10'] >= 0 && denominations['10'] <= 1000000 &&
+        denominations['coins'] is number && denominations['coins'] >= 0 && denominations['coins'] <= 1000000;
+    }
+
+    // Validate /users/{userId} document payload
+    function isValidUserDoc(data) {
+      return data is map &&
+        data.keys().size() > 0 &&
+        data.keys().hasOnly(['name', 'email', 'createdAt', 'profile', 'denominations', 'businessBalance', 'lastSynced']) &&
+        (!('name' in data) || (data.name is string && data.name.size() >= 1 && data.name.size() <= 100)) &&
+        (!('email' in data) || isValidEmail(data.email)) &&
+        (!('createdAt' in data) || (data.createdAt is number && data.createdAt > 0)) &&
+        (!('lastSynced' in data) || (data.lastSynced is number && data.lastSynced > 0)) &&
+        (!('businessBalance' in data) || (data.businessBalance is number && data.businessBalance >= -1000000000000 && data.businessBalance <= 1000000000000)) &&
+        (!('profile' in data) || isValidUserProfile(data.profile)) &&
+        (!('denominations' in data) || isValidDenominations(data.denominations));
+    }
+
+    // Validate /users/{userId}/transactions/{txId} document payload
+    function isValidTransaction(data, txId) {
+      return data is map &&
+        data.keys().hasAll(['id', 'type', 'pocket', 'category', 'amount', 'date', 'note', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'type', 'pocket', 'toPocket', 'category', 'amount', 'date', 'note', 'createdAt']) &&
+        data.id is string && data.id == txId && data.id.size() >= 1 && data.id.size() <= 100 &&
+        data.type is string && data.type in ['expense', 'income', 'transfer'] &&
+        data.pocket is string && data.pocket in ['cash', 'bank', 'business'] &&
+        (!('toPocket' in data) || (data.toPocket is string && data.toPocket in ['cash', 'bank', 'business'])) &&
+        data.category is string && data.category.size() >= 1 && data.category.size() <= 100 &&
+        data.amount is number && data.amount > 0 && data.amount <= 1000000000 &&
+        isValidDateString(data.date) &&
+        data.note is string && data.note.size() <= 500 &&
+        data.createdAt is number && data.createdAt > 0;
+    }
+
+    // ===============================================================
+    // Root Match: Default Deny All
+    // ===============================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ===============================================================
+    // User Document & Subcollections
+    // ===============================================================
+    match /users/{userId} {
+      // Strict user-ownership isolation: only the authenticated owner can read/write their user document
+      allow read: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+        isValidUserDoc(request.resource.data);
+
+      allow update: if isOwner(userId) &&
+        isValidUserDoc(request.resource.data) &&
+        (!('createdAt' in resource.data) || request.resource.data.createdAt == resource.data.createdAt) &&
+        (!('email' in resource.data) || request.resource.data.email == resource.data.email);
+
+      allow delete: if isOwner(userId);
+
+      // Subcollection: transactions
+      match /transactions/{txId} {
+        // Only the owner of the parent user document can read and manage their financial transactions
+        allow read: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+          isValidTransaction(request.resource.data, txId);
+
+        allow update: if isOwner(userId) &&
+          isValidTransaction(request.resource.data, txId) &&
+          request.resource.data.id == resource.data.id &&
+          request.resource.data.createdAt == resource.data.createdAt;
+
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

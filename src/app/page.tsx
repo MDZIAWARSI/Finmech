@@ -132,7 +132,7 @@ export default function Home() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 mx-auto w-full max-w-7xl px-3 sm:px-6 py-4 sm:py-6">
+      <main className="flex-1 mx-auto w-full max-w-5xl px-3 sm:px-6 py-4 sm:py-6">
         {activeTab === 'overview' && (
           <DashboardOverview
             summary={summary}
@@ -179,17 +179,6 @@ export default function Home() {
           />
         )}
       </main>
-
-      {/* Mobile Floating Action Button (FAB) for Ergonomic 1-Thumb Quick Add */}
-      <div className="md:hidden fixed bottom-20 right-4 z-30">
-        <button
-          onClick={() => setIsQuickAddOpen(true)}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 text-slate-950 shadow-xl shadow-emerald-500/35 active:scale-[0.92] transition-transform duration-150"
-          aria-label="Quick Add Spend"
-        >
-          <Plus className="h-7 w-7" aria-hidden="true" />
-        </button>
-      </div>
 
       {/* Quick Input Modal */}
       <QuickInputModal

@@ -71,35 +71,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    // Fallback safety timeout to guarantee loading never hangs
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+    }, 1200);
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      clearTimeout(safetyTimer);
       if (currentUser) {
+        const photo = currentUser.photoURL || currentUser.providerData?.find((p) => p.photoURL)?.photoURL || null;
+        const name = currentUser.displayName || currentUser.providerData?.find((p) => p.displayName)?.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'User');
+        const email = currentUser.email || currentUser.providerData?.find((p) => p.email)?.email || null;
+
+        const storedUser = {
+          uid: currentUser.uid,
+          displayName: name,
+          photoURL: photo,
+          email: email,
+        };
         setUser(currentUser);
         try {
-          const photo = currentUser.photoURL || currentUser.providerData?.find((p) => p.photoURL)?.photoURL || null;
-          const name = currentUser.displayName || currentUser.providerData?.find((p) => p.displayName)?.displayName || null;
-          const email = currentUser.email || currentUser.providerData?.find((p) => p.email)?.email || null;
-
-          const storedUser = {
-            uid: currentUser.uid,
-            displayName: name,
-            photoURL: photo,
-            email: email,
-          };
           localStorage.setItem('finmech_local_user', JSON.stringify(storedUser));
-          if (db) {
-            await setDoc(doc(db, 'users', currentUser.uid), {
-              name: name,
-              email: email,
-              photoURL: photo,
-              profile: {
-                name: name,
-                photoURL: photo,
-              },
-              updatedAt: Date.now(),
-            }, { merge: true });
-          }
-        } catch (e) {
-          console.warn('Could not sync auth profile to firestore:', e);
+        } catch { }
+
+        // Non-blocking background sync adhering to firestore.rules
+        if (db) {
+          setDoc(doc(db, 'users', currentUser.uid), {
+            name: name,
+            email: email,
+            lastSynced: Date.now(),
+          }, { merge: true }).catch((e) => {
+            console.warn('Could not sync auth profile to firestore:', e);
+          });
         }
       } else {
         setUser(null);
@@ -110,40 +113,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(safetyTimer);
+      unsubscribe();
+    };
   }, []);
 
   const signInWithGoogle = async () => {
     if (auth && googleProvider) {
       const res = await signInWithPopup(auth, googleProvider);
       if (res.user) {
-        setUser(res.user);
-        try {
-          const photo = res.user.photoURL || res.user.providerData?.find((p) => p.photoURL)?.photoURL || null;
-          const name = res.user.displayName || res.user.providerData?.find((p) => p.displayName)?.displayName || null;
-          const email = res.user.email || res.user.providerData?.find((p) => p.email)?.email || null;
+        const photo = res.user.photoURL || res.user.providerData?.find((p) => p.photoURL)?.photoURL || null;
+        const name = res.user.displayName || res.user.providerData?.find((p) => p.displayName)?.displayName || (res.user.email ? res.user.email.split('@')[0] : 'User');
+        const email = res.user.email || res.user.providerData?.find((p) => p.email)?.email || null;
 
-          const storedUser = {
-            uid: res.user.uid,
-            displayName: name,
-            photoURL: photo,
-            email: email,
-          };
+        const storedUser = {
+          uid: res.user.uid,
+          displayName: name,
+          photoURL: photo,
+          email: email,
+        };
+        setUser(res.user);
+        setLoading(false);
+        try {
           localStorage.setItem('finmech_local_user', JSON.stringify(storedUser));
-          if (db) {
-            await setDoc(doc(db, 'users', res.user.uid), {
-              name: name,
-              email: email,
-              photoURL: photo,
-              profile: {
-                name: name,
-                photoURL: photo,
-              },
-              updatedAt: Date.now(),
-            }, { merge: true });
-          }
-        } catch (e) {
-          console.warn('Could not save google profile:', e);
+        } catch { }
+
+        // Non-blocking background sync
+        if (db) {
+          setDoc(doc(db, 'users', res.user.uid), {
+            name: name,
+            email: email,
+            lastSynced: Date.now(),
+          }, { merge: true }).catch((e) => {
+            console.warn('Could not save google profile:', e);
+          });
         }
       }
     } else {

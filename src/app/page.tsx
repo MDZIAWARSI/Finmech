@@ -372,7 +372,7 @@ export default function Home() {
   };
 
   // Only render on client to ensure hydrations match localStorage
-  if (!mounted || authLoading) {
+  if (!mounted || (authLoading && !user)) {
     return (
       <div className="min-h-screen bg-[#fafafa] dark:bg-[#09090b] flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-neutral-300 dark:border-neutral-700 border-t-neutral-900 dark:border-t-white animate-spin" />

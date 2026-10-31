@@ -53,6 +53,7 @@ export function subscribeToUserData(
     } else {
       // First-time sync: Upload current local state to initialize cloud document
       const currentProfile = getStoredProfile(userId);
+      if (!currentProfile.name) currentProfile.name = 'User';
       const currentDenoms = getStoredDenominations(userId);
       const currentBizBalance = getStoredLiveBusinessBalance(userId);
       setDoc(userDocRef, {
@@ -60,7 +61,7 @@ export function subscribeToUserData(
         denominations: currentDenoms,
         businessBalance: currentBizBalance,
         createdAt: Date.now(),
-        updatedAt: Date.now(),
+        lastSynced: Date.now(),
       }, { merge: true }).catch(console.warn);
     }
   }, (err) => console.warn('Firestore user doc snapshot error:', err));

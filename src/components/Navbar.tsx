@@ -88,17 +88,12 @@ export function Navbar({
     { id: 'business' as NavTab, label: 'Business', icon: Briefcase },
   ];
 
-  // Dynamic wing widths: wide, spacious, tactile floating dock
+  // Fixed balanced wing widths: perfectly symmetrical floating dock with zero lopsidedness
   const isLeftActive = currentTab === 'dashboard' || currentTab === 'spends';
   const isRightActive = currentTab === 'cash' || currentTab === 'business';
 
-  const leftWingWidth = isLeftActive
-    ? (currentTab === 'dashboard' ? 156 : 148)
-    : 104;
-
-  const rightWingWidth = isRightActive
-    ? (currentTab === 'business' ? 156 : 142)
-    : 104;
+  const leftWingWidth = 142;
+  const rightWingWidth = 142;
 
   return (
     <>
@@ -239,18 +234,20 @@ export function Navbar({
           {/* Background Pill: Expands left and right with balanced spring physics while keeping center + strictly anchored */}
           <motion.div
             animate={{
-              left: -(leftWingWidth + 46),
-              right: -(rightWingWidth + 46),
+              left: -(leftWingWidth + 36),
+              right: -(rightWingWidth + 36),
             }}
             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-            className="absolute top-0 -translate-y-1/2 h-[60px] bg-white/95 dark:bg-[#121215]/95 backdrop-blur-2xl border border-neutral-200/90 dark:border-neutral-800 shadow-[0_20px_50px_rgba(0,0,0,0.16)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.8)] rounded-full pointer-events-none z-0"
+            className="absolute top-0 -translate-y-1/2 h-[58px] bg-white/95 dark:bg-[#121215]/95 backdrop-blur-2xl border border-neutral-200/90 dark:border-neutral-800 shadow-[0_20px_50px_rgba(0,0,0,0.16)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.8)] rounded-full pointer-events-none z-0"
           />
 
           {/* Left Wing Tabs: Sits strictly to the left of the center + button */}
           <motion.div
             animate={{ width: leftWingWidth }}
             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-            className="absolute right-[30px] top-0 -translate-y-1/2 flex items-center justify-end gap-2 pointer-events-auto z-10"
+            className={`absolute right-[27px] top-0 -translate-y-1/2 flex items-center pointer-events-auto z-10 ${
+              isLeftActive ? 'justify-end gap-1.5' : 'justify-between'
+            }`}
           >
             {leftTabs.map((item) => {
               const Icon = item.icon;
@@ -259,8 +256,8 @@ export function Navbar({
                 <button
                   key={item.id}
                   onClick={() => onTabChange(item.id)}
-                  className={`relative h-11 rounded-full flex items-center justify-center gap-2 text-xs transition-colors group focus:outline-none shrink-0 ${
-                    isActive ? 'px-4' : 'w-11'
+                  className={`relative h-[42px] rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
+                    isActive ? 'px-3.5' : 'w-[42px]'
                   }`}
                   aria-label={item.label}
                 >
@@ -300,7 +297,7 @@ export function Navbar({
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
               onClick={onOpenQuickEntry}
-              className="w-[52px] h-[52px] rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-[0_6px_20px_rgba(0,0,0,0.25)] dark:shadow-[0_6px_20px_rgba(255,255,255,0.22)] active:scale-90 transition-transform shrink-0 focus:outline-none"
+              className="w-[50px] h-[50px] rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-[0_6px_20px_rgba(0,0,0,0.25)] dark:shadow-[0_6px_20px_rgba(255,255,255,0.22)] active:scale-90 transition-transform shrink-0 focus:outline-none"
               aria-label="Add transaction"
             >
               <Plus className="w-6 h-6 stroke-[2.8]" />
@@ -311,7 +308,9 @@ export function Navbar({
           <motion.div
             animate={{ width: rightWingWidth }}
             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-            className="absolute left-[30px] top-0 -translate-y-1/2 flex items-center justify-start gap-2 pointer-events-auto z-10"
+            className={`absolute left-[27px] top-0 -translate-y-1/2 flex items-center pointer-events-auto z-10 ${
+              isRightActive ? 'justify-start gap-1.5' : 'justify-between'
+            }`}
           >
             {rightTabs.map((item) => {
               const Icon = item.icon;
@@ -320,8 +319,8 @@ export function Navbar({
                 <button
                   key={item.id}
                   onClick={() => onTabChange(item.id)}
-                  className={`relative h-11 rounded-full flex items-center justify-center gap-2 text-xs transition-colors group focus:outline-none shrink-0 ${
-                    isActive ? 'px-4' : 'w-11'
+                  className={`relative h-[42px] rounded-full flex items-center justify-center gap-1.5 text-xs transition-colors group focus:outline-none shrink-0 ${
+                    isActive ? 'px-3.5' : 'w-[42px]'
                   }`}
                   aria-label={item.label}
                 >

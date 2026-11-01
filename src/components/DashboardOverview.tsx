@@ -23,6 +23,7 @@ import {
 import { FinancialSummary, Transaction } from '@/types/finance';
 import { NavTab } from './Navbar';
 import { SpendingPieChart, SpendingTrendGraph } from './Charts';
+import { CalendarSpendView } from './CalendarSpendView';
 
 interface DashboardOverviewProps {
   summary: FinancialSummary;
@@ -45,20 +46,53 @@ export function DashboardOverview({
   onEditTransaction,
 }: DashboardOverviewProps) {
   const [hideBalances, setHideBalances] = useState(false);
-  const [activeChartTab, setActiveChartTab] = useState<'distribution' | 'trend'>('distribution');
+  const [activeChartTab, setActiveChartTab] = useState<'distribution' | 'trend' | 'calendar'>('distribution');
   const [movementFilter, setMovementFilter] = useState<'all' | 'bank' | 'cash' | 'business'>('all');
+  const [dateFilter, setDateFilter] = useState<string>('');
   const [showAllMovements, setShowAllMovements] = useState(false);
 
   const filteredMovements = useMemo(() => {
-    if (movementFilter === 'all') return recentTransactions;
-    return recentTransactions.filter((tx) => tx.pocket === movementFilter || tx.toPocket === movementFilter);
-  }, [recentTransactions, movementFilter]);
+    return recentTransactions.filter((tx) => {
+      const matchesPocket =
+        movementFilter === 'all' || tx.pocket === movementFilter || tx.toPocket === movementFilter;
+      const matchesDate = !dateFilter || tx.date.startsWith(dateFilter);
+      return matchesPocket && matchesDate;
+    });
+  }, [recentTransactions, movementFilter, dateFilter]);
 
   const displayedMovements = showAllMovements ? filteredMovements : filteredMovements.slice(0, 6);
 
   const formatAmount = (val: number) => {
     if (hideBalances) return '••••••';
     return `${currency}${val.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+  };
+
+  const formatTxDate = (dateStr: string) => {
+    const txDate = new Date(dateStr);
+    const now = new Date();
+    const isToday =
+      txDate.getFullYear() === now.getFullYear() &&
+      txDate.getMonth() === now.getMonth() &&
+      txDate.getDate() === now.getDate();
+
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday =
+      txDate.getFullYear() === yesterday.getFullYear() &&
+      txDate.getMonth() === yesterday.getMonth() &&
+      txDate.getDate() === yesterday.getDate();
+
+    if (isToday) {
+      return `Today, ${txDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    }
+    if (isYesterday) {
+      return `Yesterday, ${txDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    }
+    return txDate.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
   };
 
   const getCategoryIcon = (category: string) => {
@@ -390,14 +424,28 @@ export function DashboardOverview({
             >
               Weekly Curve
             </button>
+            <button
+              onClick={() => setActiveChartTab('calendar')}
+              className={`px-3 py-1 rounded-full transition-all ${
+                activeChartTab === 'calendar'
+                  ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'
+                  : 'text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
+              }`}
+            >
+              Calendar
+            </button>
           </div>
 
           <span className="text-xs font-semibold text-neutral-400">
-            {activeChartTab === 'distribution' ? 'Capital Breakdown' : 'Daily Outflow Dynamics'}
+            {activeChartTab === 'distribution' 
+              ? 'Monthly Breakdown' 
+              : activeChartTab === 'calendar' 
+              ? 'Real Date Matrix' 
+              : 'Daily Outflow Dynamics'}
           </span>
         </div>
 
-        {/* Dynamic Chart */}
+        {/* Dynamic Chart / Calendar */}
         <div className="py-2">
           {activeChartTab === 'distribution' ? (
             <SpendingPieChart
@@ -406,11 +454,18 @@ export function DashboardOverview({
               currency={currency}
               onSelectCategory={() => onNavigateTab('spends')}
             />
-          ) : (
+          ) : activeChartTab === 'trend' ? (
             <SpendingTrendGraph
               data={trendData}
               currency={currency}
               title="Daily Spend Velocity"
+            />
+          ) : (
+            <CalendarSpendView
+              transactions={recentTransactions}
+              currency={currency}
+              onEditTransaction={onEditTransaction}
+              onOpenQuickEntry={() => onNavigateTab('spends')}
             />
           )}
         </div>
@@ -434,43 +489,63 @@ export function DashboardOverview({
             </p>
           </div>
 
-          {/* Pocket Filter Selector */}
-          <div className="flex items-center bg-neutral-100 dark:bg-[#1c1c21] p-0.5 rounded-xl text-xs font-semibold self-start sm:self-auto">
-            {[
-              { id: 'all', label: `All (${recentTransactions.length})` },
-              { id: 'bank', label: 'Bank' },
-              { id: 'cash', label: 'Cash' },
-              { id: 'business', label: 'Business' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setMovementFilter(tab.id as any)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] transition-all ${
-                  movementFilter === tab.id
-                    ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs font-bold'
-                    : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          {/* Pocket Filter Selector & Date Picker */}
+          <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto">
+            <div className="flex items-center bg-neutral-100 dark:bg-[#1c1c21] p-0.5 rounded-xl text-xs font-semibold">
+              {[
+                { id: 'all', label: `All (${recentTransactions.length})` },
+                { id: 'bank', label: 'Bank' },
+                { id: 'cash', label: 'Cash' },
+                { id: 'business', label: 'Business' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setMovementFilter(tab.id as any)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] transition-all ${
+                    movementFilter === tab.id
+                      ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs font-bold'
+                      : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Exact Date Filter */}
+            <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#1c1c21] px-2 py-1 rounded-xl text-xs">
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="bg-transparent text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 focus:outline-none"
+                title="Filter by date"
+              />
+              {dateFilter && (
+                <button
+                  type="button"
+                  onClick={() => setDateFilter('')}
+                  className="text-[10px] text-neutral-400 hover:text-neutral-800 dark:hover:text-white font-bold ml-0.5"
+                  title="Clear date filter"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
           {displayedMovements.length === 0 ? (
             <div className="py-8 text-center text-xs text-neutral-400">
-              No transactions recorded for {movementFilter === 'all' ? 'any account' : movementFilter}. Tap + to add an entry.
+              No transactions recorded for {movementFilter === 'all' ? 'any account' : movementFilter} {dateFilter ? `on ${dateFilter}` : ''}. Tap + to add an entry.
             </div>
           ) : (
             displayedMovements.map((tx) => {
               const isIncome = tx.type === 'income';
               const isTransfer = tx.type === 'transfer';
-              const dateStr = new Date(tx.date).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-              });
+              const dateStr = formatTxDate(tx.date);
 
               return (
                 <div

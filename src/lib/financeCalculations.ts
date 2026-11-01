@@ -67,7 +67,9 @@ export function computeFinancialSummary(
       else if (tx.pocket === 'bank') bankBalance -= tx.amount;
       else if (tx.pocket === 'business') {
         businessBalance -= tx.amount;
-        totalBusinessOutflow += tx.amount;
+        if (!isInternalAdjustment) {
+          totalBusinessOutflow += tx.amount;
+        }
       }
 
       if (isCurrentMonth && !isInternalAdjustment) {
@@ -86,7 +88,11 @@ export function computeFinancialSummary(
       else if (tx.pocket === 'bank') bankBalance += tx.amount;
       else if (tx.pocket === 'business') {
         businessBalance += tx.amount;
-        totalBusinessInflow += tx.amount;
+        if (!isInternalAdjustment) {
+          totalBusinessInflow += tx.amount;
+        } else {
+          seededFromPersonal += tx.amount;
+        }
       }
 
       if (isCurrentMonth && !isInternalAdjustment) {
@@ -119,10 +125,14 @@ export function computeFinancialSummary(
     }
   });
 
-  // Allow manual override sync if user adjusted cash via denomination counter
-  if (typeof manualCashAdjusted === 'number') {
+  // If no transactions exist for cash yet, use manualCashAdjusted (denomination count) as starting baseline
+  const hasCashTransactions = transactions.some(
+    (t) => t.pocket === 'cash' || t.toPocket === 'cash'
+  );
+  if (!hasCashTransactions && typeof manualCashAdjusted === 'number') {
     cashBalance = manualCashAdjusted;
   }
+
   // When transactions exist for business, the ledger calculation is authoritative so new entries update the balance.
   // If no business transactions exist yet, use manualBusinessAdjusted as starting baseline.
   const hasBusinessTransactions = transactions.some(

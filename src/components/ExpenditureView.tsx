@@ -88,6 +88,13 @@ export function ExpenditureView({
     availableMonths[0]?.key || 'all'
   );
 
+  const isInternalAdjustment = (cat: string) =>
+    cat === 'Cash Audit Reconciliation' ||
+    cat === 'Business Capital Adjustment' ||
+    cat === 'Starting Balance' ||
+    cat === 'Initial Balance' ||
+    cat === 'Starting Balance / Deposit';
+
   // Filter transactions by selected month
   const monthFilteredExpenses = useMemo(() => {
     if (selectedMonthKey === 'all') return typeFilteredTransactions;
@@ -98,19 +105,25 @@ export function ExpenditureView({
     });
   }, [typeFilteredTransactions, selectedMonthKey]);
 
-  // Compute stats for the selected month
+  // Compute stats for the selected month (excluding internal baseline adjustments)
   const activeMonthTotal = useMemo(() => {
     if (typeFilter === 'all') {
       // In all personal view, show pure personal expenditure so income isn't summed into spends
-      return monthFilteredExpenses.filter((tx) => tx.type === 'expense').reduce((acc, tx) => acc + tx.amount, 0);
+      return monthFilteredExpenses
+        .filter((tx) => tx.type === 'expense' && !isInternalAdjustment(tx.category))
+        .reduce((acc, tx) => acc + tx.amount, 0);
     }
-    return monthFilteredExpenses.reduce((acc, tx) => acc + tx.amount, 0);
+    return monthFilteredExpenses
+      .filter((tx) => !isInternalAdjustment(tx.category))
+      .reduce((acc, tx) => acc + tx.amount, 0);
   }, [monthFilteredExpenses, typeFilter]);
 
-  // Dynamic Category breakdown for Pie Chart: strictly personal expenses (never income or business)
+  // Dynamic Category breakdown for Pie Chart: strictly personal expenses (never income, business, or internal adjustments)
   const monthCategoryBreakdown = useMemo(() => {
     const totals: Record<string, number> = {};
-    const relevantExpenses = monthFilteredExpenses.filter((tx) => tx.type === 'expense');
+    const relevantExpenses = monthFilteredExpenses.filter(
+      (tx) => tx.type === 'expense' && !isInternalAdjustment(tx.category)
+    );
     const totalExp = relevantExpenses.reduce((acc, tx) => acc + tx.amount, 0);
 
     relevantExpenses.forEach((tx) => {
@@ -177,13 +190,31 @@ export function ExpenditureView({
     return found ? found.label : selectedMonthKey;
   }, [selectedMonthKey, availableMonths]);
 
-  // Trend data for current month
-  const trendData = [
-    { day: 'W1', amount: Math.round(activeMonthTotal * 0.22) },
-    { day: 'W2', amount: Math.round(activeMonthTotal * 0.28) },
-    { day: 'W3', amount: Math.round(activeMonthTotal * 0.32) },
-    { day: 'W4', amount: Math.round(activeMonthTotal * 0.18) },
-  ];
+  // Real weekly expenditure breakdown calculated from actual transaction dates
+  const trendData = useMemo(() => {
+    let w1 = 0;
+    let w2 = 0;
+    let w3 = 0;
+    let w4 = 0;
+
+    monthFilteredExpenses
+      .filter((tx) => tx.type === 'expense' && !isInternalAdjustment(tx.category))
+      .forEach((tx) => {
+        const d = new Date(tx.date);
+        const day = d.getDate();
+        if (day <= 7) w1 += tx.amount;
+        else if (day <= 14) w2 += tx.amount;
+        else if (day <= 21) w3 += tx.amount;
+        else w4 += tx.amount;
+      });
+
+    return [
+      { day: 'W1', amount: w1 },
+      { day: 'W2', amount: w2 },
+      { day: 'W3', amount: w3 },
+      { day: 'W4', amount: w4 },
+    ];
+  }, [monthFilteredExpenses]);
 
   return (
     <div className="space-y-8 pb-32 pt-2">

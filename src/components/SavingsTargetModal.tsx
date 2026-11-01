@@ -27,7 +27,9 @@ export function SavingsTargetModal({
   useEffect(() => {
     if (isOpen) {
       setTargetInput(currentTarget.toString());
-      setDaysLeft(Math.max(1, 30 - new Date().getDate()));
+      const now = new Date();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      setDaysLeft(Math.max(1, daysInMonth - now.getDate()));
     }
   }, [isOpen, currentTarget]);
 

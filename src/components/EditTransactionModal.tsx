@@ -35,6 +35,7 @@ export function EditTransactionModal({
   const [toPocket, setToPocket] = useState<PocketType | undefined>(undefined);
   const [amount, setAmount] = useState<string>('');
   const [category, setCategory] = useState<string>('');
+  const [date, setDate] = useState<string>('');
   const [note, setNote] = useState<string>('');
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -45,6 +46,7 @@ export function EditTransactionModal({
       setToPocket(transaction.toPocket);
       setAmount(transaction.amount.toString());
       setCategory(transaction.category);
+      setDate(transaction.date ? transaction.date.split('T')[0] : new Date().toISOString().split('T')[0]);
       setNote(transaction.note || '');
       setConfirmDelete(false);
     }
@@ -57,6 +59,18 @@ export function EditTransactionModal({
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) return;
 
+    let resolvedIsoDate = transaction.date;
+    if (date) {
+      try {
+        const d = new Date(date);
+        if (!isNaN(d.getTime())) {
+          resolvedIsoDate = d.toISOString();
+        }
+      } catch {
+        resolvedIsoDate = transaction.date;
+      }
+    }
+
     const updated: Transaction = {
       ...transaction,
       type,
@@ -64,6 +78,7 @@ export function EditTransactionModal({
       toPocket: type === 'transfer' ? toPocket || 'cash' : undefined,
       amount: parsedAmount,
       category: category.trim() || 'General',
+      date: resolvedIsoDate,
       note: note.trim(),
     };
 
@@ -205,8 +220,19 @@ export function EditTransactionModal({
             </div>
           </div>
 
-          {/* Category & Note */}
+          {/* Date, Category & Note */}
           <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
+                Date
+              </label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full px-3 py-2 bg-neutral-50 dark:bg-[#18181b] border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
+              />
+            </div>
             <div>
               <label className="block text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
                 Category
@@ -219,18 +245,19 @@ export function EditTransactionModal({
                 className="w-full px-3 py-2 bg-neutral-50 dark:bg-[#18181b] border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
               />
             </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
-                Note / Description
-              </label>
-              <input
-                type="text"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Optional note"
-                className="w-full px-3 py-2 bg-neutral-50 dark:bg-[#18181b] border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
-              />
-            </div>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
+              Note / Description
+            </label>
+            <input
+              type="text"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Optional note"
+              className="w-full px-3 py-2 bg-neutral-50 dark:bg-[#18181b] border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
+            />
           </div>
 
           {/* Save & Delete Action Buttons */}

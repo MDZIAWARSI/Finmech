@@ -221,6 +221,28 @@ export default function Home() {
     if (user?.uid) {
       updateDenominationsInCloud(user.uid, newCounts);
     }
+
+    // Check variance between newly audited physical total and current ledger cash balance
+    const physicalTotal = calculateDenominationTotal(newCounts);
+    const variance = physicalTotal - summary.cashInHand;
+    if (variance !== 0) {
+      const adjustmentTx: Transaction = {
+        id: `tx_adj_${Date.now()}`,
+        type: variance > 0 ? 'income' : 'expense',
+        pocket: 'cash',
+        category: 'Cash Audit Reconciliation',
+        amount: Math.abs(variance),
+        date: new Date().toISOString(),
+        note: 'Physical wallet denomination count audit',
+        createdAt: Date.now(),
+      };
+      const updated = [adjustmentTx, ...transactions];
+      setTransactions(updated);
+      saveTransactions(updated, user?.uid);
+      if (user?.uid) {
+        addTransactionToCloud(user.uid, adjustmentTx);
+      }
+    }
   };
 
   const handleAtmWithdrawal = (amount: number) => {
@@ -241,9 +263,42 @@ export default function Home() {
     if (user?.uid) {
       addTransactionToCloud(user.uid, atmTx);
     }
+
+    // Automatically update physical denomination note count (in ₹500 notes) so physical wallet stays in sync
+    const notesToAdd = Math.floor(amount / 500);
+    if (notesToAdd > 0) {
+      const updatedDenoms = {
+        ...denominations,
+        500: (denominations[500] || 0) + notesToAdd,
+      };
+      setDenominations(updatedDenoms);
+      saveDenominations(updatedDenoms, user?.uid);
+      if (user?.uid) {
+        updateDenominationsInCloud(user.uid, updatedDenoms);
+      }
+    }
   };
 
   const handleUpdateBusinessBalance = (newBalance: number) => {
+    const variance = newBalance - summary.businessBalance;
+    if (variance !== 0) {
+      const adjTx: Transaction = {
+        id: `tx_biz_adj_${Date.now()}`,
+        type: variance > 0 ? 'income' : 'expense',
+        pocket: 'business',
+        category: 'Business Capital Adjustment',
+        amount: Math.abs(variance),
+        date: new Date().toISOString(),
+        note: variance > 0 ? 'Business starting capital / deposit' : 'Business cash drawer count reconciliation',
+        createdAt: Date.now(),
+      };
+      const updated = [adjTx, ...transactions];
+      setTransactions(updated);
+      saveTransactions(updated, user?.uid);
+      if (user?.uid) {
+        addTransactionToCloud(user.uid, adjTx);
+      }
+    }
     setManualBusinessBalance(newBalance);
     saveLiveBusinessBalance(newBalance, user?.uid);
     if (user?.uid) {

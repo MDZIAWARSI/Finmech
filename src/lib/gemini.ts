@@ -67,7 +67,9 @@ Respond in valid JSON format ONLY with this schema:
   const target = summary.savingsGoal.targetAmount;
   const currentSaved = summary.savingsGoal.currentSaved;
   const remaining = summary.savingsGoal.remaining;
-  const daysLeftInMonth = Math.max(1, 30 - new Date().getDate());
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysLeftInMonth = Math.max(1, daysInMonth - now.getDate());
   const maxDailyAllowance = Math.max(0, Math.round((summary.monthlyIncome - target - summary.monthlyExpenditure) / daysLeftInMonth));
 
   let executiveDiagnosis = '';
@@ -179,7 +181,9 @@ Answer concisely (max 3-4 sentences), with extreme tactical precision, numerical
   const q = message.toLowerCase();
   const target = summary.savingsGoal.targetAmount;
   const remaining = summary.savingsGoal.remaining;
-  const daysLeft = Math.max(1, 30 - new Date().getDate());
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysLeft = Math.max(1, daysInMonth - now.getDate());
 
   if (q.includes('target') || q.includes('save') || q.includes('goal')) {
     if (remaining <= 0) {

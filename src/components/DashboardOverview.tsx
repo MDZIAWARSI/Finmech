@@ -78,16 +78,40 @@ export function DashboardOverview({
     return <ArrowUpRight className="w-4 h-4 text-neutral-800 dark:text-neutral-200" />;
   };
 
-  // 7-day trend points
-  const trendData = [
-    { day: 'Mon', amount: Math.round(summary.dailyAverageSpend * 0.7) },
-    { day: 'Tue', amount: Math.round(summary.dailyAverageSpend * 1.2) },
-    { day: 'Wed', amount: Math.round(summary.dailyAverageSpend * 0.5) },
-    { day: 'Thu', amount: Math.round(summary.dailyAverageSpend * 1.4) },
-    { day: 'Fri', amount: Math.round(summary.dailyAverageSpend * 0.9) },
-    { day: 'Sat', amount: Math.round(summary.dailyAverageSpend * 1.6) },
-    { day: 'Sun', amount: Math.round(summary.dailyAverageSpend * 0.8) },
-  ];
+  // Real 7-day trend points computed from actual personal expense transactions
+  const trendData = useMemo(() => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const now = new Date();
+    const result: { day: string; amount: number; fullDate: string }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(now.getDate() - i);
+      const dayName = days[d.getDay()];
+      const dateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      result.push({ day: dayName, amount: 0, fullDate: dateString });
+    }
+
+    recentTransactions.forEach((tx) => {
+      if (tx.type === 'expense' && tx.pocket !== 'business') {
+        const isAdj =
+          tx.category === 'Cash Audit Reconciliation' ||
+          tx.category === 'Business Capital Adjustment' ||
+          tx.category === 'Starting Balance' ||
+          tx.category === 'Initial Balance' ||
+          tx.category === 'Starting Balance / Deposit';
+        if (isAdj) return;
+
+        const d = new Date(tx.date);
+        const txDateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const match = result.find((r) => r.fullDate === txDateString);
+        if (match) {
+          match.amount += tx.amount;
+        }
+      }
+    });
+
+    return result.map((r) => ({ day: r.day, amount: r.amount }));
+  }, [recentTransactions]);
 
   // Category breakdown for pie chart
   const pieSlices = summary.categoryBreakdown.map((c) => ({
@@ -97,13 +121,18 @@ export function DashboardOverview({
   }));
 
   // Sparkline data points for the mini-chart inside Spent tile (Reference Image 7)
-  const miniSparklinePoints = [30, 45, 25, 60, 40, 75, 55];
+  const miniSparklinePoints = useMemo(() => {
+    const amounts = trendData.map((d) => d.amount);
+    const hasValues = amounts.some((a) => a > 0);
+    return hasValues ? amounts : [0, 0, 0, 0, 0, 0, 0];
+  }, [trendData]);
   const sparkWidth = 100;
   const sparkHeight = 28;
   const maxSpark = Math.max(...miniSparklinePoints);
+  const maxVal = maxSpark > 0 ? maxSpark : 1;
   const sparkPath = miniSparklinePoints.reduce((acc, val, i) => {
     const x = (i / (miniSparklinePoints.length - 1)) * sparkWidth;
-    const y = sparkHeight - (val / maxSpark) * (sparkHeight - 4);
+    const y = maxSpark > 0 ? sparkHeight - (val / maxVal) * (sparkHeight - 4) : sparkHeight / 2;
     return i === 0 ? `M ${x} ${y}` : `${acc} L ${x} ${y}`;
   }, '');
 

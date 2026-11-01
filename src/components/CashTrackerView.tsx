@@ -20,7 +20,7 @@ interface CashTrackerViewProps {
   currency?: string;
   onUpdateDenominations: (newCounts: CashDenominationCount) => void;
   onAtmWithdrawal: (amount: number) => void;
-  onOpenQuickEntry: () => void;
+  onOpenQuickEntry: (params?: any) => void;
 }
 
 export function CashTrackerView({
@@ -35,7 +35,7 @@ export function CashTrackerView({
   const [isSavedNotice, setIsSavedNotice] = useState(false);
 
   const physicalTotal = calculateDenominationTotal(counts);
-  const variance = physicalTotal - cashInHand;
+  const difference = physicalTotal - cashInHand;
 
   const handleAdjustCount = (denom: keyof CashDenominationCount, delta: number) => {
     const updated = {
@@ -73,13 +73,22 @@ export function CashTrackerView({
             Physical Pocket Wallet
           </span>
 
-          <button
-            onClick={onOpenQuickEntry}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:opacity-90 transition-opacity shadow-xs"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add Spend
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => onOpenQuickEntry({ type: 'income', pocket: 'cash', category: 'Starting Balance / Deposit' })}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Cash
+            </button>
+            <button
+              onClick={() => onOpenQuickEntry({ type: 'expense', pocket: 'cash' })}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:opacity-90 transition-opacity shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Log Spend
+            </button>
+          </div>
         </div>
 
         {/* Large Stark Typographic Display */}
@@ -88,18 +97,27 @@ export function CashTrackerView({
         </div>
 
         <div className="text-xs text-neutral-400 dark:text-neutral-500 mt-2 flex items-center gap-2">
-          <span>Physical counted: <strong className="text-neutral-800 dark:text-neutral-200">{currency}{physicalTotal.toLocaleString('en-IN')}</strong></span>
-          {variance !== 0 && (
-            <span className={`font-semibold ${variance > 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
-              ({variance > 0 ? `+${currency}${variance}` : `-${currency}${Math.abs(variance)}`} variance)
+          <span>Counted in notes: <strong className="text-neutral-800 dark:text-neutral-200">{currency}{physicalTotal.toLocaleString('en-IN')}</strong></span>
+          {difference !== 0 ? (
+            <span className={`font-semibold ${difference > 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+              ({difference > 0 ? `+${currency}${difference} unapplied` : `-${currency}${Math.abs(difference)} unapplied`} • tap "Apply to Wallet")
+            </span>
+          ) : (
+            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+              ✓ Notes match wallet
             </span>
           )}
         </div>
 
         {/* Rapid ATM Refill Buttons (Minimalist Pill Row) */}
         <div className="pt-6">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-2">
-            Instant ATM Refill (Bank → Cash)
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+              ATM Cash Refill
+            </span>
+            <span className="text-[10px] text-neutral-400">
+              Draws money from Bank into Cash
+            </span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {[500, 2000, 5000].map((amt) => (
@@ -107,6 +125,7 @@ export function CashTrackerView({
                 key={amt}
                 onClick={() => onAtmWithdrawal(amt)}
                 className="py-2.5 px-3 rounded-2xl bg-neutral-100/70 dark:bg-[#141417] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-1.5 text-xs font-semibold transition-all active:scale-95"
+                title={`Transfer ${currency}${amt} from Bank to Cash`}
               >
                 <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-500" />
                 +{currency}{amt.toLocaleString()}
@@ -121,10 +140,10 @@ export function CashTrackerView({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-              Notes & Coins Denomination Audit
+              Count Actual Notes in Hand
             </h2>
             <p className="text-xs text-neutral-400 mt-0.5">
-              Tally real physical notes in hand
+              Tally your physical 500, 200, 100 notes
             </p>
           </div>
 
@@ -144,7 +163,7 @@ export function CashTrackerView({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-xs hover:opacity-90 transition-opacity"
             >
               {isSavedNotice ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <RefreshCw className="w-3.5 h-3.5" />}
-              {isSavedNotice ? 'Verified!' : 'Save & Sync'}
+              {isSavedNotice ? 'Wallet Updated!' : 'Apply to Wallet'}
             </button>
           </div>
         </div>

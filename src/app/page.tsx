@@ -278,7 +278,7 @@ export default function Home() {
         category: 'Cash Audit Reconciliation',
         amount: Math.abs(variance),
         date: new Date().toISOString(),
-        note: 'Physical wallet denomination count audit',
+        note: variance > 0 ? 'Wallet cash count update' : 'Cash count adjustment',
         createdAt: Date.now(),
       };
       const updated = [adjustmentTx, ...transactions];

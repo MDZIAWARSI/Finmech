@@ -30,7 +30,7 @@ interface DashboardOverviewProps {
   recentTransactions: Transaction[];
   currency?: string;
   onNavigateTab: (tab: NavTab) => void;
-  onOpenQuickEntry: () => void;
+  onOpenQuickEntry: (params?: any) => void;
   onOpenTargetModal: () => void;
   onDeleteTransaction?: (id: string) => void;
   onEditTransaction?: (tx: Transaction) => void;
@@ -41,6 +41,7 @@ export function DashboardOverview({
   recentTransactions,
   currency = '₹',
   onNavigateTab,
+  onOpenQuickEntry,
   onOpenTargetModal,
   onDeleteTransaction,
   onEditTransaction,
@@ -333,8 +334,19 @@ export function DashboardOverview({
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 text-[10px] text-neutral-400 truncate group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
-            View logs →
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] text-neutral-400">
+            <span className="group-hover:text-neutral-700 dark:group-hover:text-neutral-300">View logs →</span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenQuickEntry({ type: 'income', pocket: 'bank', category: 'Starting Balance / Deposit' });
+              }}
+              className="font-bold text-blue-600 dark:text-blue-400 hover:underline px-1 py-0.5 rounded"
+              title="Deposit money into Bank"
+            >
+              + Deposit
+            </button>
           </div>
         </div>
 
@@ -361,8 +373,19 @@ export function DashboardOverview({
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 text-[10px] text-neutral-400 truncate group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
-            Audit notes →
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] text-neutral-400">
+            <span className="group-hover:text-neutral-700 dark:group-hover:text-neutral-300">Audit notes →</span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenQuickEntry({ type: 'income', pocket: 'cash', category: 'Starting Balance / Deposit' });
+              }}
+              className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline px-1 py-0.5 rounded"
+              title="Add cash to wallet"
+            >
+              + Add
+            </button>
           </div>
         </div>
 
@@ -389,8 +412,19 @@ export function DashboardOverview({
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 text-[10px] text-neutral-400 truncate group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
-            Manage →
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] text-neutral-400">
+            <span className="group-hover:text-neutral-700 dark:group-hover:text-neutral-300">Manage →</span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenQuickEntry({ type: 'income', pocket: 'business', category: 'Client Payment' });
+              }}
+              className="font-bold text-amber-600 dark:text-amber-400 hover:underline px-1 py-0.5 rounded"
+              title="Add business revenue or capital"
+            >
+              + Add
+            </button>
           </div>
         </div>
       </div>

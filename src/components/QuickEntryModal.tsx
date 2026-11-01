@@ -222,63 +222,71 @@ export function QuickEntryModal({
           </button>
         </div>
 
-        {/* Source Pocket & Destination (if transfer) */}
-        <div className="flex items-center justify-center gap-2 py-2 text-xs">
-          <span className="text-neutral-400">Pocket:</span>
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setPocket('cash')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-medium transition-all ${
-                pocket === 'cash'
-                  ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-900 dark:border-white'
-                  : 'bg-neutral-50 dark:bg-[#1a1a1f] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800'
-              }`}
-            >
-              <Wallet className="w-3 h-3" />
-              Cash
-            </button>
-            <button
-              type="button"
-              onClick={() => setPocket('bank')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-medium transition-all ${
-                pocket === 'bank'
-                  ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-900 dark:border-white'
-                  : 'bg-neutral-50 dark:bg-[#1a1a1f] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800'
-              }`}
-            >
-              <Landmark className="w-3 h-3" />
-              Bank
-            </button>
-            <button
-              type="button"
-              onClick={() => setPocket('business')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-medium transition-all ${
-                pocket === 'business'
-                  ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-900 dark:border-white'
-                  : 'bg-neutral-50 dark:bg-[#1a1a1f] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800'
-              }`}
-            >
-              <Briefcase className="w-3 h-3" />
-              Business
-            </button>
+        {/* Account Selector: Where is money going / coming from? */}
+        <div className="bg-neutral-50 dark:bg-[#16161a] p-2.5 rounded-2xl border border-neutral-200/60 dark:border-neutral-800/60 my-1">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5 text-center">
+            {type === 'income' ? 'Deposit Into Account:' : type === 'expense' ? 'Pay From Account:' : 'Transfer Between Accounts:'}
           </div>
 
-          {type === 'transfer' && (
-            <>
-              <ArrowRight className="w-3.5 h-3.5 text-neutral-400" />
-              <select
-                value={toPocket}
-                onChange={(e) => setToPocket(e.target.value as PocketType)}
-                aria-label="Destination pocket"
-                className="px-2 py-1 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs font-medium text-neutral-800 dark:text-neutral-200 focus:outline-none"
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setPocket('bank')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all ${
+                  pocket === 'bank'
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                    : 'bg-white dark:bg-[#1f1f26] text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700 hover:border-neutral-400'
+                }`}
               >
-                <option value="cash">Cash</option>
-                <option value="bank">Bank</option>
-                <option value="business">Business</option>
-              </select>
-            </>
-          )}
+                <Landmark className="w-3.5 h-3.5" />
+                Bank
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPocket('cash')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all ${
+                  pocket === 'cash'
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                    : 'bg-white dark:bg-[#1f1f26] text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700 hover:border-neutral-400'
+                }`}
+              >
+                <Wallet className="w-3.5 h-3.5" />
+                Cash
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPocket('business')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all ${
+                  pocket === 'business'
+                    ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
+                    : 'bg-white dark:bg-[#1f1f26] text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700 hover:border-neutral-400'
+                }`}
+              >
+                <Briefcase className="w-3.5 h-3.5" />
+                Business
+              </button>
+            </div>
+
+            {type === 'transfer' && (
+              <div className="flex items-center gap-1.5 pl-1 border-l border-neutral-200 dark:border-neutral-700">
+                <ArrowRight className="w-3.5 h-3.5 text-neutral-400" />
+                <span className="text-[10px] text-neutral-400 font-bold">To:</span>
+                <select
+                  value={toPocket}
+                  onChange={(e) => setToPocket(e.target.value as PocketType)}
+                  aria-label="Destination pocket"
+                  className="px-2.5 py-1.5 bg-white dark:bg-[#1f1f26] border border-neutral-200 dark:border-neutral-700 rounded-xl text-xs font-bold text-neutral-900 dark:text-white focus:outline-none"
+                >
+                  <option value="bank">Bank</option>
+                  <option value="cash">Cash</option>
+                  <option value="business">Business</option>
+                </select>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Amount Display (Revolut aesthetic) */}

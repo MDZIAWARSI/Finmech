@@ -18,7 +18,8 @@ import {
   ReceiptText,
   Edit3,
   Trash2,
-  Landmark
+  Landmark,
+  Calendar
 } from 'lucide-react';
 import { FinancialSummary, Transaction } from '@/types/finance';
 import { NavTab } from './Navbar';
@@ -334,15 +335,15 @@ export function DashboardOverview({
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] text-neutral-400">
-            <span className="group-hover:text-neutral-700 dark:group-hover:text-neutral-300">View logs →</span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between gap-1 text-[10px]">
+            <span className="text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-300 truncate whitespace-nowrap">Logs →</span>
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenQuickEntry({ type: 'income', pocket: 'bank', category: 'Starting Balance / Deposit' });
               }}
-              className="font-bold text-blue-600 dark:text-blue-400 hover:underline px-1 py-0.5 rounded"
+              className="font-bold text-blue-600 dark:text-blue-400 hover:underline px-1 py-0.5 rounded shrink-0 whitespace-nowrap"
               title="Deposit money into Bank"
             >
               + Deposit
@@ -373,15 +374,15 @@ export function DashboardOverview({
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] text-neutral-400">
-            <span className="group-hover:text-neutral-700 dark:group-hover:text-neutral-300">Audit notes →</span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between gap-1 text-[10px]">
+            <span className="text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-300 truncate whitespace-nowrap">Audit →</span>
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenQuickEntry({ type: 'income', pocket: 'cash', category: 'Starting Balance / Deposit' });
               }}
-              className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline px-1 py-0.5 rounded"
+              className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline px-1 py-0.5 rounded shrink-0 whitespace-nowrap"
               title="Add cash to wallet"
             >
               + Add
@@ -412,15 +413,15 @@ export function DashboardOverview({
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] text-neutral-400">
-            <span className="group-hover:text-neutral-700 dark:group-hover:text-neutral-300">Manage →</span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between gap-1 text-[10px]">
+            <span className="text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-300 truncate whitespace-nowrap">Manage →</span>
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenQuickEntry({ type: 'income', pocket: 'business', category: 'Client Payment' });
               }}
-              className="font-bold text-amber-600 dark:text-amber-400 hover:underline px-1 py-0.5 rounded"
+              className="font-bold text-amber-600 dark:text-amber-400 hover:underline px-1 py-0.5 rounded shrink-0 whitespace-nowrap"
               title="Add business revenue or capital"
             >
               + Add
@@ -436,11 +437,11 @@ export function DashboardOverview({
         aria-label="Visual Analytics Bento"
         className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-4"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#1c1c21] p-1 rounded-full text-xs font-semibold">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#1c1c21] p-1 rounded-full text-xs font-semibold max-w-full overflow-x-auto no-scrollbar shrink-0">
             <button
               onClick={() => setActiveChartTab('distribution')}
-              className={`px-3 py-1 rounded-full transition-all ${
+              className={`px-2.5 sm:px-3 py-1 rounded-full whitespace-nowrap transition-all ${
                 activeChartTab === 'distribution'
                   ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'
                   : 'text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
@@ -450,7 +451,7 @@ export function DashboardOverview({
             </button>
             <button
               onClick={() => setActiveChartTab('trend')}
-              className={`px-3 py-1 rounded-full transition-all ${
+              className={`px-2.5 sm:px-3 py-1 rounded-full whitespace-nowrap transition-all ${
                 activeChartTab === 'trend'
                   ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'
                   : 'text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
@@ -460,7 +461,7 @@ export function DashboardOverview({
             </button>
             <button
               onClick={() => setActiveChartTab('calendar')}
-              className={`px-3 py-1 rounded-full transition-all ${
+              className={`px-2.5 sm:px-3 py-1 rounded-full whitespace-nowrap transition-all ${
                 activeChartTab === 'calendar'
                   ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'
                   : 'text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
@@ -470,7 +471,7 @@ export function DashboardOverview({
             </button>
           </div>
 
-          <span className="text-xs font-semibold text-neutral-400">
+          <span className="hidden sm:inline-block text-xs font-semibold text-neutral-400 whitespace-nowrap">
             {activeChartTab === 'distribution' 
               ? 'Monthly Breakdown' 
               : activeChartTab === 'calendar' 
@@ -548,20 +549,31 @@ export function DashboardOverview({
             </div>
 
             {/* Exact Date Filter */}
-            <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#1c1c21] px-2 py-1 rounded-xl text-xs">
+            <div className="relative flex items-center bg-neutral-100 dark:bg-[#1c1c21] hover:bg-neutral-200/80 dark:hover:bg-[#25252b] px-2.5 py-1 rounded-xl text-xs transition-colors cursor-pointer group shadow-xs">
+              <Calendar className="w-3.5 h-3.5 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 shrink-0 mr-1.5" />
+              <span className="text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 whitespace-nowrap">
+                {dateFilter 
+                  ? new Date(dateFilter + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) 
+                  : 'Date'}
+              </span>
               <input
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="bg-transparent text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 focus:outline-none"
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                 title="Filter by date"
+                aria-label="Filter transactions by date"
               />
               {dateFilter && (
                 <button
                   type="button"
-                  onClick={() => setDateFilter('')}
-                  className="text-[10px] text-neutral-400 hover:text-neutral-800 dark:hover:text-white font-bold ml-0.5"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDateFilter('');
+                  }}
+                  className="relative z-10 text-[10px] text-neutral-400 hover:text-neutral-800 dark:hover:text-white font-bold ml-1.5 p-0.5"
                   title="Clear date filter"
+                  aria-label="Clear date filter"
                 >
                   ✕
                 </button>

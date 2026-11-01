@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, ArrowRight, Delete, Check, Wallet, Landmark, Briefcase } from 'lucide-react';
+import { X, ArrowRight, Delete, Check, Wallet, Landmark, Briefcase, Tag } from 'lucide-react';
 import { TransactionType, PocketType } from '@/types/finance';
 
 interface QuickEntryModalProps {
@@ -157,24 +157,24 @@ export function QuickEntryModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header: Close & Type Toggle */}
-        <div className="flex items-center justify-between pb-3">
+        <div className="flex items-center justify-between pb-3 gap-2">
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shrink-0"
             aria-label="Close"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
 
           {/* Segmented type switcher */}
-          <div className="flex items-center bg-neutral-100 dark:bg-[#1c1c21] p-1 rounded-full text-xs font-medium">
+          <div className="flex items-center bg-neutral-100 dark:bg-[#1c1c21] p-1 rounded-full text-xs font-semibold shrink-0">
             <button
               type="button"
               onClick={() => {
                 setType('expense');
                 setCategory('Food & Dining');
               }}
-              className={`px-3 py-1 rounded-full transition-all ${
+              className={`px-3 py-1 rounded-full whitespace-nowrap transition-all ${
                 type === 'expense'
                   ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'
                   : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300'
@@ -188,7 +188,7 @@ export function QuickEntryModal({
                 setType('income');
                 setCategory('Project Milestone');
               }}
-              className={`px-3 py-1 rounded-full transition-all ${
+              className={`px-3 py-1 rounded-full whitespace-nowrap transition-all ${
                 type === 'income'
                   ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'
                   : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300'
@@ -204,7 +204,7 @@ export function QuickEntryModal({
                 setPocket('bank');
                 setToPocket('cash');
               }}
-              className={`px-3 py-1 rounded-full transition-all ${
+              className={`px-3 py-1 rounded-full whitespace-nowrap transition-all ${
                 type === 'transfer'
                   ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs'
                   : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300'
@@ -216,7 +216,7 @@ export function QuickEntryModal({
 
           <button
             onClick={handleClear}
-            className="text-xs font-medium text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 px-2 py-1"
+            className="text-xs font-medium text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 px-2 py-1 shrink-0"
           >
             Reset
           </button>
@@ -303,27 +303,25 @@ export function QuickEntryModal({
 
         {/* Category Picker & Note row */}
         <div className="mb-3 space-y-2">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowCategoryPicker(!showCategoryPicker)}
-              className="flex-1 py-2 px-3 bg-neutral-100 dark:bg-[#1c1c21] rounded-xl text-xs font-medium text-neutral-800 dark:text-neutral-200 flex items-center justify-between border border-neutral-200/50 dark:border-neutral-800 hover:border-neutral-400 transition-colors"
-            >
-              <span className="truncate">Tag: <strong>{category}</strong></span>
-              <span className="text-[10px] text-neutral-400">Change ▾</span>
-            </button>
-            <input
-              type="text"
-              placeholder="Note (optional)..."
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              className="flex-1 py-2 px-3 bg-neutral-100 dark:bg-[#1c1c21] rounded-xl text-xs text-neutral-900 dark:text-white placeholder-neutral-400 border border-neutral-200/50 dark:border-neutral-800 focus:outline-none focus:ring-1 focus:ring-neutral-400"
-            />
-          </div>
+          {/* Category Tag Selector */}
+          <button
+            type="button"
+            onClick={() => setShowCategoryPicker(!showCategoryPicker)}
+            className="w-full py-2.5 px-3.5 bg-neutral-100 dark:bg-[#1c1c21] rounded-xl text-xs font-medium text-neutral-800 dark:text-neutral-200 flex items-center justify-between border border-neutral-200/60 dark:border-neutral-800 hover:border-neutral-400 transition-colors shadow-xs"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <Tag className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+              <span className="text-neutral-400 shrink-0">Category:</span>
+              <span className="font-bold text-neutral-900 dark:text-white truncate">{category}</span>
+            </div>
+            <span className="text-[11px] font-semibold text-neutral-400 shrink-0 ml-2 whitespace-nowrap">
+              {showCategoryPicker ? 'Done ▲' : 'Change ▾'}
+            </span>
+          </button>
 
           {/* Collapsible Category Options */}
           {showCategoryPicker && (
-            <div className="flex flex-wrap gap-1.5 p-2 bg-neutral-50 dark:bg-[#18181b] rounded-xl border border-neutral-200/80 dark:border-neutral-800 max-h-28 overflow-y-auto no-scrollbar">
+            <div className="flex flex-wrap gap-1.5 p-2.5 bg-neutral-50 dark:bg-[#18181b] rounded-xl border border-neutral-200/80 dark:border-neutral-800 max-h-32 overflow-y-auto no-scrollbar animate-in fade-in duration-150">
               {currentCategoryList.map((cat) => (
                 <button
                   key={cat}
@@ -334,8 +332,8 @@ export function QuickEntryModal({
                   }}
                   className={`px-2.5 py-1 text-[11px] font-medium rounded-lg transition-all ${
                     category === cat
-                      ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
-                      : 'bg-white dark:bg-[#202025] text-neutral-700 dark:text-neutral-300 border border-neutral-200/60 dark:border-neutral-700/60'
+                      ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-bold'
+                      : 'bg-white dark:bg-[#202025] text-neutral-700 dark:text-neutral-300 border border-neutral-200/60 dark:border-neutral-700/60 hover:bg-neutral-100 dark:hover:bg-[#282830]'
                   }`}
                 >
                   {cat}
@@ -343,6 +341,17 @@ export function QuickEntryModal({
               ))}
             </div>
           )}
+
+          {/* Note Input */}
+          <div>
+            <input
+              type="text"
+              placeholder="Note (optional, e.g. Lunch with team)..."
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              className="w-full py-2.5 px-3.5 bg-neutral-100 dark:bg-[#1c1c21] rounded-xl text-xs text-neutral-900 dark:text-white placeholder-neutral-400 border border-neutral-200/60 dark:border-neutral-800 focus:outline-none focus:ring-1 focus:ring-neutral-400 shadow-xs"
+            />
+          </div>
         </div>
 
         {/* Tactile 12-key Numpad (Revolut-style) */}

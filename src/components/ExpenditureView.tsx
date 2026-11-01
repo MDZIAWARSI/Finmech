@@ -304,11 +304,11 @@ export function ExpenditureView({
       {/* Interactive Trend Graph, Pie Chart & Real Calendar for Selected Month */}
       {(monthCategoryBreakdown.length > 0 || viewMode === 'calendar') && (
         <section aria-label="Visual month charts" className="pt-2">
-          <div className="flex items-center justify-between pb-3">
-            <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#141417] p-1 rounded-full text-xs font-medium">
+          <div className="flex items-center justify-between gap-2 pb-3">
+            <div className="flex items-center gap-1 bg-neutral-100 dark:bg-[#141417] p-1 rounded-full text-xs font-medium max-w-full overflow-x-auto no-scrollbar shrink-0">
               <button
                 onClick={() => setViewMode('trend')}
-                className={`px-3 py-1 rounded-full transition-all ${
+                className={`px-2.5 sm:px-3 py-1 rounded-full whitespace-nowrap transition-all ${
                   viewMode === 'trend'
                     ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white font-semibold shadow-xs'
                     : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
@@ -318,7 +318,7 @@ export function ExpenditureView({
               </button>
               <button
                 onClick={() => setViewMode('chart')}
-                className={`px-3 py-1 rounded-full transition-all ${
+                className={`px-2.5 sm:px-3 py-1 rounded-full whitespace-nowrap transition-all ${
                   viewMode === 'chart'
                     ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white font-semibold shadow-xs'
                     : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
@@ -328,7 +328,7 @@ export function ExpenditureView({
               </button>
               <button
                 onClick={() => setViewMode('calendar')}
-                className={`px-3 py-1 rounded-full transition-all ${
+                className={`px-2.5 sm:px-3 py-1 rounded-full whitespace-nowrap transition-all ${
                   viewMode === 'calendar'
                     ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white font-semibold shadow-xs'
                     : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
@@ -338,7 +338,7 @@ export function ExpenditureView({
               </button>
             </div>
 
-            <span className="text-xs text-neutral-400 font-medium">
+            <span className="hidden sm:inline-block text-xs text-neutral-400 font-medium whitespace-nowrap">
               {viewMode === 'trend'
                 ? `${activeMonthLabel} Velocity`
                 : viewMode === 'calendar'

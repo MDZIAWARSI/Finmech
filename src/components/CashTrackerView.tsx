@@ -51,6 +51,19 @@ export function CashTrackerView({
     setTimeout(() => setIsSavedNotice(false), 2500);
   };
 
+  const handleResetToZero = () => {
+    const zeroCounts: CashDenominationCount = {
+      500: 0,
+      200: 0,
+      100: 0,
+      50: 0,
+      20: 0,
+      10: 0,
+      coins: 0,
+    };
+    setCounts(zeroCounts);
+  };
+
   return (
     <div className="space-y-8 pb-32 pt-2">
       {/* Hero Physical Cash: Borderless & High Whitespace */}
@@ -115,13 +128,25 @@ export function CashTrackerView({
             </p>
           </div>
 
-          <button
-            onClick={handleSaveAndSync}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-xs hover:opacity-90 transition-opacity"
-          >
-            {isSavedNotice ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <RefreshCw className="w-3.5 h-3.5" />}
-            {isSavedNotice ? 'Verified!' : 'Save & Sync'}
-          </button>
+          <div className="flex items-center gap-1.5">
+            {physicalTotal > 0 && (
+              <button
+                type="button"
+                onClick={handleResetToZero}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold text-neutral-500 hover:text-red-500 bg-neutral-100 dark:bg-neutral-800 transition-colors"
+                title="Reset all note counts to 0"
+              >
+                Reset to 0
+              </button>
+            )}
+            <button
+              onClick={handleSaveAndSync}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-xs hover:opacity-90 transition-opacity"
+            >
+              {isSavedNotice ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <RefreshCw className="w-3.5 h-3.5" />}
+              {isSavedNotice ? 'Verified!' : 'Save & Sync'}
+            </button>
+          </div>
         </div>
 
         {/* Denomination rows */}

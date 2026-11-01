@@ -125,21 +125,11 @@ export function computeFinancialSummary(
     }
   });
 
-  // If no transactions exist for cash yet, use manualCashAdjusted (denomination count) as starting baseline
-  const hasCashTransactions = transactions.some(
-    (t) => t.pocket === 'cash' || t.toPocket === 'cash'
-  );
-  if (!hasCashTransactions && typeof manualCashAdjusted === 'number') {
-    cashBalance = manualCashAdjusted;
-  }
-
-  // When transactions exist for business, the ledger calculation is authoritative so new entries update the balance.
-  // If no business transactions exist yet, use manualBusinessAdjusted as starting baseline.
-  const hasBusinessTransactions = transactions.some(
-    (t) => t.pocket === 'business' || t.toPocket === 'business'
-  );
-  if (!hasBusinessTransactions && typeof manualBusinessAdjusted === 'number') {
-    businessBalance = manualBusinessAdjusted;
+  // If transactions list is empty, all pocket balances must be strictly zero (no ghost balances)
+  if (transactions.length === 0) {
+    cashBalance = 0;
+    bankBalance = 0;
+    businessBalance = 0;
   }
 
   // Pure personal liquid net balance: Cash in Hand + Personal Bank

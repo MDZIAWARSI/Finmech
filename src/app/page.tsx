@@ -167,6 +167,22 @@ export default function Home() {
     }
   }, [summary.businessBalance, mounted, user?.uid]);
 
+  // When user has zero transactions, ensure balances and counters start at absolute zero
+  useEffect(() => {
+    if (mounted && transactions.length === 0) {
+      if (calculateDenominationTotal(denominations) > 0) {
+        setDenominations(DEFAULT_DENOMINATIONS);
+        saveDenominations(DEFAULT_DENOMINATIONS, user?.uid);
+        if (user?.uid) updateDenominationsInCloud(user.uid, DEFAULT_DENOMINATIONS);
+      }
+      if (manualBusinessBalance && manualBusinessBalance > 0) {
+        setManualBusinessBalance(0);
+        saveLiveBusinessBalance(0, user?.uid);
+        if (user?.uid) updateBusinessBalanceInCloud(user.uid, 0);
+      }
+    }
+  }, [transactions.length, mounted]);
+
   // Actions
   const handleAddTransaction = (entry: {
     type: TransactionType;
@@ -197,11 +213,40 @@ export default function Home() {
   };
 
   const handleDeleteTransaction = (id: string) => {
+    const deletedTx = transactions.find((t) => t.id === id);
     const updated = transactions.filter((t) => t.id !== id);
     setTransactions(updated);
     saveTransactions(updated, user?.uid);
     if (user?.uid) {
       deleteTransactionFromCloud(user.uid, id);
+    }
+
+    // If deleting an ATM withdrawal, deduct the added ₹500 notes from wallet counter
+    if (deletedTx && deletedTx.type === 'transfer' && deletedTx.toPocket === 'cash') {
+      const notesToRemove = Math.floor(deletedTx.amount / 500);
+      if (notesToRemove > 0) {
+        const updatedDenoms = {
+          ...denominations,
+          500: Math.max(0, (denominations[500] || 0) - notesToRemove),
+        };
+        setDenominations(updatedDenoms);
+        saveDenominations(updatedDenoms, user?.uid);
+        if (user?.uid) {
+          updateDenominationsInCloud(user.uid, updatedDenoms);
+        }
+      }
+    }
+
+    // If all transactions have been deleted, reset all pockets, physical denominations, and business counts to absolute zero
+    if (updated.length === 0) {
+      setDenominations(DEFAULT_DENOMINATIONS);
+      saveDenominations(DEFAULT_DENOMINATIONS, user?.uid);
+      setManualBusinessBalance(0);
+      saveLiveBusinessBalance(0, user?.uid);
+      if (user?.uid) {
+        updateDenominationsInCloud(user.uid, DEFAULT_DENOMINATIONS);
+        updateBusinessBalanceInCloud(user.uid, 0);
+      }
     }
   };
 

@@ -154,7 +154,7 @@ export default function Home() {
   const summary = computeFinancialSummary(
     transactions,
     profile.monthlySavingsTarget,
-    undefined,
+    calculateDenominationTotal(denominations),
     manualBusinessBalance,
     currentDate
   );
@@ -221,28 +221,6 @@ export default function Home() {
     if (user?.uid) {
       updateDenominationsInCloud(user.uid, newCounts);
     }
-
-    // Calculate physical cash total and create an adjustment transaction if there is variance
-    const physicalTotal = calculateDenominationTotal(newCounts);
-    const variance = physicalTotal - summary.cashInHand;
-    if (variance !== 0) {
-      const adjustmentTx: Transaction = {
-        id: `tx_adj_${Date.now()}`,
-        type: variance > 0 ? 'income' : 'expense',
-        pocket: 'cash',
-        category: 'Cash Audit Reconciliation',
-        amount: Math.abs(variance),
-        date: new Date().toISOString(),
-        note: `Denomination count audit adjustment`,
-        createdAt: Date.now(),
-      };
-      const updated = [adjustmentTx, ...transactions];
-      setTransactions(updated);
-      saveTransactions(updated, user?.uid);
-      if (user?.uid) {
-        addTransactionToCloud(user.uid, adjustmentTx);
-      }
-    }
   };
 
   const handleAtmWithdrawal = (amount: number) => {
@@ -270,27 +248,6 @@ export default function Home() {
     saveLiveBusinessBalance(newBalance, user?.uid);
     if (user?.uid) {
       updateBusinessBalanceInCloud(user.uid, newBalance);
-    }
-
-    // Also record a business capital adjustment transaction for ledger alignment
-    const variance = newBalance - summary.businessBalance;
-    if (variance !== 0) {
-      const adjTx: Transaction = {
-        id: `tx_biz_adj_${Date.now()}`,
-        type: variance > 0 ? 'income' : 'expense',
-        pocket: 'business',
-        category: 'Business Capital Adjustment',
-        amount: Math.abs(variance),
-        date: new Date().toISOString(),
-        note: 'Live business count manual update',
-        createdAt: Date.now(),
-      };
-      const updated = [adjTx, ...transactions];
-      setTransactions(updated);
-      saveTransactions(updated, user?.uid);
-      if (user?.uid) {
-        addTransactionToCloud(user.uid, adjTx);
-      }
     }
   };
 

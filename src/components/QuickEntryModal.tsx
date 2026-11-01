@@ -34,9 +34,10 @@ const EXPENSE_CATEGORIES = [
 ];
 
 const INCOME_CATEGORIES = [
-  'Project Milestone',
+  'Starting Balance / Deposit',
   'Salary / Retainer',
   'Client Payment',
+  'Project Milestone',
   'Investment Return',
   'Other Income',
 ];

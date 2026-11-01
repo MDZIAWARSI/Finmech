@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Eye, 
   EyeOff, 
@@ -17,7 +17,8 @@ import {
   ArrowUpRight,
   ReceiptText,
   Edit3,
-  Trash2
+  Trash2,
+  Landmark
 } from 'lucide-react';
 import { FinancialSummary, Transaction } from '@/types/finance';
 import { NavTab } from './Navbar';
@@ -45,6 +46,15 @@ export function DashboardOverview({
 }: DashboardOverviewProps) {
   const [hideBalances, setHideBalances] = useState(false);
   const [activeChartTab, setActiveChartTab] = useState<'distribution' | 'trend'>('distribution');
+  const [movementFilter, setMovementFilter] = useState<'all' | 'bank' | 'cash' | 'business'>('all');
+  const [showAllMovements, setShowAllMovements] = useState(false);
+
+  const filteredMovements = useMemo(() => {
+    if (movementFilter === 'all') return recentTransactions;
+    return recentTransactions.filter((tx) => tx.pocket === movementFilter || tx.toPocket === movementFilter);
+  }, [recentTransactions, movementFilter]);
+
+  const displayedMovements = showAllMovements ? filteredMovements : filteredMovements.slice(0, 6);
 
   const formatAmount = (val: number) => {
     if (hideBalances) return '••••••';
@@ -227,70 +237,97 @@ export function DashboardOverview({
           </div>
         </div>
 
-        {/* Bento Tile 3: Cash in Hand + Pocket Wallet */}
+      </div>
+
+      {/* =========================================================================
+          THE 3 LIQUID POCKETS: Bank Account, Cash in Hand, Live Business
+          ========================================================================= */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-1">
+        {/* Pocket 1: Bank Balance */}
         <div
-          onClick={() => onNavigateTab('cash')}
-          className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 active:scale-[0.97] transition-all cursor-pointer group flex flex-col justify-between"
+          onClick={() => {
+            setMovementFilter('bank');
+            const el = document.getElementById('recent-movements-section');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="rounded-2xl sm:rounded-3xl p-3 sm:p-4 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 active:scale-[0.97] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
-            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1 sm:gap-1.5 truncate">
-                <Wallet className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">Cash in Hand</span>
+            <div className="flex items-center justify-between mb-1 sm:mb-1.5">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1 truncate">
+                <Landmark className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                <span className="truncate">Bank</span>
               </span>
               <ChevronRight className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors shrink-0" />
             </div>
 
-            <div className="text-xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight truncate">
-              {formatAmount(summary.cashInHand)}
+            <div className="text-base sm:text-2xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight truncate">
+              {formatAmount(summary.bankBalance)}
             </div>
 
-            <div className="mt-2.5 flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[10px] font-semibold text-neutral-600 dark:text-neutral-400">
-                Wallet Cash
-              </span>
+            <div className="mt-1 text-[10px] text-neutral-400 truncate">
+              Digital / UPI
             </div>
           </div>
 
-          <div className="mt-3 pt-2.5 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] sm:text-xs text-neutral-400">
-            <span className="truncate">Physical notes</span>
-            <span className="font-semibold text-neutral-700 dark:text-neutral-300 hidden sm:inline group-hover:underline">
-              Audit →
-            </span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 text-[10px] text-neutral-400 truncate group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
+            View logs →
           </div>
         </div>
 
-        {/* Bento Tile 4: Live Business Capital + Revenue Inflow */}
+        {/* Pocket 2: Cash in Hand */}
         <div
-          onClick={() => onNavigateTab('business')}
-          className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 active:scale-[0.97] transition-all cursor-pointer group flex flex-col justify-between"
+          onClick={() => onNavigateTab('cash')}
+          className="rounded-2xl sm:rounded-3xl p-3 sm:p-4 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 active:scale-[0.97] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
-            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1 sm:gap-1.5 truncate">
-                <Briefcase className="w-3.5 h-3.5 shrink-0" />
+            <div className="flex items-center justify-between mb-1 sm:mb-1.5">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1 truncate">
+                <Wallet className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="truncate">Cash</span>
+              </span>
+              <ChevronRight className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors shrink-0" />
+            </div>
+
+            <div className="text-base sm:text-2xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight truncate">
+              {formatAmount(summary.cashInHand)}
+            </div>
+
+            <div className="mt-1 text-[10px] text-neutral-400 truncate">
+              Wallet Notes
+            </div>
+          </div>
+
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 text-[10px] text-neutral-400 truncate group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
+            Audit notes →
+          </div>
+        </div>
+
+        {/* Pocket 3: Live Business */}
+        <div
+          onClick={() => onNavigateTab('business')}
+          className="rounded-2xl sm:rounded-3xl p-3 sm:p-4 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:border-neutral-400 dark:hover:border-neutral-700 active:scale-[0.97] transition-all cursor-pointer group flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-1 sm:mb-1.5">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1 truncate">
+                <Briefcase className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                 <span className="truncate">Business</span>
               </span>
               <ChevronRight className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors shrink-0" />
             </div>
 
-            <div className="text-xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight truncate">
+            <div className="text-base sm:text-2xl font-extrabold text-neutral-900 dark:text-white tabular-nums tracking-tight truncate">
               {formatAmount(summary.businessBalance)}
             </div>
 
-            <div className="mt-2.5 flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200/40 dark:border-emerald-900/40">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Count
-              </span>
+            <div className="mt-1 text-[10px] text-neutral-400 truncate">
+              Division Money
             </div>
           </div>
 
-          <div className="mt-3 pt-2.5 border-t border-neutral-100 dark:border-neutral-800/60 flex items-center justify-between text-[10px] sm:text-xs text-neutral-400">
-            <span className="truncate">Active Capital</span>
-            <span className="font-semibold text-neutral-700 dark:text-neutral-300 hidden sm:inline group-hover:underline">
-              Manage →
-            </span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 text-[10px] text-neutral-400 truncate group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
+            Manage →
           </div>
         </div>
       </div>
@@ -351,31 +388,54 @@ export function DashboardOverview({
       </section>
 
       {/* =========================================================================
-          BENTO TILE 6: Recent Movements Activity Stream (Full-Width Bento Tile)
+          RECENT MOVEMENTS ACTIVITY STREAM (With Pocket Filter & Full Ledger Access)
           ========================================================================= */}
       <section 
+        id="recent-movements-section"
         aria-label="Recent Movements Bento"
         className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-3"
       >
-        <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-neutral-800/60">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
-            Recent Movements
-          </h2>
-          <button
-            onClick={() => onNavigateTab('spends')}
-            className="text-xs font-bold text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors"
-          >
-            All Spends ({recentTransactions.length}) →
-          </button>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-neutral-100 dark:border-neutral-800/60">
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
+              Account Activity Logs
+            </h2>
+            <p className="text-[11px] text-neutral-400 mt-0.5">
+              Click any transaction to edit, reassign pocket (Bank/Business/Cash), or delete
+            </p>
+          </div>
+
+          {/* Pocket Filter Selector */}
+          <div className="flex items-center bg-neutral-100 dark:bg-[#1c1c21] p-0.5 rounded-xl text-xs font-semibold self-start sm:self-auto">
+            {[
+              { id: 'all', label: `All (${recentTransactions.length})` },
+              { id: 'bank', label: 'Bank' },
+              { id: 'cash', label: 'Cash' },
+              { id: 'business', label: 'Business' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setMovementFilter(tab.id as any)}
+                className={`px-2.5 py-1 rounded-lg text-[11px] transition-all ${
+                  movementFilter === tab.id
+                    ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-xs font-bold'
+                    : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
-          {recentTransactions.length === 0 ? (
+          {displayedMovements.length === 0 ? (
             <div className="py-8 text-center text-xs text-neutral-400">
-              No transactions recorded yet. Tap + to add your first entry.
+              No transactions recorded for {movementFilter === 'all' ? 'any account' : movementFilter}. Tap + to add an entry.
             </div>
           ) : (
-            recentTransactions.slice(0, 5).map((tx) => {
+            displayedMovements.map((tx) => {
               const isIncome = tx.type === 'income';
               const isTransfer = tx.type === 'transfer';
               const dateStr = new Date(tx.date).toLocaleDateString('en-US', {
@@ -388,7 +448,7 @@ export function DashboardOverview({
                   key={tx.id}
                   onClick={() => onEditTransaction && onEditTransaction(tx)}
                   className="py-3 px-2 rounded-2xl flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-[#18181b] transition-all group cursor-pointer"
-                  title="Click to edit, reassign account, or delete"
+                  title="Click to edit, reassign account (Bank/Business/Cash), or delete"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-neutral-800/80 flex items-center justify-center shrink-0">
@@ -398,9 +458,19 @@ export function DashboardOverview({
                       <div className="text-xs font-bold text-neutral-900 dark:text-white truncate">
                         {tx.note || tx.category}
                       </div>
-                      <div className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5 truncate">
-                        {dateStr} • <span className="capitalize font-medium text-neutral-600 dark:text-neutral-300">{tx.pocket}</span>
-                        {tx.toPocket && <span> → {tx.toPocket}</span>}
+                      <div className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5 truncate flex items-center gap-1.5">
+                        <span>{dateStr}</span>
+                        <span>•</span>
+                        <span className={`px-1.5 py-0.2 rounded font-semibold capitalize text-[10px] ${
+                          tx.pocket === 'business' 
+                            ? 'bg-amber-100/70 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                            : tx.pocket === 'bank'
+                            ? 'bg-blue-100/70 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400'
+                            : 'bg-emerald-100/70 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+                        }`}>
+                          {tx.pocket}
+                        </span>
+                        {tx.toPocket && <span>→ <span className="capitalize font-semibold">{tx.toPocket}</span></span>}
                       </div>
                     </div>
                   </div>
@@ -433,7 +503,7 @@ export function DashboardOverview({
                             onEditTransaction(tx);
                           }}
                           className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-neutral-700 transition-colors"
-                          title="Edit / Redo"
+                          title="Edit / Move Pocket"
                           aria-label="Edit transaction"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -460,6 +530,19 @@ export function DashboardOverview({
             })
           )}
         </div>
+
+        {/* Show More / Show Less Toggle */}
+        {filteredMovements.length > 6 && (
+          <div className="pt-2 text-center border-t border-neutral-100 dark:border-neutral-800/60">
+            <button
+              type="button"
+              onClick={() => setShowAllMovements(!showAllMovements)}
+              className="px-4 py-1.5 rounded-full text-xs font-semibold text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800 transition-colors"
+            >
+              {showAllMovements ? 'Show Less' : `Show All ${filteredMovements.length} Activity Logs`}
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );

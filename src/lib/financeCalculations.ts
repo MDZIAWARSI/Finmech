@@ -34,9 +34,10 @@ export function computeFinancialSummary(
   let bankBalance = 0;
   let businessBalance = 0;
 
-  // Determine reference time (uses passed date or latest transaction date to remain deterministic)
-  const now = referenceDate || (transactions.length > 0 ? new Date(transactions[0].date) : new Date('2026-10-31T00:00:00Z'));
-  const nowTime = now.getTime();
+  // Determine reference time (uses passed date or latest transaction date to remain deterministic and avoid hydration mismatch)
+  const now = referenceDate || (transactions.length > 0 ? new Date(transactions[0].date) : new Date(0));
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
 
   let monthlyExpenditure = 0;
   let monthlyIncome = 0;
@@ -50,9 +51,16 @@ export function computeFinancialSummary(
 
   transactions.forEach((tx) => {
     const txDate = new Date(tx.date);
-    const txTime = txDate.getTime();
-    // Rolling 31-day activity window or calendar month
-    const isCurrentMonth = Math.abs(nowTime - txTime) <= 31 * 86400000;
+    // True calendar month match so monthly numbers match calendar billing and Spends tab
+    const isCurrentMonth = txDate.getFullYear() === currentYear && txDate.getMonth() === currentMonth;
+
+    // Check if this transaction is an internal baseline setup or adjustment
+    const isInternalAdjustment =
+      tx.category === 'Cash Audit Reconciliation' ||
+      tx.category === 'Business Capital Adjustment' ||
+      tx.category === 'Starting Balance' ||
+      tx.category === 'Initial Balance' ||
+      tx.category === 'Starting Balance / Deposit';
 
     if (tx.type === 'expense') {
       if (tx.pocket === 'cash') cashBalance -= tx.amount;
@@ -62,7 +70,7 @@ export function computeFinancialSummary(
         totalBusinessOutflow += tx.amount;
       }
 
-      if (isCurrentMonth) {
+      if (isCurrentMonth && !isInternalAdjustment) {
         // Keep business spends separate: only personal spends (cash/bank) count towards personal monthly expenditure
         if (tx.pocket !== 'business') {
           monthlyExpenditure += tx.amount;
@@ -81,7 +89,7 @@ export function computeFinancialSummary(
         totalBusinessInflow += tx.amount;
       }
 
-      if (isCurrentMonth) {
+      if (isCurrentMonth && !isInternalAdjustment) {
         // Keep business revenue separate: business inflows are NOT personal savings or personal income
         if (tx.pocket !== 'business') {
           monthlyIncome += tx.amount;
@@ -95,11 +103,6 @@ export function computeFinancialSummary(
         businessBalance -= tx.amount;
         if (tx.toPocket === 'bank' || tx.toPocket === 'cash') {
           transferredToPersonal += tx.amount;
-          // When business funds are transferred to personal bank or cash (Owner Draw),
-          // it officially enters personal income towards monthly savings
-          if (isCurrentMonth) {
-            monthlyIncome += tx.amount;
-          }
         }
       }
 

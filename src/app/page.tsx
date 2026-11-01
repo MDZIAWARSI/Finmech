@@ -404,14 +404,6 @@ export default function Home() {
     saveProfile(resetProfile, user?.uid);
   };
 
-  // Clear device cache and re-sync
-  const handleClearLocalCache = () => {
-    clearUserData(user?.uid);
-    setTransactions([]);
-    setDenominations(DEFAULT_DENOMINATIONS);
-    setManualBusinessBalance(0);
-  };
-
   const handleExportData = () => {
     const jsonStr = exportFinancialDataJson(
       transactions, 
@@ -554,7 +546,6 @@ export default function Home() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         onClearAllData={handleClearAllData}
-        onClearLocalCache={handleClearLocalCache}
         onExportData={handleExportData}
       />
     </div>

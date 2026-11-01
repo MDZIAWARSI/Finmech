@@ -8,10 +8,10 @@ import {
   AlertCircle, 
   Download, 
   Trash2, 
-  RefreshCw, 
   LogOut,
   CheckCircle2,
-  Database
+  Database,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -19,7 +19,6 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onClearAllData?: () => Promise<void> | void;
-  onClearLocalCache?: () => void;
   onExportData?: () => void;
 }
 
@@ -27,7 +26,6 @@ export function AuthModal({
   isOpen, 
   onClose,
   onClearAllData,
-  onClearLocalCache,
   onExportData,
 }: AuthModalProps) {
   const { user, signInWithGoogle, signInWithEmail, signUpWithEmail, signOutUser } = useAuth();
@@ -105,13 +103,6 @@ export function AuthModal({
       setErrorMsg('Failed to clear data: ' + err.message);
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleLocalCacheClear = () => {
-    if (onClearLocalCache) {
-      onClearLocalCache();
-      setStatusMsg('Device cache flushed. Re-synced from Google Cloud.');
     }
   };
 
@@ -224,10 +215,25 @@ export function AuthModal({
             {/* Data Management Actions */}
             <div className="space-y-2 pt-1">
               <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-1">
-                Data Management
+                Resources & Data Management
               </label>
 
-              {/* 1. Export JSON Backup */}
+              {/* 1. Download User Guide PDF */}
+              <a
+                href="/finmech_user_guide.pdf"
+                download="Finmech_User_Guide.pdf"
+                className="w-full py-2.5 px-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-[#18181b] text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center justify-between transition-colors shadow-xs group"
+              >
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+                  <span>Download User Guide Handbook</span>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800/60">
+                  PDF
+                </span>
+              </a>
+
+              {/* 2. Export JSON Backup */}
               {onExportData && (
                 <button
                   type="button"
@@ -236,24 +242,9 @@ export function AuthModal({
                 >
                   <div className="flex items-center gap-2">
                     <Download className="w-4 h-4 text-neutral-500" />
-                    <span>Download Financial Backup (JSON)</span>
+                    <span>Download Financial Backup</span>
                   </div>
-                  <span className="text-[10px] text-neutral-400">Export</span>
-                </button>
-              )}
-
-              {/* 2. Clear Local Cache Only */}
-              {onClearLocalCache && (
-                <button
-                  type="button"
-                  onClick={handleLocalCacheClear}
-                  className="w-full py-2.5 px-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-[#18181b] text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center justify-between transition-colors shadow-xs"
-                >
-                  <div className="flex items-center gap-2">
-                    <RefreshCw className="w-4 h-4 text-neutral-500" />
-                    <span>Clear Device Cache & Re-sync</span>
-                  </div>
-                  <span className="text-[10px] text-neutral-400">Cache</span>
+                  <span className="text-[10px] text-neutral-400 font-medium">JSON</span>
                 </button>
               )}
 
@@ -430,6 +421,17 @@ export function AuthModal({
                 {isSubmitting ? 'Authenticating...' : tab === 'signin' ? 'Sign In' : 'Create Account'}
               </button>
             </form>
+
+            <div className="pt-2 text-center border-t border-neutral-100 dark:border-neutral-800/60">
+              <a
+                href="/finmech_user_guide.pdf"
+                download="Finmech_User_Guide.pdf"
+                className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+              >
+                <FileText className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Download Finmech User Guide (PDF)</span>
+              </a>
+            </div>
           </div>
         )}
       </div>
